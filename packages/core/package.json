@@ -1,0 +1,21 @@
+{
+  "name": "@dittojs/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
+    "lint": "eslint src --max-warnings=0",
+    "test": "vitest run --root . --config ../../vitest.config.ts",
+    "clean": "rm -rf dist coverage"
+  }
+}
