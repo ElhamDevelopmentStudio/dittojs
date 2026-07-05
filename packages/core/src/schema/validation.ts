@@ -6,6 +6,7 @@ import type {
   GroupMode,
   ModuleManifest,
   ModuleType,
+  PresetManifest,
   Requirement,
 } from "./types"
 
@@ -259,6 +260,32 @@ export function validateModuleManifest(manifest: ModuleManifest): ManifestValida
     validateFiles(issues, candidate.files, moduleId)
   }
 
+  if (candidate.type === "preset") {
+    const presetCandidate = candidate as Partial<PresetManifest>
+
+    if (!Array.isArray(presetCandidate.selections) || presetCandidate.selections.length === 0) {
+      addIssue(
+        issues,
+        "preset.selections.missing",
+        "Preset manifests must include at least one selection.",
+        "selections",
+        moduleId,
+      )
+    } else {
+      for (const [index, selection] of presetCandidate.selections.entries()) {
+        if (!hasText(selection) || !isValidModuleId(selection)) {
+          addIssue(
+            issues,
+            "preset.selection.invalid",
+            "Preset selections must use valid module IDs.",
+            `selections.${index}`,
+            moduleId,
+          )
+        }
+      }
+    }
+  }
+
   return {
     valid: issues.length === 0,
     issues,
@@ -308,6 +335,34 @@ export function validateCatalog(catalog: ModuleManifest[]): CatalogValidationRes
           "catalog.requirement.moduleId.missing",
           `Requirement references missing module "${requirement.moduleId}".`,
           `catalog.${manifest.id}.requires.${index}.moduleId`,
+          manifest.id,
+        )
+      }
+    }
+  }
+
+  for (const manifest of catalog) {
+    if (manifest.type === "preset") {
+      for (const [index, selection] of manifest.selections.entries()) {
+        if (!moduleIds.has(selection)) {
+          addIssue(
+            issues,
+            "catalog.preset.selection.missing",
+            `Preset selection references missing module "${selection}".`,
+            `catalog.${manifest.id}.selections.${index}`,
+            manifest.id,
+          )
+        }
+      }
+    }
+
+    for (const [defaultKey, defaultModuleId] of Object.entries(manifest.defaults ?? {})) {
+      if (!moduleIds.has(defaultModuleId)) {
+        addIssue(
+          issues,
+          "catalog.default.moduleId.missing",
+          `Default "${defaultKey}" references missing module "${defaultModuleId}".`,
+          `catalog.${manifest.id}.defaults.${defaultKey}`,
           manifest.id,
         )
       }

@@ -17,6 +17,8 @@ export const MODULE_TYPES = [
 
 export type ModuleType = (typeof MODULE_TYPES)[number]
 
+export type NonPresetModuleType = Exclude<ModuleType, "preset">
+
 export const REQUIREMENT_STRENGTHS = ["hard", "soft"] as const
 
 export type RequirementStrength = (typeof REQUIREMENT_STRENGTHS)[number]
@@ -65,9 +67,8 @@ export type UiMetadata = {
   tags?: string[]
 }
 
-export type ModuleManifest = {
+type ModuleManifestBase = {
   id: string
-  type: ModuleType
 
   label: string
   description?: string
@@ -87,4 +88,19 @@ export type ModuleManifest = {
   ui?: UiMetadata
 
   metadata?: Record<string, unknown>
+}
+
+export type StandardModuleManifest = ModuleManifestBase & {
+  type: NonPresetModuleType
+}
+
+export type PresetManifest = ModuleManifestBase & {
+  type: "preset"
+  selections: string[]
+}
+
+export type ModuleManifest = StandardModuleManifest | PresetManifest
+
+export function isPresetManifest(manifest: ModuleManifest): manifest is PresetManifest {
+  return manifest.type === "preset"
 }

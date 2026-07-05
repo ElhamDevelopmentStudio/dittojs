@@ -1,3 +1,13 @@
-import type { ModuleManifest } from "@dittojs/core"
-
-export const catalog: ModuleManifest[] = []
+export { catalog } from "./catalog"
+export * from "./modules/blocks"
+export * from "./modules/components"
+export * from "./modules/forms"
+export * from "./modules/framework"
+export * from "./modules/http"
+export * from "./modules/presets"
+export * from "./modules/primitive-engines"
+export * from "./modules/state"
+export * from "./modules/styling"
+export * from "./modules/tooling"
+export * from "./modules/ui"
+export * from "./modules/validation"

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest"
 
 import { validateCatalog, validateModuleManifest } from "./validation"
-import type { GroupMode, ModuleManifest } from "./types"
+import type { GroupMode, StandardModuleManifest } from "./types"
 
-function validManifest(overrides: Partial<ModuleManifest> = {}): ModuleManifest {
+function validManifest(overrides: Partial<StandardModuleManifest> = {}): StandardModuleManifest {
   return {
     id: "framework.react",
     type: "framework",
@@ -156,6 +156,32 @@ describe("validateModuleManifest", () => {
       expect.arrayContaining([expect.objectContaining({ code: "file.to.duplicate" })]),
     )
   })
+
+  it("passes a valid preset manifest", () => {
+    const result = validateModuleManifest({
+      id: "preset.react",
+      type: "preset",
+      label: "React Preset",
+      selections: ["framework.react"],
+    })
+
+    expect(result.valid).toBe(true)
+    expect(result.issues).toEqual([])
+  })
+
+  it("fails when a preset has no selections", () => {
+    const result = validateModuleManifest({
+      id: "preset.empty",
+      type: "preset",
+      label: "Empty Preset",
+      selections: [],
+    })
+
+    expect(result.valid).toBe(false)
+    expect(result.issues).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: "preset.selections.missing" })]),
+    )
+  })
 })
 
 describe("validateCatalog", () => {
@@ -228,5 +254,40 @@ describe("validateCatalog", () => {
 
     expect(result.valid).toBe(true)
     expect(result.issues).toEqual([])
+  })
+
+  it("fails when a preset selection references a missing module", () => {
+    const result = validateCatalog([
+      {
+        id: "preset.react",
+        type: "preset",
+        label: "React Preset",
+        selections: ["framework.react"],
+      },
+    ])
+
+    expect(result.valid).toBe(false)
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: "catalog.preset.selection.missing" }),
+      ]),
+    )
+  })
+
+  it("fails when a default references a missing module", () => {
+    const result = validateCatalog([
+      validManifest({
+        defaults: {
+          styling: "styling.tailwind",
+        },
+      }),
+    ])
+
+    expect(result.valid).toBe(false)
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: "catalog.default.moduleId.missing" }),
+      ]),
+    )
   })
 })
