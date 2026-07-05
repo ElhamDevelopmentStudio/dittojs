@@ -1,5 +1,7 @@
 import type { ModuleManifest } from "@dittojs/core"
 
+import { packageRange } from "../package-versions"
+
 export const stateManifests: ModuleManifest[] = [
   {
     id: "state.zustand",
@@ -14,9 +16,15 @@ export const stateManifests: ModuleManifest[] = [
     },
     packages: {
       dependencies: {
-        zustand: "latest",
+        zustand: packageRange("zustand"),
       },
     },
+    files: [
+      {
+        from: "state/zustand/files/app-store.ts",
+        to: "src/stores/app-store.ts",
+      },
+    ],
     ui: {
       label: "Zustand",
       recommended: true,

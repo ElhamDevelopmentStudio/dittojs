@@ -9,6 +9,7 @@
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "generate:fixtures": "tsx scripts/generate-fixtures.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "clean": "turbo run clean && rm -rf .turbo coverage dist",
@@ -20,6 +21,7 @@
     "eslint": "^10.6.0",
     "prettier": "^3.9.4",
     "turbo": "^2.10.3",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.62.1",
     "vitest": "^4.1.9"

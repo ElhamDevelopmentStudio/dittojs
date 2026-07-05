@@ -1,5 +1,7 @@
 import type { ModuleManifest } from "@dittojs/core"
 
+import { packageRange } from "../package-versions"
+
 export const formManifests: ModuleManifest[] = [
   {
     id: "form.react-hook-form",
@@ -14,7 +16,7 @@ export const formManifests: ModuleManifest[] = [
     },
     packages: {
       dependencies: {
-        "react-hook-form": "latest",
+        "react-hook-form": packageRange("react-hook-form"),
       },
     },
     ui: {

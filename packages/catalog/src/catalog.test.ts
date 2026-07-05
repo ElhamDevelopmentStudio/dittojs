@@ -9,6 +9,7 @@ import {
 } from "@dittojs/core"
 
 import { catalog } from "./catalog"
+import { packageVersions, type PackageDependencyType } from "./package-versions"
 
 const requiredCapabilities = new Set([
   "component-library.shadcn",
@@ -21,6 +22,14 @@ const requiredCapabilities = new Set([
   "ui.label",
   "validation.schema",
 ])
+const invalidPackageVersions = new Set(["latest", "*", ""])
+const packageVersionIndex: Record<
+  string,
+  {
+    range: string
+    dependencyType: PackageDependencyType
+  }
+> = packageVersions
 
 function moduleIds(manifests: ModuleManifest[]): Set<string> {
   return new Set(manifests.map((manifest) => manifest.id))
@@ -46,6 +55,20 @@ function errorMessages(result: ReturnType<typeof resolveRecipe>): string[] {
   return result.conflicts
     .filter((conflict) => conflict.severity === "error")
     .map((conflict) => conflict.message)
+}
+
+function packageEntries(manifest: ModuleManifest): Array<{
+  bucket: PackageDependencyType
+  packageName: string
+  version: string
+}> {
+  return (["dependencies", "devDependencies", "peerDependencies"] as const).flatMap((bucket) =>
+    Object.entries(manifest.packages?.[bucket] ?? {}).map(([packageName, version]) => ({
+      bucket,
+      packageName,
+      version,
+    })),
+  )
 }
 
 describe("catalog", () => {
@@ -102,6 +125,30 @@ describe("catalog", () => {
     }
   })
 
+  it("uses centralized concrete package ranges", () => {
+    for (const manifest of catalog) {
+      for (const entry of packageEntries(manifest)) {
+        const packageVersion = packageVersionIndex[entry.packageName]
+
+        expect(
+          packageVersion,
+          `${manifest.id} declares ${entry.packageName} without a centralized version policy entry`,
+        ).toBeDefined()
+        expect(
+          invalidPackageVersions.has(entry.version),
+          `${manifest.id} declares invalid version "${entry.version}" for ${entry.packageName}`,
+        ).toBe(false)
+        expect(entry.version, `${manifest.id} should use centralized ${entry.packageName}`).toBe(
+          packageVersion?.range,
+        )
+        expect(
+          packageVersion?.dependencyType,
+          `${manifest.id} declares ${entry.packageName} in the wrong package bucket`,
+        ).toBe(entry.bucket)
+      }
+    }
+  })
+
   it("resolves every preset without blocking conflicts", () => {
     expect(presets().map((preset) => preset.id)).toEqual(
       expect.arrayContaining([
@@ -144,6 +191,12 @@ describe("catalog", () => {
         },
       ]),
     )
+    expect(result.packages.devDependencies).toMatchObject({
+      "@tailwindcss/vite": packageVersions["@tailwindcss/vite"].range,
+      tailwindcss: packageVersions.tailwindcss.range,
+    })
+    expect(result.packages.devDependencies).not.toHaveProperty("postcss")
+    expect(result.packages.devDependencies).not.toHaveProperty("autoprefixer")
   })
 
   it("resolves dashboard and chat presets through nested presets", () => {

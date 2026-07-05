@@ -1,5 +1,7 @@
 import type { ModuleManifest } from "@dittojs/core"
 
+import { packageRange } from "../package-versions"
+
 export const validationManifests: ModuleManifest[] = [
   {
     id: "validation.zod",
@@ -14,7 +16,7 @@ export const validationManifests: ModuleManifest[] = [
     },
     packages: {
       dependencies: {
-        zod: "latest",
+        zod: packageRange("zod"),
       },
     },
     ui: {

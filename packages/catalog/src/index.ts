@@ -1,4 +1,5 @@
 export { catalog } from "./catalog"
+export * from "./package-versions"
 export * from "./modules/blocks"
 export * from "./modules/components"
 export * from "./modules/forms"

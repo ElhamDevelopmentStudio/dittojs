@@ -663,6 +663,14 @@ export function resolveRecipe(input: ResolveInput): ResolvedRecipe {
   detectGroupConflicts()
 
   const collected = collectPackagesAndFiles()
+  const metadata: ResolvedRecipe["metadata"] = {
+    resolvedAt: new Date().toISOString(),
+  }
+
+  if (input.presetId !== undefined) {
+    metadata.preset = input.presetId
+    metadata.presetId = input.presetId
+  }
 
   return {
     userSelections: [...input.userSelections],
@@ -674,8 +682,6 @@ export function resolveRecipe(input: ResolveInput): ResolvedRecipe {
     packages: collected.packages,
     files: collected.files,
     defaultsApplied,
-    metadata: {
-      resolvedAt: new Date().toISOString(),
-    },
+    metadata,
   }
 }

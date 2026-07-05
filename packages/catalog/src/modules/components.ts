@@ -1,5 +1,7 @@
 import type { ModuleManifest } from "@dittojs/core"
 
+import { packageRange } from "../package-versions"
+
 export const componentManifests: ModuleManifest[] = [
   {
     id: "component.button",
@@ -16,7 +18,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     files: [
       {
-        from: "registry/shadcn/components/button/files/button.tsx",
+        from: "shadcn/components/button/files/button.tsx",
         to: "src/components/ui/button.tsx",
       },
     ],
@@ -41,7 +43,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     files: [
       {
-        from: "registry/shadcn/components/input/files/input.tsx",
+        from: "shadcn/components/input/files/input.tsx",
         to: "src/components/ui/input.tsx",
       },
     ],
@@ -66,7 +68,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     files: [
       {
-        from: "registry/shadcn/components/textarea/files/textarea.tsx",
+        from: "shadcn/components/textarea/files/textarea.tsx",
         to: "src/components/ui/textarea.tsx",
       },
     ],
@@ -91,7 +93,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     files: [
       {
-        from: "registry/shadcn/components/label/files/label.tsx",
+        from: "shadcn/components/label/files/label.tsx",
         to: "src/components/ui/label.tsx",
       },
     ],
@@ -116,7 +118,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     files: [
       {
-        from: "registry/shadcn/components/avatar/files/avatar.tsx",
+        from: "shadcn/components/avatar/files/avatar.tsx",
         to: "src/components/ui/avatar.tsx",
       },
     ],
@@ -141,8 +143,8 @@ export const componentManifests: ModuleManifest[] = [
     ],
     files: [
       {
-        from: "registry/shadcn/components/dropdown/files/dropdown-menu.tsx",
-        to: "src/components/ui/dropdown-menu.tsx",
+        from: "shadcn/components/dropdown/files/dropdown.tsx",
+        to: "src/components/ui/dropdown.tsx",
       },
     ],
     ui: {
@@ -166,7 +168,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     files: [
       {
-        from: "registry/shadcn/components/sheet/files/sheet.tsx",
+        from: "shadcn/components/sheet/files/sheet.tsx",
         to: "src/components/ui/sheet.tsx",
       },
     ],
@@ -216,12 +218,12 @@ export const componentManifests: ModuleManifest[] = [
     ],
     packages: {
       dependencies: {
-        "@hookform/resolvers": "latest",
+        "@hookform/resolvers": packageRange("@hookform/resolvers"),
       },
     },
     files: [
       {
-        from: "registry/shadcn/components/form/files/form.tsx",
+        from: "shadcn/components/form/files/form.tsx",
         to: "src/components/ui/form.tsx",
       },
     ],

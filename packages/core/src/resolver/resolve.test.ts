@@ -631,6 +631,10 @@ describe("resolveRecipe", () => {
         presetId: "preset.react",
       },
     ])
+    expect(result.metadata).toMatchObject({
+      preset: "preset.react",
+      presetId: "preset.react",
+    })
   })
 
   it("expands a preset selected by the user", () => {

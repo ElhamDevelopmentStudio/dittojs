@@ -34,6 +34,10 @@ export function createDittoMetadata(input: GenerateProjectInput): DittoGenerated
     generatorPackage: generatorPackage.packageName,
     generatorVersion: input.generatorVersion ?? generatorPackage.version,
     createdAt: createdAtToIsoString(input.createdAt),
+    packageManager:
+      input.packageManager ??
+      readStringMetadataValue(resolvedRecipe.metadata, "packageManager") ??
+      "pnpm",
     userSelections: [...resolvedRecipe.userSelections],
     effectiveSelections: [...resolvedRecipe.effectiveSelections],
     packages: resolvedRecipe.packages,
@@ -41,9 +45,25 @@ export function createDittoMetadata(input: GenerateProjectInput): DittoGenerated
   const preset =
     readStringMetadataValue(resolvedRecipe.metadata, "preset") ??
     readStringMetadataValue(resolvedRecipe.metadata, "presetId")
+  const packageVersionPolicy = readStringMetadataValue(
+    resolvedRecipe.metadata,
+    "packageVersionPolicy",
+  )
+  const generatedWithPackageVersionsAt = readStringMetadataValue(
+    resolvedRecipe.metadata,
+    "generatedWithPackageVersionsAt",
+  )
 
   if (preset !== undefined) {
     metadata.preset = preset
+  }
+
+  if (packageVersionPolicy !== undefined) {
+    metadata.packageVersionPolicy = packageVersionPolicy
+  }
+
+  if (generatedWithPackageVersionsAt !== undefined) {
+    metadata.generatedWithPackageVersionsAt = generatedWithPackageVersionsAt
   }
 
   return metadata

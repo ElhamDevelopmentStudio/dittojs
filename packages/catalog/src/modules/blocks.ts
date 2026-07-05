@@ -31,7 +31,7 @@ export const blockManifests: ModuleManifest[] = [
     ],
     files: [
       {
-        from: "registry/blocks/navbar/files/navbar.tsx",
+        from: "blocks/navbar/files/navbar.tsx",
         to: "src/components/blocks/navbar.tsx",
       },
     ],
@@ -61,7 +61,7 @@ export const blockManifests: ModuleManifest[] = [
     ],
     files: [
       {
-        from: "registry/blocks/sidebar/files/sidebar.tsx",
+        from: "blocks/sidebar/files/sidebar.tsx",
         to: "src/components/blocks/sidebar.tsx",
       },
     ],
@@ -91,7 +91,7 @@ export const blockManifests: ModuleManifest[] = [
     ],
     files: [
       {
-        from: "registry/blocks/messaging-input/files/messaging-input.tsx",
+        from: "blocks/messaging-input/files/messaging-input.tsx",
         to: "src/components/blocks/messaging-input.tsx",
       },
     ],
@@ -109,7 +109,7 @@ export const blockManifests: ModuleManifest[] = [
     provides: ["block.typing-indicator"],
     files: [
       {
-        from: "registry/blocks/typing-indicator/files/typing-indicator.tsx",
+        from: "blocks/typing-indicator/files/typing-indicator.tsx",
         to: "src/components/blocks/typing-indicator.tsx",
       },
     ],
@@ -134,7 +134,7 @@ export const blockManifests: ModuleManifest[] = [
     ],
     files: [
       {
-        from: "registry/blocks/online-presence/files/online-presence.tsx",
+        from: "blocks/online-presence/files/online-presence.tsx",
         to: "src/components/blocks/online-presence.tsx",
       },
     ],

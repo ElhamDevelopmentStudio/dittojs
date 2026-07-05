@@ -1,5 +1,7 @@
 import type { ModuleManifest } from "@dittojs/core"
 
+import { packageRange } from "../package-versions"
+
 export const stylingManifests: ModuleManifest[] = [
   {
     id: "styling.tailwind",
@@ -14,11 +16,15 @@ export const stylingManifests: ModuleManifest[] = [
     },
     packages: {
       devDependencies: {
-        tailwindcss: "latest",
-        postcss: "latest",
-        autoprefixer: "latest",
+        tailwindcss: packageRange("tailwindcss"),
       },
     },
+    files: [
+      {
+        from: "react/files/src/index.css",
+        to: "src/index.css",
+      },
+    ],
     ui: {
       label: "Tailwind CSS",
       recommended: true,

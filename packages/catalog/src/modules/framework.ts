@@ -1,5 +1,7 @@
 import type { ModuleManifest } from "@dittojs/core"
 
+import { packageRange } from "../package-versions"
+
 export const frameworkManifests: ModuleManifest[] = [
   {
     id: "framework.react",
@@ -14,10 +16,28 @@ export const frameworkManifests: ModuleManifest[] = [
     },
     packages: {
       dependencies: {
-        react: "latest",
-        "react-dom": "latest",
+        react: packageRange("react"),
+        "react-dom": packageRange("react-dom"),
+      },
+      devDependencies: {
+        "@types/react": packageRange("@types/react"),
+        "@types/react-dom": packageRange("@types/react-dom"),
       },
     },
+    files: [
+      {
+        from: "react/files/index.html",
+        to: "index.html",
+      },
+      {
+        from: "react/files/src/main.tsx",
+        to: "src/main.tsx",
+      },
+      {
+        from: "react/files/src/App.tsx",
+        to: "src/App.tsx",
+      },
+    ],
     ui: {
       label: "React",
       recommended: true,

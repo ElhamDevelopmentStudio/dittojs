@@ -1,5 +1,7 @@
 import type { ModuleManifest } from "@dittojs/core"
 
+import { packageRange } from "../package-versions"
+
 export const httpManifests: ModuleManifest[] = [
   {
     id: "http.axios",
@@ -14,9 +16,15 @@ export const httpManifests: ModuleManifest[] = [
     },
     packages: {
       dependencies: {
-        axios: "latest",
+        axios: packageRange("axios"),
       },
     },
+    files: [
+      {
+        from: "http/axios/files/axios.ts",
+        to: "src/lib/axios.ts",
+      },
+    ],
     ui: {
       label: "Axios",
       recommended: true,

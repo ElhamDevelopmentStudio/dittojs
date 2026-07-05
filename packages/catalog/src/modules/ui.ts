@@ -1,5 +1,7 @@
 import type { ModuleManifest } from "@dittojs/core"
 
+import { packageRange } from "../package-versions"
+
 export const uiLibraryManifests: ModuleManifest[] = [
   {
     id: "ui.shadcn",
@@ -19,12 +21,18 @@ export const uiLibraryManifests: ModuleManifest[] = [
     },
     packages: {
       dependencies: {
-        "class-variance-authority": "latest",
-        clsx: "latest",
-        "tailwind-merge": "latest",
-        "lucide-react": "latest",
+        "class-variance-authority": packageRange("class-variance-authority"),
+        clsx: packageRange("clsx"),
+        "tailwind-merge": packageRange("tailwind-merge"),
+        "lucide-react": packageRange("lucide-react"),
       },
     },
+    files: [
+      {
+        from: "shadcn/lib/utils.ts",
+        to: "src/lib/utils.ts",
+      },
+    ],
     ui: {
       label: "shadcn",
       recommended: true,

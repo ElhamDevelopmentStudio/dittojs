@@ -1,15 +1,18 @@
 import { mkdir, readFile, rm, stat, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
+import { cwd } from "node:process"
 
 import { afterEach, describe, expect, it } from "vitest"
 
-import type { ResolvedRecipe } from "@dittojs/core"
+import { PACKAGE_VERSION_POLICY, catalog, packageVersions } from "@dittojs/catalog"
+import { resolveRecipe, type ResolvedRecipe } from "@dittojs/core"
 
 import { generateProject } from "./index"
 
 const createdAt = "2026-07-05T00:00:00.000Z"
 const tempDirs: string[] = []
+const invalidPackageVersions = new Set(["latest", "*", ""])
 
 function resolvedRecipe(overrides: Partial<ResolvedRecipe> = {}): ResolvedRecipe {
   return {
@@ -23,11 +26,11 @@ function resolvedRecipe(overrides: Partial<ResolvedRecipe> = {}): ResolvedRecipe
     warnings: [],
     packages: {
       dependencies: {
-        react: "latest",
+        react: packageVersions.react.range,
       },
       devDependencies: {
-        typescript: "latest",
-        vite: "latest",
+        typescript: packageVersions.typescript.range,
+        vite: packageVersions.vite.range,
       },
       peerDependencies: {},
     },
@@ -37,6 +40,18 @@ function resolvedRecipe(overrides: Partial<ResolvedRecipe> = {}): ResolvedRecipe
       resolvedAt: createdAt,
     },
     ...overrides,
+  }
+}
+
+function expectValidPackageVersions(packageMaps: Array<Record<string, string> | undefined>): void {
+  for (const packageMap of packageMaps) {
+    for (const [packageName, version] of Object.entries(packageMap ?? {})) {
+      expect(version, `${packageName} should have a version`).toBeTruthy()
+      expect(invalidPackageVersions.has(version), `${packageName} should not use ${version}`).toBe(
+        false,
+      )
+      expect(version, `${packageName} should use a caret range`).toMatch(/^\^\d+\.\d+\.\d+/)
+    }
   }
 }
 
@@ -63,6 +78,30 @@ async function exists(filePath: string): Promise<boolean> {
     return true
   } catch {
     return false
+  }
+}
+
+function registryTemplateRoot(): string {
+  return path.resolve(cwd(), "..", "..", "packages", "registry")
+}
+
+function reactRecommendedRecipe(): ResolvedRecipe {
+  const presetId = "preset.react-recommended"
+  const resolved = resolveRecipe({
+    catalog,
+    presetId,
+    userSelections: [],
+  })
+
+  return {
+    ...resolved,
+    metadata: {
+      ...resolved.metadata,
+      preset: presetId,
+      presetId,
+      packageVersionPolicy: PACKAGE_VERSION_POLICY.policy,
+      generatedWithPackageVersionsAt: PACKAGE_VERSION_POLICY.generatedWithPackageVersionsAt,
+    },
   }
 }
 
@@ -98,13 +137,14 @@ describe("generateProject", () => {
         typecheck: "tsc --noEmit",
       },
       dependencies: {
-        react: "latest",
+        react: packageVersions.react.range,
       },
       devDependencies: {
-        typescript: "latest",
-        vite: "latest",
+        typescript: packageVersions.typescript.range,
+        vite: packageVersions.vite.range,
       },
     })
+    expectValidPackageVersions([packageJson.dependencies, packageJson.devDependencies])
   })
 
   it("writes ditto.generated.json metadata", async () => {
@@ -134,9 +174,10 @@ describe("generateProject", () => {
       effectiveSelections: ["preset.custom", "framework.react"],
       packages: {
         dependencies: {
-          react: "latest",
+          react: packageVersions.react.range,
         },
       },
+      packageManager: "pnpm",
     })
   })
 
@@ -341,5 +382,112 @@ describe("generateProject", () => {
     await expect(
       readFile(path.join(outputDir, "src", "components", "blocks", "navbar.tsx"), "utf8"),
     ).resolves.toBe("export const Navbar = () => null\n")
+  })
+
+  it("generates React Recommended from the resolved catalog preset and registry files", async () => {
+    const outputDir = await createTempDir("react-recommended")
+    const resolvedRecipe = reactRecommendedRecipe()
+
+    const result = await generateProject({
+      resolvedRecipe,
+      outputDir,
+      templateRoot: registryTemplateRoot(),
+      projectName: "React Recommended",
+      generatorVersion: "test-version",
+      createdAt,
+    })
+    const packageJson = await readJson<{
+      dependencies: Record<string, string>
+      devDependencies: Record<string, string>
+    }>(path.join(outputDir, "package.json"))
+    const metadata = await readJson<{
+      preset: string
+      packageVersionPolicy: string
+      generatedWithPackageVersionsAt: string
+      packageManager: string
+      userSelections: string[]
+      effectiveSelections: string[]
+    }>(path.join(outputDir, "ditto.generated.json"))
+
+    expect(result.filesWritten).toEqual(
+      expect.arrayContaining([
+        "package.json",
+        "README.md",
+        "ditto.generated.json",
+        "src/App.tsx",
+        "src/components/ui/button.tsx",
+        "src/components/ui/form.tsx",
+        "src/lib/axios.ts",
+        "src/stores/app-store.ts",
+      ]),
+    )
+    expect(packageJson.dependencies).toMatchObject({
+      "@base-ui/react": packageVersions["@base-ui/react"].range,
+      "@hookform/resolvers": packageVersions["@hookform/resolvers"].range,
+      axios: packageVersions.axios.range,
+      "class-variance-authority": packageVersions["class-variance-authority"].range,
+      clsx: packageVersions.clsx.range,
+      "lucide-react": packageVersions["lucide-react"].range,
+      react: packageVersions.react.range,
+      "react-dom": packageVersions["react-dom"].range,
+      "react-hook-form": packageVersions["react-hook-form"].range,
+      "tailwind-merge": packageVersions["tailwind-merge"].range,
+      zod: packageVersions.zod.range,
+      zustand: packageVersions.zustand.range,
+    })
+    expect(packageJson.devDependencies).toMatchObject({
+      "@tailwindcss/vite": packageVersions["@tailwindcss/vite"].range,
+      "@types/react": packageVersions["@types/react"].range,
+      "@types/react-dom": packageVersions["@types/react-dom"].range,
+      "@vitejs/plugin-react": packageVersions["@vitejs/plugin-react"].range,
+      tailwindcss: packageVersions.tailwindcss.range,
+      typescript: packageVersions.typescript.range,
+      vite: packageVersions.vite.range,
+    })
+    expect(packageJson.devDependencies).not.toHaveProperty("postcss")
+    expect(packageJson.devDependencies).not.toHaveProperty("autoprefixer")
+    expectValidPackageVersions([packageJson.dependencies, packageJson.devDependencies])
+    expect(metadata).toMatchObject({
+      preset: "preset.react-recommended",
+      packageVersionPolicy: PACKAGE_VERSION_POLICY.policy,
+      generatedWithPackageVersionsAt: PACKAGE_VERSION_POLICY.generatedWithPackageVersionsAt,
+      packageManager: "pnpm",
+      userSelections: [],
+      effectiveSelections: expect.arrayContaining([
+        "preset.react-recommended",
+        "framework.react",
+        "tooling.vite",
+        "tooling.typescript",
+        "styling.tailwind",
+        "ui.shadcn",
+        "component.button",
+        "component.input",
+        "component.textarea",
+        "component.label",
+        "component.avatar",
+        "component.dropdown",
+        "component.sheet",
+        "component.form",
+        "form.react-hook-form",
+        "validation.zod",
+        "http.axios",
+        "state.zustand",
+      ]),
+    })
+
+    await expect(readFile(path.join(outputDir, "src", "App.tsx"), "utf8")).resolves.toContain(
+      "useForm<ContactValues>",
+    )
+    await expect(readFile(path.join(outputDir, "vite.config.ts"), "utf8")).resolves.toContain(
+      "@tailwindcss/vite",
+    )
+    await expect(readFile(path.join(outputDir, "src", "index.css"), "utf8")).resolves.toContain(
+      '@import "tailwindcss";',
+    )
+    await expect(
+      readFile(path.join(outputDir, "src", "components", "ui", "button.tsx"), "utf8"),
+    ).resolves.toContain("buttonVariants")
+    await expect(exists(path.join(outputDir, "postcss.config.js"))).resolves.toBe(false)
+    await expect(exists(path.join(outputDir, "tailwind.config.ts"))).resolves.toBe(false)
   })
 })

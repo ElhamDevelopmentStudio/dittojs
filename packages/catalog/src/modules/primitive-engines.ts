@@ -1,5 +1,7 @@
 import type { ModuleManifest } from "@dittojs/core"
 
+import { packageRange } from "../package-versions"
+
 export const primitiveEngineManifests: ModuleManifest[] = [
   {
     id: "primitive-engine.base-ui",
@@ -14,7 +16,7 @@ export const primitiveEngineManifests: ModuleManifest[] = [
     },
     packages: {
       dependencies: {
-        "@base-ui-components/react": "latest",
+        "@base-ui/react": packageRange("@base-ui/react"),
       },
     },
     ui: {

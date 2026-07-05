@@ -46,6 +46,9 @@ export type DittoGeneratedMetadata = {
   generatorVersion?: string
   createdAt: string
   preset?: string
+  packageVersionPolicy?: string
+  generatedWithPackageVersionsAt?: string
+  packageManager?: string
   userSelections: string[]
   effectiveSelections: string[]
   packages: ResolvedPackageSet

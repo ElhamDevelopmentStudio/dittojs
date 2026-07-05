@@ -1,5 +1,7 @@
 import type { ModuleManifest } from "@dittojs/core"
 
+import { packageRange } from "../package-versions"
+
 export const toolingManifests: ModuleManifest[] = [
   {
     id: "tooling.vite",
@@ -9,10 +11,21 @@ export const toolingManifests: ModuleManifest[] = [
     provides: ["tooling.vite"],
     packages: {
       devDependencies: {
-        vite: "latest",
-        "@vitejs/plugin-react": "latest",
+        vite: packageRange("vite"),
+        "@vitejs/plugin-react": packageRange("@vitejs/plugin-react"),
+        "@tailwindcss/vite": packageRange("@tailwindcss/vite"),
       },
     },
+    files: [
+      {
+        from: "react/files/vite.config.ts",
+        to: "vite.config.ts",
+      },
+      {
+        from: "react/files/src/vite-env.d.ts",
+        to: "src/vite-env.d.ts",
+      },
+    ],
     ui: {
       label: "Vite",
       recommended: true,
@@ -28,9 +41,15 @@ export const toolingManifests: ModuleManifest[] = [
     provides: ["tooling.typescript"],
     packages: {
       devDependencies: {
-        typescript: "latest",
+        typescript: packageRange("typescript"),
       },
     },
+    files: [
+      {
+        from: "react/files/tsconfig.json",
+        to: "tsconfig.json",
+      },
+    ],
     ui: {
       label: "TypeScript",
       recommended: true,
