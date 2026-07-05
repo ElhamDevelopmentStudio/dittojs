@@ -1,0 +1,247 @@
+# DittoJs Testing Strategy
+
+## Testing goal
+
+DittoJs must test both the generator and the projects it generates.
+
+It is not enough for DittoJs itself to build.
+
+The generated templates must also install, typecheck, and build.
+
+## Core testing principle
+
+Test DittoJs and test DittoJs output.
+
+## Test layers
+
+```txt
+1. Schema tests
+2. Resolver unit tests
+3. Catalog integrity tests
+4. Generator unit tests
+5. Generated fixture tests
+6. Web UI component tests
+7. End-to-end tests
+8. Dependency update CI tests
+````
+
+## Schema tests
+
+Schema tests verify that manifests are valid.
+
+Test:
+
+* required fields
+* invalid IDs
+* invalid group modes
+* invalid requirements
+* missing referenced module IDs
+* unsafe file paths
+* duplicate IDs
+* duplicate provided capabilities where invalid
+
+## Resolver tests
+
+Resolver tests are critical.
+
+Required cases:
+
+```txt
+Selecting shadcn selects Tailwind.
+Selecting shadcn locks Tailwind.
+Removing shadcn unlocks Tailwind.
+Selecting Button selects shadcn.
+Selecting Navbar selects Button, Input, Avatar, and Dropdown.
+Button remains locked while Navbar requires it.
+Button unlocks when Navbar is removed.
+Button stays selected if manually selected.
+React Hook Form conflicts with TanStack Form.
+Zod and Yup cannot both be selected as primary validators.
+Defaults are applied when no explicit choice exists.
+Explicit user selections override defaults.
+Missing providers return clear errors.
+Ambiguous providers return clear conflicts.
+Circular dependencies return clear errors.
+Packages are collected.
+Files are collected.
+File collisions are detected.
+```
+
+## Catalog integrity tests
+
+Catalog tests verify that all manifests work together.
+
+Test:
+
+* all module IDs are unique
+* all capabilities are valid strings
+* all direct module requirements reference existing modules
+* all required capabilities have providers
+* all file paths are safe
+* all package maps are valid
+* all presets resolve successfully
+* all MVP blocks resolve successfully
+
+## Generator tests
+
+Generator tests verify:
+
+* output directory creation
+* package.json writing
+* config file writing
+* source file writing
+* README writing
+* metadata writing
+* safe path protection
+* file collision errors
+* recipe input generation
+* preset input generation
+
+## Generated fixture tests
+
+Generated fixtures must be tested as real projects.
+
+For each important recipe:
+
+```bash
+pnpm install
+pnpm typecheck
+pnpm build
+```
+
+MVP fixtures:
+
+```txt
+react-recommended
+custom-minimal
+custom-maximal
+saas-dashboard
+chat-app
+```
+
+Form fixtures later:
+
+```txt
+rhf-zod
+rhf-yup
+tanstack-zod
+tanstack-yup
+conform-zod
+```
+
+## Web UI tests
+
+UI tests should verify:
+
+* preset cards render
+* selecting preset updates summary
+* selecting shadcn locks Tailwind
+* selecting Navbar locks Button/Input/Avatar/Dropdown
+* locked items cannot be deselected directly
+* conflicts are displayed
+* advanced customization can be opened
+* review screen shows correct stack
+* create button is disabled on error conflicts
+
+## End-to-end tests
+
+E2E tests should cover:
+
+```txt
+1. User selects React Recommended and reaches review.
+2. User selects Custom and adds Navbar.
+3. User sees Button/Input auto-selected and locked.
+4. User removes Navbar and dependencies unlock.
+5. User generates template.
+6. User downloads ZIP or receives successful generation state.
+```
+
+## CI checks
+
+Every PR should run:
+
+```txt
+pnpm install
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm generate:fixtures
+pnpm test:generated
+```
+
+## Generated template CI
+
+Generated templates should be tested independently.
+
+Example:
+
+```txt
+fixtures/generated/react-recommended
+fixtures/generated/saas-dashboard
+fixtures/generated/chat-app
+```
+
+Each should:
+
+```bash
+pnpm install
+pnpm typecheck
+pnpm build
+```
+
+## Dependency update testing
+
+When dependency update PRs are opened:
+
+1. Update dependency.
+2. Regenerate fixtures.
+3. Install generated templates.
+4. Typecheck generated templates.
+5. Build generated templates.
+6. Run smoke tests.
+7. Require manual review for risky updates.
+
+## Snapshot testing
+
+Resolver output snapshots may be used for important presets.
+
+Snapshots should not replace behavioral assertions.
+
+Use snapshots for:
+
+* package output
+* file output
+* resolved recipe summaries
+
+Use direct assertions for:
+
+* locks
+* conflicts
+* dependencies
+* required modules
+
+## Manual testing
+
+Manual testing should focus on UI/UX.
+
+Manual reviewer should check:
+
+* clarity
+* visual hierarchy
+* locked dependency explanations
+* advanced customization flow
+* conflict messages
+* generated stack summary
+* overall trust
+
+## Definition of reliable generation
+
+A generated template is reliable when:
+
+* It installs.
+* It typechecks.
+* It builds.
+* It has no unused required imports.
+* Its README matches the generated stack.
+* Its metadata matches the recipe.
