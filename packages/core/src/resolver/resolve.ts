@@ -1,21 +1,20 @@
 import type {
-  AppliedDefault,
-  LockReason,
-  ResolveConflict,
-  ResolveInput,
-  ResolvedPackageSet,
-  ResolvedRecipe,
-  ResolveWarning,
-  SelectionReason,
-} from "./types"
-import type {
   FileMapping,
   GroupMode,
   ModuleManifest,
   PackageSet,
   Requirement,
 } from "../schema/index"
-import { isPresetManifest } from "../schema/index"
+import type {
+  AppliedDefault,
+  LockReason,
+  ResolveConflict,
+  ResolvedPackageSet,
+  ResolvedRecipe,
+  ResolveInput,
+  ResolveWarning,
+  SelectionReason,
+} from "./types"
 
 type PackageBucket = "dependencies" | "devDependencies" | "peerDependencies"
 
@@ -31,12 +30,28 @@ type FileOwner = {
   file: FileMapping
 }
 
+type ResolvablePresetManifest = ModuleManifest & {
+  type: "preset"
+  selections: string[]
+}
+
 function hasText(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0
 }
 
 function uniqueSorted(values: string[]): string[] {
   return [...new Set(values)].sort()
+}
+
+function isResolvablePresetManifest(
+  manifest: ModuleManifest,
+): manifest is ResolvablePresetManifest {
+  return (
+    manifest.type === "preset" &&
+    "selections" in manifest &&
+    Array.isArray(manifest.selections) &&
+    manifest.selections.every((selection) => typeof selection === "string")
+  )
 }
 
 function reasonKey(reason: SelectionReason): string {
@@ -317,7 +332,7 @@ export function resolveRecipe(input: ResolveInput): ResolvedRecipe {
   }
 
   function expandPreset(manifest: ModuleManifest, stack: string[]): void {
-    if (!isPresetManifest(manifest)) {
+    if (!isResolvablePresetManifest(manifest)) {
       return
     }
 

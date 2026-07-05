@@ -3,7 +3,6 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "ignoreDeprecations": "6.0",
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -11,14 +10,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "paths": {
-      "@dittojs/core": ["packages/core/src/index.ts"],
-      "@dittojs/generator": ["packages/generator/src/index.ts"],
-      "@dittojs/catalog": ["packages/catalog/src/index.ts"],
-      "@dittojs/registry": ["packages/registry/src/index.ts"],
-      "@dittojs/ui": ["packages/ui/src/index.ts"],
-      "@dittojs/testing": ["packages/testing/src/index.ts"]
+      "@dittojs/core": ["./packages/core/src/index.ts"],
+      "@dittojs/generator": ["./packages/generator/src/index.ts"],
+      "@dittojs/catalog": ["./packages/catalog/src/index.ts"],
+      "@dittojs/registry": ["./packages/registry/src/index.ts"],
+      "@dittojs/ui": ["./packages/ui/src/index.ts"],
+      "@dittojs/testing": ["./packages/testing/src/index.ts"]
     }
   }
 }

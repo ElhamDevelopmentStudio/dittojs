@@ -16,9 +16,9 @@
   },
   "scripts": {
     "build": "tsc -b tsconfig.json",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc -b ../core/tsconfig.json && tsc --noEmit -p tsconfig.typecheck.json",
     "lint": "eslint src --max-warnings=0",
-    "test": "vitest run --root . --config ../../vitest.config.ts --passWithNoTests",
+    "test": "tsc -b ../core/tsconfig.json && vitest run --root . --config ../../vitest.config.ts --passWithNoTests",
     "clean": "rm -rf dist coverage"
   }
 }

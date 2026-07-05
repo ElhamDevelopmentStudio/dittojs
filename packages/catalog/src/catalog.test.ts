@@ -6,7 +6,7 @@ import {
   validateCatalog,
   type ModuleManifest,
   type PresetManifest,
-} from "../../core/src/index"
+} from "@dittojs/core"
 
 import { catalog } from "./catalog"
 
