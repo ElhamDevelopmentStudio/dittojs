@@ -19,7 +19,8 @@ export const componentManifests: ModuleManifest[] = [
     files: [
       {
         from: "shadcn/components/button/files/button.tsx",
-        to: "src/components/ui/button.tsx",
+        slot: "ui-component",
+        name: "button",
       },
     ],
     ui: {
@@ -44,7 +45,8 @@ export const componentManifests: ModuleManifest[] = [
     files: [
       {
         from: "shadcn/components/input/files/input.tsx",
-        to: "src/components/ui/input.tsx",
+        slot: "ui-component",
+        name: "input",
       },
     ],
     ui: {
@@ -69,7 +71,8 @@ export const componentManifests: ModuleManifest[] = [
     files: [
       {
         from: "shadcn/components/textarea/files/textarea.tsx",
-        to: "src/components/ui/textarea.tsx",
+        slot: "ui-component",
+        name: "textarea",
       },
     ],
     ui: {
@@ -94,7 +97,8 @@ export const componentManifests: ModuleManifest[] = [
     files: [
       {
         from: "shadcn/components/label/files/label.tsx",
-        to: "src/components/ui/label.tsx",
+        slot: "ui-component",
+        name: "label",
       },
     ],
     ui: {
@@ -119,7 +123,8 @@ export const componentManifests: ModuleManifest[] = [
     files: [
       {
         from: "shadcn/components/avatar/files/avatar.tsx",
-        to: "src/components/ui/avatar.tsx",
+        slot: "ui-component",
+        name: "avatar",
       },
     ],
     ui: {
@@ -144,7 +149,8 @@ export const componentManifests: ModuleManifest[] = [
     files: [
       {
         from: "shadcn/components/dropdown/files/dropdown.tsx",
-        to: "src/components/ui/dropdown.tsx",
+        slot: "ui-component",
+        name: "dropdown",
       },
     ],
     ui: {
@@ -169,7 +175,8 @@ export const componentManifests: ModuleManifest[] = [
     files: [
       {
         from: "shadcn/components/sheet/files/sheet.tsx",
-        to: "src/components/ui/sheet.tsx",
+        slot: "ui-component",
+        name: "sheet",
       },
     ],
     ui: {
@@ -224,7 +231,8 @@ export const componentManifests: ModuleManifest[] = [
     files: [
       {
         from: "shadcn/components/form/files/form.tsx",
-        to: "src/components/ui/form.tsx",
+        slot: "ui-component",
+        name: "form",
       },
     ],
     ui: {

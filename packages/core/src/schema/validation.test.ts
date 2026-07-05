@@ -135,6 +135,79 @@ describe("validateModuleManifest", () => {
     )
   })
 
+  it("passes a valid slot file mapping", () => {
+    const result = validateModuleManifest(
+      validManifest({
+        files: [
+          {
+            from: "templates/button.tsx",
+            slot: "ui-component",
+            name: "button",
+          },
+        ],
+      }),
+    )
+
+    expect(result.valid).toBe(true)
+    expect(result.issues).toEqual([])
+  })
+
+  it("fails when a file mapping has neither to nor slot", () => {
+    const result = validateModuleManifest(
+      validManifest({
+        files: [
+          {
+            from: "templates/button.tsx",
+          } as never,
+        ],
+      }),
+    )
+
+    expect(result.valid).toBe(false)
+    expect(result.issues).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: "file.target.missing" })]),
+    )
+  })
+
+  it("fails when a file mapping has both to and slot", () => {
+    const result = validateModuleManifest(
+      validManifest({
+        files: [
+          {
+            from: "templates/button.tsx",
+            to: "src/components/ui/button.tsx",
+            slot: "ui-component",
+            name: "button",
+          } as never,
+        ],
+      }),
+    )
+
+    expect(result.valid).toBe(false)
+    expect(result.issues).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: "file.target.ambiguous" })]),
+    )
+  })
+
+  it("fails when slot placeholder values are unsafe", () => {
+    const result = validateModuleManifest(
+      validManifest({
+        files: [
+          {
+            from: "templates/button.tsx",
+            slot: "ui-component",
+            name: "../button",
+          },
+        ],
+      }),
+    )
+
+    expect(result.valid).toBe(false)
+    expect(result.issues).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: "file.name.invalid" })]),
+    )
+  })
+
   it("fails when a module maps duplicate target paths", () => {
     const result = validateModuleManifest(
       validManifest({

@@ -181,6 +181,23 @@ describe("generateProject", () => {
     })
   })
 
+  it("writes selected project structure metadata", async () => {
+    const outputDir = await createTempDir("structure-metadata")
+
+    await generateProject({
+      resolvedRecipe: resolvedRecipe({
+        effectiveSelections: ["framework.react", "structure.react.simple"],
+      }),
+      outputDir,
+      generatorVersion: "test-version",
+      createdAt,
+    })
+
+    await expect(readJson(path.join(outputDir, "ditto.generated.json"))).resolves.toMatchObject({
+      projectStructure: "structure.react.simple",
+    })
+  })
+
   it("writes README.md with stack and commands", async () => {
     const outputDir = await createTempDir("readme")
 
@@ -262,6 +279,109 @@ describe("generateProject", () => {
         createdAt,
       }),
     ).rejects.toThrow(/File target collision/)
+  })
+
+  it("copies a template file through a structure slot", async () => {
+    const outputDir = await createTempDir("slot-copy-output")
+    const templateRoot = await createTempDir("slot-copy-template")
+
+    await mkdir(path.join(templateRoot, "blocks"), { recursive: true })
+    await writeFile(
+      path.join(templateRoot, "blocks", "navbar.tsx"),
+      "export const Navbar = () => null\n",
+      "utf8",
+    )
+
+    const result = await generateProject({
+      resolvedRecipe: resolvedRecipe({
+        effectiveSelections: ["framework.react", "structure.react.feature-based"],
+        files: [
+          {
+            from: "blocks/navbar.tsx",
+            slot: "block",
+            name: "navbar",
+            feature: "layout",
+          },
+        ],
+      }),
+      outputDir,
+      templateRoot,
+      createdAt,
+    })
+
+    await expect(
+      readFile(
+        path.join(outputDir, "src", "features", "layout", "components", "navbar.tsx"),
+        "utf8",
+      ),
+    ).resolves.toBe("export const Navbar = () => null\n")
+    expect(result.filesWritten).toContain("src/features/layout/components/navbar.tsx")
+  })
+
+  it("fails clearly when slot mappings have no selected structure", async () => {
+    const outputDir = await createTempDir("slot-no-structure")
+    const templateRoot = await createTempDir("slot-no-structure-template")
+
+    await expect(
+      generateProject({
+        resolvedRecipe: resolvedRecipe({
+          files: [
+            {
+              from: "templates/button.tsx",
+              slot: "ui-component",
+              name: "button",
+            },
+          ],
+        }),
+        outputDir,
+        templateRoot,
+        createdAt,
+      }),
+    ).rejects.toThrow(/Project structure selection is required/)
+  })
+
+  it("fails clearly when a file mapping has neither to nor slot", async () => {
+    const outputDir = await createTempDir("mapping-missing-target")
+    const templateRoot = await createTempDir("mapping-missing-target-template")
+
+    await expect(
+      generateProject({
+        resolvedRecipe: resolvedRecipe({
+          files: [
+            {
+              from: "templates/button.tsx",
+            } as never,
+          ],
+        }),
+        outputDir,
+        templateRoot,
+        createdAt,
+      }),
+    ).rejects.toThrow(/must include either to or slot/)
+  })
+
+  it("fails clearly when a file mapping has both to and slot", async () => {
+    const outputDir = await createTempDir("mapping-ambiguous-target")
+    const templateRoot = await createTempDir("mapping-ambiguous-target-template")
+
+    await expect(
+      generateProject({
+        resolvedRecipe: resolvedRecipe({
+          effectiveSelections: ["framework.react", "structure.react.simple"],
+          files: [
+            {
+              from: "templates/button.tsx",
+              to: "src/components/ui/button.tsx",
+              slot: "ui-component",
+              name: "button",
+            } as never,
+          ],
+        }),
+        outputDir,
+        templateRoot,
+        createdAt,
+      }),
+    ).rejects.toThrow(/must use either to or slot, not both/)
   })
 
   it("respects resolver error conflicts", async () => {
@@ -402,6 +522,7 @@ describe("generateProject", () => {
     }>(path.join(outputDir, "package.json"))
     const metadata = await readJson<{
       preset: string
+      projectStructure: string
       packageVersionPolicy: string
       generatedWithPackageVersionsAt: string
       packageManager: string
@@ -451,11 +572,13 @@ describe("generateProject", () => {
       preset: "preset.react-recommended",
       packageVersionPolicy: PACKAGE_VERSION_POLICY.policy,
       generatedWithPackageVersionsAt: PACKAGE_VERSION_POLICY.generatedWithPackageVersionsAt,
+      projectStructure: "structure.react.simple",
       packageManager: "pnpm",
       userSelections: [],
       effectiveSelections: expect.arrayContaining([
         "preset.react-recommended",
         "framework.react",
+        "structure.react.simple",
         "tooling.vite",
         "tooling.typescript",
         "styling.tailwind",

@@ -75,6 +75,10 @@ function isSafeRelativePath(filePath: string): boolean {
   return segments.every((segment) => segment.length > 0 && segment !== "." && segment !== "..")
 }
 
+function isValidSlotName(value: string): boolean {
+  return /^[a-z][a-z0-9-]*$/.test(value)
+}
+
 function validateTargets(
   issues: ManifestValidationIssue[],
   targets: ValidationTarget[],
@@ -174,6 +178,10 @@ function validateFiles(
   const seenTargets = new Set<string>()
 
   for (const [index, file] of files.entries()) {
+    const rawFile = file as Record<string, unknown>
+    const hasDirectTarget = hasText(rawFile.to)
+    const hasSlotTarget = hasText(rawFile.slot)
+
     if (!hasText(file.from) || !isSafeRelativePath(file.from)) {
       addIssue(
         issues,
@@ -184,28 +192,100 @@ function validateFiles(
       )
     }
 
-    if (!hasText(file.to) || !isSafeRelativePath(file.to)) {
+    if (hasDirectTarget && hasSlotTarget) {
       addIssue(
         issues,
-        "file.to.invalid",
-        "File target paths must be relative and must not escape the output project.",
-        `files.${index}.to`,
+        "file.target.ambiguous",
+        "File mappings must use either to or slot, not both.",
+        `files.${index}`,
         moduleId,
       )
       continue
     }
 
-    if (seenTargets.has(file.to)) {
+    if (!hasDirectTarget && !hasSlotTarget) {
       addIssue(
         issues,
-        "file.to.duplicate",
-        `Duplicate file target path "${file.to}".`,
-        `files.${index}.to`,
+        "file.target.missing",
+        "File mappings must include either to or slot.",
+        `files.${index}`,
+        moduleId,
+      )
+      continue
+    }
+
+    if (hasDirectTarget) {
+      const target = rawFile.to as string
+
+      if (!isSafeRelativePath(target)) {
+        addIssue(
+          issues,
+          "file.to.invalid",
+          "File target paths must be relative and must not escape the output project.",
+          `files.${index}.to`,
+          moduleId,
+        )
+        continue
+      }
+
+      if (seenTargets.has(target)) {
+        addIssue(
+          issues,
+          "file.to.duplicate",
+          `Duplicate file target path "${target}".`,
+          `files.${index}.to`,
+          moduleId,
+        )
+      }
+
+      seenTargets.add(target)
+      continue
+    }
+
+    const slot = rawFile.slot as string
+    const name = rawFile.name as string | undefined
+    const feature = rawFile.feature as string | undefined
+    const route = rawFile.route as string | undefined
+
+    if (!isValidSlotName(slot)) {
+      addIssue(
+        issues,
+        "file.slot.invalid",
+        "File slot names must use lowercase kebab-case.",
+        `files.${index}.slot`,
         moduleId,
       )
     }
 
-    seenTargets.add(file.to)
+    if (!hasText(name) || !isSafeRelativePath(name)) {
+      addIssue(
+        issues,
+        "file.name.invalid",
+        "File slot names must be relative-safe placeholder values.",
+        `files.${index}.name`,
+        moduleId,
+      )
+    }
+
+    if (feature !== undefined && (!hasText(feature) || !isSafeRelativePath(feature))) {
+      addIssue(
+        issues,
+        "file.feature.invalid",
+        "File slot feature values must be relative-safe placeholder values.",
+        `files.${index}.feature`,
+        moduleId,
+      )
+    }
+
+    if (route !== undefined && (!hasText(route) || !isSafeRelativePath(route))) {
+      addIssue(
+        issues,
+        "file.route.invalid",
+        "File slot route values must be relative-safe placeholder values.",
+        `files.${index}.route`,
+        moduleId,
+      )
+    }
   }
 }
 

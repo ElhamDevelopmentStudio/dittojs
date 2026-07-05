@@ -22,7 +22,8 @@ export const stateManifests: ModuleManifest[] = [
     files: [
       {
         from: "state/zustand/files/app-store.ts",
-        to: "src/stores/app-store.ts",
+        slot: "store",
+        name: "app-store",
       },
     ],
     ui: {

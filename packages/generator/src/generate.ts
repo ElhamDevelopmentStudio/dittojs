@@ -13,11 +13,22 @@ import {
   resolveSafeOutputPath,
 } from "./paths"
 import { createReadme } from "./readme"
+import {
+  requireProjectStructureAdapter,
+  resolveStructurePath,
+  selectedProjectStructureAdapter,
+  type ProjectStructureAdapter,
+} from "./structure"
 import type { GenerateProjectInput, GenerateProjectResult, GeneratorWarning } from "./types"
 import { GenerateProjectError } from "./types"
 import { copyTemplateFile, writeJsonFile, writeTextFile } from "./writer"
 
 const RESERVED_GENERATED_TARGETS = new Set([PACKAGE_JSON_TARGET, METADATA_TARGET, README_TARGET])
+
+type ResolvedFileMapping = {
+  from: string
+  to: string
+}
 
 function summarizeResolverErrors(conflicts: ResolveConflict[]): string {
   return conflicts.map((conflict) => conflict.message).join("; ")
@@ -47,13 +58,70 @@ function validateRecipeCanGenerate(input: GenerateProjectInput): void {
   }
 }
 
-function validateFileMappings(files: FileMapping[]): void {
-  const targets = new Map<string, FileMapping>()
+function hasStringProperty(file: FileMapping, key: string): boolean {
+  const value = (file as Record<string, unknown>)[key]
+
+  return typeof value === "string" && value.trim().length > 0
+}
+
+function usesStructureSlot(file: FileMapping): boolean {
+  return hasStringProperty(file, "slot")
+}
+
+function resolveFileMappingTarget(
+  file: FileMapping,
+  adapter: ProjectStructureAdapter | undefined,
+): string {
+  const hasDirectTarget = hasStringProperty(file, "to")
+  const hasSlotTarget = hasStringProperty(file, "slot")
+
+  if (hasDirectTarget && hasSlotTarget) {
+    throw new GenerateProjectError(
+      `File mapping "${file.from}" must use either to or slot, not both.`,
+    )
+  }
+
+  if (!hasDirectTarget && !hasSlotTarget) {
+    throw new GenerateProjectError(`File mapping "${file.from}" must include either to or slot.`)
+  }
+
+  if (hasDirectTarget) {
+    return normalizeSafeRelativePath((file as { to: string }).to, "output target")
+  }
+
+  if (adapter === undefined) {
+    throw new GenerateProjectError(
+      `File mapping "${file.from}" uses slot "${(file as { slot?: string }).slot}" without a selected project structure.`,
+    )
+  }
+
+  const slotFile = file as {
+    slot: string
+    name?: string
+    feature?: string
+    route?: string
+  }
+
+  return resolveStructurePath({
+    adapter,
+    slot: slotFile.slot,
+    name: slotFile.name,
+    feature: slotFile.feature,
+    route: slotFile.route,
+  })
+}
+
+function resolveFileMappings(
+  files: FileMapping[],
+  adapter: ProjectStructureAdapter | undefined,
+): ResolvedFileMapping[] {
+  const targets = new Map<string, ResolvedFileMapping>()
+  const resolvedFiles: ResolvedFileMapping[] = []
 
   for (const file of files) {
     normalizeSafeRelativePath(file.from, "template source")
 
-    const targetPath = normalizeSafeRelativePath(file.to, "output target")
+    const targetPath = resolveFileMappingTarget(file, adapter)
 
     if (RESERVED_GENERATED_TARGETS.has(targetPath)) {
       throw new GenerateProjectError(
@@ -69,8 +137,16 @@ function validateFileMappings(files: FileMapping[]): void {
       )
     }
 
-    targets.set(targetPath, file)
+    const resolvedFile: ResolvedFileMapping = {
+      from: file.from,
+      to: targetPath,
+    }
+
+    targets.set(targetPath, resolvedFile)
+    resolvedFiles.push(resolvedFile)
   }
+
+  return resolvedFiles
 }
 
 function projectName(input: GenerateProjectInput, outputDir: string): string {
@@ -79,7 +155,11 @@ function projectName(input: GenerateProjectInput, outputDir: string): string {
 
 export async function generateProject(input: GenerateProjectInput): Promise<GenerateProjectResult> {
   validateRecipeCanGenerate(input)
-  validateFileMappings(input.resolvedRecipe.files)
+  const usesSlots = input.resolvedRecipe.files.some(usesStructureSlot)
+  const adapter = usesSlots
+    ? requireProjectStructureAdapter(input.resolvedRecipe)
+    : selectedProjectStructureAdapter(input.resolvedRecipe)
+  const resolvedFiles = resolveFileMappings(input.resolvedRecipe.files, adapter)
 
   if (
     input.resolvedRecipe.files.length > 0 &&
@@ -108,7 +188,10 @@ export async function generateProject(input: GenerateProjectInput): Promise<Gene
   await writeJsonFile({
     outputDir,
     targetPath: METADATA_TARGET,
-    value: createDittoMetadata(input),
+    value: createDittoMetadata({
+      ...input,
+      selectedProjectStructure: adapter?.id,
+    }),
   }).then((filePath) => filesWritten.push(filePath))
 
   await writeTextFile({
@@ -121,7 +204,7 @@ export async function generateProject(input: GenerateProjectInput): Promise<Gene
     }),
   }).then((filePath) => filesWritten.push(filePath))
 
-  for (const file of input.resolvedRecipe.files) {
+  for (const file of resolvedFiles) {
     filesWritten.push(
       await copyTemplateFile({
         templateRoot: input.templateRoot ?? "",

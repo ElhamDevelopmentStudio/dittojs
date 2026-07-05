@@ -70,6 +70,7 @@ dittojs/
       recipe/
       package-json/
       files/
+      structure/
 
     catalog/
       frameworks/
@@ -81,6 +82,7 @@ dittojs/
       validation/
       state/
       http/
+      project-structures/
       presets/
 
     registry/
@@ -127,6 +129,7 @@ Contains the available modules:
 * validation libraries
 * state libraries
 * HTTP clients
+* project structures
 * presets
 
 The catalog is data, not generation logic.
@@ -138,6 +141,7 @@ Turns a resolved recipe into a project folder.
 Responsibilities:
 
 * Write files.
+* Resolve project structure slots.
 * Merge package dependencies.
 * Generate config files.
 * Generate metadata.

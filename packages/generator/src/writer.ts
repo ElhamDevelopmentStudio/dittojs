@@ -1,10 +1,13 @@
 import { copyFile, mkdir, writeFile } from "node:fs/promises"
 import path from "node:path"
 
-import type { FileMapping } from "@dittojs/core"
-
 import { resolveSafeOutputPath, resolveSafeTemplatePath } from "./paths"
 import { GenerateProjectError } from "./types"
+
+export type ResolvedCopyFileMapping = {
+  from: string
+  to: string
+}
 
 function isNodeError(error: unknown): error is Error & { code?: string } {
   return error instanceof Error && "code" in error
@@ -38,7 +41,7 @@ export async function writeJsonFile(input: {
 export async function copyTemplateFile(input: {
   templateRoot: string
   outputDir: string
-  file: FileMapping
+  file: ResolvedCopyFileMapping
 }): Promise<string> {
   const sourcePath = resolveSafeTemplatePath(input.templateRoot, input.file.from)
   const target = resolveSafeOutputPath(input.outputDir, input.file.to)

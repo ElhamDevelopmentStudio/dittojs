@@ -5,7 +5,7 @@
 
 The manifest system describes every selectable and resolvable unit in DittoJs.
 
-Every framework, styling system, UI library, primitive component, block, form engine, validator, preset, and adapter must be represented by manifest data.
+Every framework, styling system, UI library, primitive component, block, form engine, validator, preset, project structure, and adapter must be represented by manifest data.
 
 The resolver and generator use manifests as their source of truth.
 
@@ -45,6 +45,7 @@ validation.zod
 validation.yup
 state.zustand
 http.axios
+structure.react.simple
 preset.react-recommended
 ````
 
@@ -71,6 +72,7 @@ validation.schema
 state.client
 http.client
 block.navbar
+project.structure
 ```
 
 Requirements should prefer capabilities over direct module IDs.
@@ -103,6 +105,7 @@ export type ModuleType =
   | "state"
   | "http"
   | "adapter"
+  | "project-structure"
   | "preset"
   | "tooling"
 
@@ -135,11 +138,22 @@ export type PackageSet = {
   peerDependencies?: Record<string, string>
 }
 
-export type FileMapping = {
+export type DirectFileMapping = {
   from: string
   to: string
   when?: string
 }
+
+export type SlotFileMapping = {
+  from: string
+  slot: string
+  name: string
+  feature?: string
+  route?: string
+  when?: string
+}
+
+export type FileMapping = DirectFileMapping | SlotFileMapping
 
 export type UiMetadata = {
   label: string
@@ -318,7 +332,7 @@ Version strategy should be centralized later. Early MVP may use `latest`, but ge
 
 Files define template file mappings.
 
-Example:
+Direct example:
 
 ```ts
 {
@@ -334,7 +348,28 @@ Example:
 }
 ```
 
-The generator must validate that `to` paths stay inside the output directory.
+Slot example:
+
+```ts
+{
+  id: "component.button",
+  type: "primitive",
+  label: "Button",
+  files: [
+    {
+      from: "components/ui/button.tsx",
+      slot: "ui-component",
+      name: "button"
+    }
+  ]
+}
+```
+
+Use `to` for fixed root files such as `index.html` and `vite.config.ts`.
+
+Use `slot` for files that should follow the selected project structure.
+
+A file mapping must include either `to` or `slot`, not both. The generator must validate that direct `to` paths and resolved slot paths stay inside the output directory.
 
 ## `defaults`
 

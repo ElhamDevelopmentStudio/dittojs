@@ -1,0 +1,6 @@
+{
+  "id": "react-recommended-feature-based",
+  "name": "React Recommended Feature Based",
+  "presetId": "preset.react-recommended",
+  "selections": ["structure.react.feature-based", "block.navbar"]
+}

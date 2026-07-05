@@ -59,6 +59,7 @@ The generator must:
 * Write README.
 * Write Ditto metadata.
 * Copy or render template files.
+* Resolve slot file mappings through the selected project structure adapter.
 * Prevent unsafe paths.
 * Report file write results.
 * Fail clearly on invalid input.
@@ -75,9 +76,19 @@ The generator must not:
 * Call AI.
 * Hardcode one-off template combinations.
 
-## Output project structure for MVP
+## Output project structures for MVP
 
-A generated React/Vite template should look like:
+A generated React/Vite template uses one selected project structure. React MVP structures are:
+
+```txt
+structure.react.simple
+structure.react.feature-based
+structure.react.route-colocated
+```
+
+The selected structure is resolved from `ResolvedRecipe.effectiveSelections`. Static root files can use direct mappings. Source files that vary by layout should use structure slots.
+
+Simple output looks like:
 
 ```txt
 generated-project/
@@ -85,8 +96,6 @@ generated-project/
   tsconfig.json
   vite.config.ts
   index.html
-  postcss.config.js
-  tailwind.config.ts
   README.md
   ditto.generated.json
 
@@ -123,6 +132,10 @@ generated-project/
 
 Only selected files should be generated.
 
+Feature-based output places feature-owned blocks and forms under `src/features/{feature}/...`.
+
+Route-colocated output places route-owned forms, pages, and schemas under `src/pages/{route}/...`.
+
 ## Metadata file
 
 Every generated project must include:
@@ -139,6 +152,7 @@ Example:
   "generatorVersion": "0.1.0",
   "createdAt": "2026-07-05T00:00:00.000Z",
   "preset": "preset.react-recommended",
+  "projectStructure": "structure.react.simple",
   "userSelections": [
     "preset.react-recommended"
   ],
@@ -185,6 +199,8 @@ templates/blocks/navbar.tsx
 ```
 
 The generator should support variable interpolation later, but MVP can start with static templates.
+
+Slot mappings must be resolved before files are copied. A mapping with both `to` and `slot`, or with neither target, must fail clearly.
 
 ## Path safety
 
@@ -264,6 +280,7 @@ Generator tests must cover:
 * metadata generation
 * safe path validation
 * file collision handling
+* project structure slot resolution
 * preset generation
 * recipe generation
 * minimal template generation

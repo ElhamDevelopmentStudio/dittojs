@@ -54,6 +54,12 @@ function isResolvablePresetManifest(
   )
 }
 
+function directFileTarget(file: FileMapping): string | undefined {
+  const target = (file as { to?: unknown }).to
+
+  return typeof target === "string" && target.length > 0 ? target : undefined
+}
+
 function reasonKey(reason: SelectionReason): string {
   switch (reason.type) {
     case "user":
@@ -441,8 +447,8 @@ export function resolveRecipe(input: ResolveInput): ResolvedRecipe {
     resolvingIds.add(moduleId)
     const nextStack = [...stack, moduleId]
 
-    expandPreset(manifest, nextStack)
     applyDefaults(manifest, nextStack)
+    expandPreset(manifest, nextStack)
 
     for (const requirement of manifest.requires ?? []) {
       resolveRequirement(manifest, requirement, nextStack)
@@ -612,17 +618,24 @@ export function resolveRecipe(input: ResolveInput): ResolvedRecipe {
       mergePackageBucket(packages, "peerDependencies", moduleId, manifest.packages)
 
       for (const file of manifest.files ?? []) {
-        const existingOwner = fileOwners.get(file.to)
+        const target = directFileTarget(file)
+
+        if (target === undefined) {
+          files.push(file)
+          continue
+        }
+
+        const existingOwner = fileOwners.get(target)
 
         if (existingOwner !== undefined) {
           addConflict({
             moduleIds: [existingOwner.moduleId, moduleId],
-            message: `File target collision at "${file.to}".`,
-            reason: `${existingOwner.moduleId} and ${moduleId} both write ${file.to}.`,
+            message: `File target collision at "${target}".`,
+            reason: `${existingOwner.moduleId} and ${moduleId} both write ${target}.`,
             severity: "error",
           })
         } else {
-          fileOwners.set(file.to, {
+          fileOwners.set(target, {
             moduleId,
             file,
           })

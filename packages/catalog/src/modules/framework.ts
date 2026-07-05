@@ -31,11 +31,13 @@ export const frameworkManifests: ModuleManifest[] = [
       },
       {
         from: "react/files/src/main.tsx",
-        to: "src/main.tsx",
+        slot: "app-entry",
+        name: "main",
       },
       {
         from: "react/files/src/App.tsx",
-        to: "src/App.tsx",
+        slot: "app-root",
+        name: "app",
       },
     ],
     ui: {

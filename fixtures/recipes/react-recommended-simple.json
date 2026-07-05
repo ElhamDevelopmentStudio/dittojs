@@ -1,0 +1,6 @@
+{
+  "id": "react-recommended-simple",
+  "name": "React Recommended Simple",
+  "presetId": "preset.react-recommended",
+  "selections": ["structure.react.simple", "block.navbar"]
+}

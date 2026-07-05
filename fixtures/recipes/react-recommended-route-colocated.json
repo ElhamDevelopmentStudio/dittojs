@@ -1,0 +1,6 @@
+{
+  "id": "react-recommended-route-colocated",
+  "name": "React Recommended Route Colocated",
+  "presetId": "preset.react-recommended",
+  "selections": ["structure.react.route-colocated", "block.navbar"]
+}

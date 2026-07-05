@@ -16,6 +16,10 @@ export type GenerateProjectInput = {
   packageManager?: string
 }
 
+export type CreateDittoMetadataInput = GenerateProjectInput & {
+  selectedProjectStructure?: string | undefined
+}
+
 export type GenerateProjectResult = {
   outputDir: string
   filesWritten: string[]
@@ -46,6 +50,7 @@ export type DittoGeneratedMetadata = {
   generatorVersion?: string
   createdAt: string
   preset?: string
+  projectStructure?: string
   packageVersionPolicy?: string
   generatedWithPackageVersionsAt?: string
   packageManager?: string

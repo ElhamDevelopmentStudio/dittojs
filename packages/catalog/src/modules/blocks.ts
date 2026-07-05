@@ -32,7 +32,9 @@ export const blockManifests: ModuleManifest[] = [
     files: [
       {
         from: "blocks/navbar/files/navbar.tsx",
-        to: "src/components/blocks/navbar.tsx",
+        slot: "block",
+        name: "navbar",
+        feature: "layout",
       },
     ],
     ui: {
@@ -62,7 +64,9 @@ export const blockManifests: ModuleManifest[] = [
     files: [
       {
         from: "blocks/sidebar/files/sidebar.tsx",
-        to: "src/components/blocks/sidebar.tsx",
+        slot: "block",
+        name: "sidebar",
+        feature: "layout",
       },
     ],
     ui: {
@@ -92,7 +96,9 @@ export const blockManifests: ModuleManifest[] = [
     files: [
       {
         from: "blocks/messaging-input/files/messaging-input.tsx",
-        to: "src/components/blocks/messaging-input.tsx",
+        slot: "block",
+        name: "messaging-input",
+        feature: "messaging",
       },
     ],
     ui: {
@@ -110,7 +116,9 @@ export const blockManifests: ModuleManifest[] = [
     files: [
       {
         from: "blocks/typing-indicator/files/typing-indicator.tsx",
-        to: "src/components/blocks/typing-indicator.tsx",
+        slot: "block",
+        name: "typing-indicator",
+        feature: "messaging",
       },
     ],
     ui: {
@@ -135,7 +143,9 @@ export const blockManifests: ModuleManifest[] = [
     files: [
       {
         from: "blocks/online-presence/files/online-presence.tsx",
-        to: "src/components/blocks/online-presence.tsx",
+        slot: "block",
+        name: "online-presence",
+        feature: "messaging",
       },
     ],
     ui: {

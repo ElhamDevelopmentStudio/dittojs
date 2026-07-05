@@ -11,6 +11,7 @@ export const MODULE_TYPES = [
   "state",
   "http",
   "adapter",
+  "project-structure",
   "preset",
   "tooling",
 ] as const
@@ -52,11 +53,27 @@ export type PackageSet = {
   peerDependencies?: Record<string, string>
 }
 
-export type FileMapping = {
+export type DirectFileMapping = {
   from: string
   to: string
   when?: string
+  slot?: never
+  name?: never
+  feature?: never
+  route?: never
 }
+
+export type SlotFileMapping = {
+  from: string
+  slot: string
+  name: string
+  feature?: string
+  route?: string
+  when?: string
+  to?: never
+}
+
+export type FileMapping = DirectFileMapping | SlotFileMapping
 
 export type UiMetadata = {
   label: string

@@ -22,7 +22,8 @@ export const stylingManifests: ModuleManifest[] = [
     files: [
       {
         from: "react/files/src/index.css",
-        to: "src/index.css",
+        slot: "global-css",
+        name: "index",
       },
     ],
     ui: {

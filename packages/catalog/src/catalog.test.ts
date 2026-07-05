@@ -14,6 +14,7 @@ import { packageVersions, type PackageDependencyType } from "./package-versions"
 const requiredCapabilities = new Set([
   "component-library.shadcn",
   "form.engine",
+  "project.structure",
   "styling.tailwind",
   "ui.avatar",
   "ui.button",
@@ -171,6 +172,7 @@ describe("catalog", () => {
     expect(result.effectiveSelections).toEqual(
       expect.arrayContaining([
         "framework.react",
+        "structure.react.simple",
         "tooling.vite",
         "tooling.typescript",
         "styling.tailwind",
@@ -197,6 +199,89 @@ describe("catalog", () => {
     })
     expect(result.packages.devDependencies).not.toHaveProperty("postcss")
     expect(result.packages.devDependencies).not.toHaveProperty("autoprefixer")
+  })
+
+  it("contains React project structure manifests", () => {
+    const structures = catalog.filter((manifest) => manifest.type === "project-structure")
+
+    expect(structures.map((structure) => structure.id)).toEqual(
+      expect.arrayContaining([
+        "structure.react.simple",
+        "structure.react.feature-based",
+        "structure.react.route-colocated",
+      ]),
+    )
+
+    for (const structure of structures) {
+      expect(structure.group).toMatchObject({
+        id: "project-structure",
+        mode: "exactly-one",
+        label: "Project structure",
+      })
+      expect(structure.requires).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            moduleId: "framework.react",
+          }),
+        ]),
+      )
+    }
+  })
+
+  it("defaults presets to their expected project structure", () => {
+    expect(resolvePreset("preset.react-recommended").effectiveSelections).toContain(
+      "structure.react.simple",
+    )
+    expect(resolvePreset("preset.custom").effectiveSelections).toContain("structure.react.simple")
+    expect(resolvePreset("preset.saas-dashboard").effectiveSelections).toContain(
+      "structure.react.feature-based",
+    )
+    expect(resolvePreset("preset.chat-app").effectiveSelections).toContain(
+      "structure.react.feature-based",
+    )
+  })
+
+  it("lets an explicit project structure override a preset default", () => {
+    const result = resolveRecipe({
+      catalog,
+      presetId: "preset.react-recommended",
+      userSelections: ["structure.react.route-colocated"],
+    })
+
+    expect(errorMessages(result)).toEqual([])
+    expect(result.effectiveSelections).toContain("structure.react.route-colocated")
+    expect(result.effectiveSelections).not.toContain("structure.react.simple")
+  })
+
+  it("reports an exactly-one conflict for multiple project structures", () => {
+    const result = resolveRecipe({
+      catalog,
+      userSelections: ["structure.react.simple", "structure.react.feature-based"],
+    })
+
+    expect(errorMessages(result)).toEqual(
+      expect.arrayContaining([expect.stringContaining('Group "project-structure"')]),
+    )
+  })
+
+  it("selecting a project structure requires React", () => {
+    const result = resolveRecipe({
+      catalog,
+      userSelections: ["structure.react.route-colocated"],
+    })
+
+    expect(errorMessages(result)).toEqual([])
+    expect(result.effectiveSelections).toEqual(
+      expect.arrayContaining(["structure.react.route-colocated", "framework.react"]),
+    )
+    expect(result.locks["framework.react"]).toEqual(
+      expect.arrayContaining([
+        {
+          requiredBy: "structure.react.route-colocated",
+          reason: "React project structures require the React framework.",
+        },
+      ]),
+    )
   })
 
   it("resolves dashboard and chat presets through nested presets", () => {

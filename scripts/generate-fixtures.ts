@@ -1,7 +1,7 @@
 import { log } from "node:console"
 import { mkdir, readdir, readFile, rm } from "node:fs/promises"
 import path from "node:path"
-import { cwd } from "node:process"
+import { argv, cwd } from "node:process"
 
 import { catalog } from "../packages/catalog/src/catalog"
 import { PACKAGE_VERSION_POLICY } from "../packages/catalog/src/package-versions"
@@ -17,17 +17,34 @@ type FixtureRecipe = {
 
 const rootDir = cwd()
 const templateRoot = path.join(rootDir, "packages", "registry")
+const defaultFixtureRecipes = [
+  "react-recommended",
+  "react-recommended-simple",
+  "react-recommended-feature-based",
+  "react-recommended-route-colocated",
+]
 
 async function readRecipe(recipeName: string): Promise<FixtureRecipe> {
   const recipePath = path.join(rootDir, "fixtures", "recipes", `${recipeName}.json`)
   const recipe = JSON.parse(await readFile(recipePath, "utf8")) as Partial<FixtureRecipe>
 
-  return {
-    id: recipe.id,
-    name: recipe.name,
-    presetId: recipe.presetId,
+  const fixtureRecipe: FixtureRecipe = {
     selections: Array.isArray(recipe.selections) ? recipe.selections : [],
   }
+
+  if (recipe.id !== undefined) {
+    fixtureRecipe.id = recipe.id
+  }
+
+  if (recipe.name !== undefined) {
+    fixtureRecipe.name = recipe.name
+  }
+
+  if (recipe.presetId !== undefined) {
+    fixtureRecipe.presetId = recipe.presetId
+  }
+
+  return fixtureRecipe
 }
 
 async function generateFixture(recipeName: string) {
@@ -73,8 +90,13 @@ async function clearOutputDir(outputDir: string): Promise<void> {
   )
 }
 
-const result = await generateFixture("react-recommended")
+const requestedRecipes = argv.slice(2)
+const fixtureRecipes = requestedRecipes.length > 0 ? requestedRecipes : defaultFixtureRecipes
 
-log(
-  `Generated ${path.relative(rootDir, result.outputDir)} with ${result.filesWritten.length} files.`,
-)
+for (const fixtureRecipe of fixtureRecipes) {
+  const result = await generateFixture(fixtureRecipe)
+
+  log(
+    `Generated ${path.relative(rootDir, result.outputDir)} with ${result.filesWritten.length} files.`,
+  )
+}

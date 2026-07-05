@@ -1,4 +1,4 @@
-import type { DittoGeneratedMetadata, GenerateProjectInput } from "./types"
+import type { CreateDittoMetadataInput, DittoGeneratedMetadata } from "./types"
 
 export const generatorPackage = {
   name: "dittojs",
@@ -27,7 +27,7 @@ function readStringMetadataValue(
   return typeof value === "string" && value.length > 0 ? value : undefined
 }
 
-export function createDittoMetadata(input: GenerateProjectInput): DittoGeneratedMetadata {
+export function createDittoMetadata(input: CreateDittoMetadataInput): DittoGeneratedMetadata {
   const { resolvedRecipe } = input
   const metadata: DittoGeneratedMetadata = {
     generator: input.generatorName ?? generatorPackage.name,
@@ -45,6 +45,9 @@ export function createDittoMetadata(input: GenerateProjectInput): DittoGenerated
   const preset =
     readStringMetadataValue(resolvedRecipe.metadata, "preset") ??
     readStringMetadataValue(resolvedRecipe.metadata, "presetId")
+  const projectStructure =
+    input.selectedProjectStructure ??
+    readStringMetadataValue(resolvedRecipe.metadata, "projectStructure")
   const packageVersionPolicy = readStringMetadataValue(
     resolvedRecipe.metadata,
     "packageVersionPolicy",
@@ -56,6 +59,10 @@ export function createDittoMetadata(input: GenerateProjectInput): DittoGenerated
 
   if (preset !== undefined) {
     metadata.preset = preset
+  }
+
+  if (projectStructure !== undefined) {
+    metadata.projectStructure = projectStructure
   }
 
   if (packageVersionPolicy !== undefined) {

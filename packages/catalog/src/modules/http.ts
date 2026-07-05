@@ -22,7 +22,8 @@ export const httpManifests: ModuleManifest[] = [
     files: [
       {
         from: "http/axios/files/axios.ts",
-        to: "src/lib/axios.ts",
+        slot: "lib",
+        name: "axios",
       },
     ],
     ui: {

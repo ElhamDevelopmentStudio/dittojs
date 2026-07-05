@@ -30,7 +30,8 @@ export const uiLibraryManifests: ModuleManifest[] = [
     files: [
       {
         from: "shadcn/lib/utils.ts",
-        to: "src/lib/utils.ts",
+        slot: "lib",
+        name: "utils",
       },
     ],
     ui: {

@@ -81,6 +81,12 @@ component.sheet
 component.form
 ```
 
+Defaults:
+
+```txt
+project structure: structure.react.simple
+```
+
 User-facing summary:
 
 ```txt
@@ -100,6 +106,12 @@ preset.react-recommended
 block.navbar
 block.sidebar
 block.settings-form
+```
+
+Defaults:
+
+```txt
+project structure: structure.react.feature-based
 ```
 
 Future additions:
@@ -125,6 +137,12 @@ block.navbar
 block.messaging-input
 block.typing-indicator
 block.online-presence
+```
+
+Defaults:
+
+```txt
+project structure: structure.react.feature-based
 ```
 
 Future additions:
@@ -153,6 +171,7 @@ primitive-engine.base-ui
 Defaults:
 
 ```txt
+project structure: structure.react.simple
 form engine: React Hook Form
 validation: Zod
 ```
@@ -188,6 +207,8 @@ React, Vite, Tailwind, shadcn, React Hook Form, Zod, Axios, Zustand.
 Users must be able to customize a preset before generation.
 
 Customization should modify user selections, then run the resolver again.
+
+Explicit user selections in exactly-one groups must override preset defaults. For example, choosing `structure.react.route-colocated` with `preset.react-recommended` suppresses the preset's default `structure.react.simple` selection.
 
 ## Preset testing
 

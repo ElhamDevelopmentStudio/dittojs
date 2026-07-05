@@ -26,6 +26,9 @@ export const presetManifests: ModuleManifest[] = [
       "component.sheet",
       "component.form",
     ],
+    defaults: {
+      "project-structure": "structure.react.simple",
+    },
     ui: {
       label: "React Recommended",
       recommended: true,
@@ -39,6 +42,9 @@ export const presetManifests: ModuleManifest[] = [
     label: "SaaS Dashboard",
     description: "Dashboard preset with the recommended React baseline, navbar, and sidebar.",
     selections: ["preset.react-recommended", "block.navbar", "block.sidebar"],
+    defaults: {
+      "project-structure": "structure.react.feature-based",
+    },
     ui: {
       label: "SaaS Dashboard",
       recommended: true,
@@ -58,6 +64,9 @@ export const presetManifests: ModuleManifest[] = [
       "block.typing-indicator",
       "block.online-presence",
     ],
+    defaults: {
+      "project-structure": "structure.react.feature-based",
+    },
     ui: {
       label: "Chat App",
       recommended: true,
@@ -78,6 +87,9 @@ export const presetManifests: ModuleManifest[] = [
       "ui.shadcn",
       "primitive-engine.base-ui",
     ],
+    defaults: {
+      "project-structure": "structure.react.simple",
+    },
     ui: {
       label: "Custom",
       category: "Presets",
