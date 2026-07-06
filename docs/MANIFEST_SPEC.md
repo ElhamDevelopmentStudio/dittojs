@@ -5,7 +5,7 @@
 
 The manifest system describes every selectable and resolvable unit in DittoJs.
 
-Every framework, styling system, UI library, primitive component, block, form engine, validator, preset, project structure, and adapter must be represented by manifest data.
+Every framework, styling system, UI library, primitive component, block, composition, form engine, validator, preset, project structure, and adapter must be represented by manifest data.
 
 The resolver and generator use manifests as their source of truth.
 
@@ -39,6 +39,7 @@ primitive-engine.radix-ui
 component.button
 component.input
 block.navbar
+composition.saas-dashboard
 form.react-hook-form
 form.tanstack-form
 validation.zod
@@ -72,6 +73,7 @@ validation.schema
 state.client
 http.client
 block.navbar
+composition.saas-dashboard
 project.structure
 ```
 
@@ -100,6 +102,7 @@ export type ModuleType =
   | "primitive"
   | "composite"
   | "block"
+  | "composition"
   | "form-engine"
   | "validation"
   | "state"
@@ -310,9 +313,14 @@ http-client
 
 Packages define dependencies to include in generated `package.json`.
 
+Package versions must come from the central catalog version policy in `packages/catalog/src/package-versions.ts`.
+Manifest package entries should use `packageRange(...)`; they must not use `latest`, `*`, empty strings, or one-off hardcoded versions.
+
 Example:
 
 ```ts
+import { packageRange } from "./package-versions"
+
 {
   id: "state.zustand",
   type: "state",
@@ -320,13 +328,13 @@ Example:
   provides: ["state.client"],
   packages: {
     dependencies: {
-      "zustand": "latest"
+      zustand: packageRange("zustand")
     }
   }
 }
 ```
 
-Version strategy should be centralized later. Early MVP may use `latest`, but generated templates should eventually pin versions through lockfiles.
+The default emitted policy is a caret range from the central version catalog. Exact pins require a documented reason in the catalog policy entry.
 
 ## `files`
 
@@ -503,9 +511,9 @@ export const rhfZodAdapterManifest = {
   ],
   packages: {
     dependencies: {
-      "react-hook-form": "latest",
-      "@hookform/resolvers": "latest",
-      "zod": "latest"
+      "react-hook-form": packageRange("react-hook-form"),
+      "@hookform/resolvers": packageRange("@hookform/resolvers"),
+      zod: packageRange("zod")
     }
   },
   files: [

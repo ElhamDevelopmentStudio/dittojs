@@ -2,9 +2,9 @@
 
 ## Purpose
 
-The component registry stores the component and block source templates used by the generator.
+The component registry stores the component, block, and composition source templates used by the generator.
 
-The registry must support primitives, composites, and blocks.
+The registry must support primitives, composites, blocks, and app compositions.
 
 ## Component categories
 
@@ -47,6 +47,16 @@ Examples:
 - Settings Form
 - Dashboard Shell
 
+### Compositions
+
+Compositions assemble blocks into the generated app root. They own the `app-root` slot and should import blocks through Ditto import tokens so project-structure adapters can resolve the final paths.
+
+Examples:
+
+- React Recommended App
+- SaaS Dashboard App
+- Chat App
+
 ## Registry structure
 
 Recommended structure:
@@ -75,6 +85,12 @@ packages/registry/
         manifest.ts
         files/
           sidebar.tsx
+
+    compositions/
+      saas-dashboard/
+        manifest.ts
+        files/
+          App.tsx
 
     forms/
       rhf-zod/
@@ -118,7 +134,8 @@ export const buttonManifest = {
   files: [
     {
       from: "shadcn/components/button/files/button.tsx",
-      to: "src/components/ui/button.tsx"
+      slot: "ui-component",
+      name: "button"
     }
   ]
 }
@@ -157,11 +174,15 @@ export const navbarManifest = {
   files: [
     {
       from: "shadcn/blocks/navbar/files/navbar.tsx",
-      to: "src/components/blocks/navbar.tsx"
+      slot: "block",
+      name: "navbar",
+      feature: "layout"
     }
   ]
 }
 ```
+
+Use direct `to` mappings only for fixed root files such as `index.html`, `tsconfig.json`, and `vite.config.ts`. Source files that depend on the selected project structure should use semantic slots so the selected adapter can place them in the correct layout.
 
 ## Form adapter registry
 
@@ -207,6 +228,14 @@ import { Button } from "@/components/ui/button"
 ```
 
 The generated project must include any alias configuration needed for these imports.
+
+Composition templates that import structure-slotted files must use generator-resolved Ditto import tokens instead of hardcoded paths:
+
+```ts
+import { Navbar } from "__DITTO_IMPORT_BLOCK_NAVBAR__"
+```
+
+The generator replaces the token with the selected structure's import path, such as `@/features/layout/components/navbar`.
 
 ## Component quality standards
 

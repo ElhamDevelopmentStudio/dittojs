@@ -79,6 +79,8 @@ Test:
 * all required capabilities have providers
 * all file paths are safe
 * all package maps are valid
+* all manifest package entries use the central version policy
+* catalog package version policy entries are concrete, non-latest, and caret by default unless explicitly documented
 * all presets resolve successfully
 * all MVP blocks resolve successfully
 
@@ -92,6 +94,11 @@ Generator tests verify:
 * source file writing
 * README writing
 * metadata writing
+* generated package Node engine writing
+* generated package version ranges
+* Tailwind v4 Vite plugin wiring
+* semantic project structure slot resolution
+* direct file mappings alongside slot file mappings
 * safe path protection
 * file collision errors
 * recipe input generation
@@ -101,23 +108,36 @@ Generator tests verify:
 
 Generated fixtures must be tested as real projects.
 
+Generated fixture outputs are produced during validation from tracked sources:
+
+* fixture recipes in `fixtures/recipes`
+* catalog manifests
+* registry template files
+* resolver behavior
+* generator behavior
+
+Full generated app output may stay ignored by git. CI must regenerate the output and validate it on every PR so stale committed files are not treated as proof.
+
 For each important recipe:
 
 ```bash
-pnpm install
-pnpm typecheck
-pnpm build
+pnpm --dir fixtures/generated/<name> install --ignore-workspace
+pnpm --dir fixtures/generated/<name> --ignore-workspace typecheck
+pnpm --dir fixtures/generated/<name> --ignore-workspace build
 ```
 
 MVP fixtures:
 
 ```txt
 react-recommended
-custom-minimal
-custom-maximal
+react-recommended-simple
+react-recommended-feature-based
+react-recommended-route-colocated
 saas-dashboard
 chat-app
 ```
+
+Later fixtures should add `custom-minimal` and `custom-maximal` once those presets have complete generated-output coverage.
 
 Form fixtures later:
 
@@ -163,12 +183,15 @@ Every PR should run:
 ```txt
 pnpm install
 pnpm lint
+pnpm format:check
 pnpm typecheck
 pnpm test
 pnpm build
 pnpm generate:fixtures
 pnpm test:generated
 ```
+
+Use `pnpm test` as the supported repository test entrypoint. It builds workspace package dependencies before package-level Vitest runs and also runs root script tests. Direct root `vitest` invocation is not the supported entrypoint because workspace package exports resolve through built package output.
 
 ## Generated template CI
 
@@ -185,9 +208,9 @@ fixtures/generated/chat-app
 Each should:
 
 ```bash
-pnpm install
-pnpm typecheck
-pnpm build
+pnpm --dir fixtures/generated/<name> install --ignore-workspace
+pnpm --dir fixtures/generated/<name> --ignore-workspace typecheck
+pnpm --dir fixtures/generated/<name> --ignore-workspace build
 ```
 
 ## Dependency update testing
@@ -245,3 +268,6 @@ A generated template is reliable when:
 * It has no unused required imports.
 * Its README matches the generated stack.
 * Its metadata matches the recipe.
+* Its `package.json` uses concrete caret ranges from the catalog policy.
+* Its `package.json` declares `engines.node` as `^20.19.0 || >=22.12.0`.
+* Its Tailwind setup uses `@tailwindcss/vite` and `@import "tailwindcss";`, with no PostCSS/autoprefixer or legacy Tailwind v3 directives.

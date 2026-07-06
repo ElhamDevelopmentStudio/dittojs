@@ -79,6 +79,7 @@ component.avatar
 component.dropdown
 component.sheet
 component.form
+composition.react-recommended
 ```
 
 Defaults:
@@ -102,7 +103,23 @@ A starter for dashboards, admin panels, and internal tools.
 Selections:
 
 ```txt
-preset.react-recommended
+framework.react
+styling.tailwind
+ui.shadcn
+primitive-engine.base-ui
+form.react-hook-form
+validation.zod
+http.axios
+state.zustand
+component.button
+component.input
+component.textarea
+component.label
+component.avatar
+component.dropdown
+component.sheet
+component.form
+composition.saas-dashboard
 block.navbar
 block.sidebar
 block.settings-form
@@ -132,7 +149,23 @@ A starter for messaging/chat interfaces.
 Selections:
 
 ```txt
-preset.react-recommended
+framework.react
+styling.tailwind
+ui.shadcn
+primitive-engine.base-ui
+form.react-hook-form
+validation.zod
+http.axios
+state.zustand
+component.button
+component.input
+component.textarea
+component.label
+component.avatar
+component.dropdown
+component.sheet
+component.form
+composition.chat-app
 block.navbar
 block.messaging-input
 block.typing-indicator

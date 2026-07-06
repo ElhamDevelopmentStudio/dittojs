@@ -8,12 +8,16 @@
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
-    "test": "turbo run test",
+    "test": "turbo run test && pnpm test:scripts",
+    "test:scripts": "vitest run --config vitest.config.ts scripts",
+    "check:package-versions": "tsx scripts/check-package-versions.ts",
     "generate:fixtures": "tsx scripts/generate-fixtures.ts",
+    "test:generated": "tsx scripts/test-generated.ts",
+    "check:generated": "pnpm generate:fixtures && pnpm test:generated",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "clean": "turbo run clean && rm -rf .turbo coverage dist",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build && pnpm check:generated"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

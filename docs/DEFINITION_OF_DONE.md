@@ -83,14 +83,20 @@ Generator changes are done only when:
 ```txt
 - Generator accepts a resolved recipe.
 - Generator does not resolve dependencies itself.
+- Generator resolves semantic file slots through the selected project structure adapter.
 - Files are written correctly.
 - package.json is generated correctly.
 - README is generated or updated correctly.
 - ditto.generated.json is generated correctly.
+- ditto.generated.json includes the selected project structure when one is selected.
+- Generated package.json declares the supported Node.js range.
+- Generated dependency ranges come from the catalog policy and do not use latest, *, or empty strings.
 - Unsafe paths are rejected.
 - File collisions are handled.
 - Generated fixtures pass install/typecheck/build.
 ```
+
+Generated fixture validation must regenerate templates from tracked fixture recipes, catalog manifests, registry templates, resolver code, and generator code. Full generated app output does not need to be committed when it is ignored, but CI must run `pnpm generate:fixtures` and `pnpm test:generated`.
 
 ## Preset Definition of Done
 
@@ -107,6 +113,8 @@ A preset is done only when:
 - Generated output builds.
 - UI summary is accurate.
 ```
+
+The generated fixture may be produced during CI instead of committed as full app output. The recipe fixture and source inputs remain the tracked source of truth.
 
 ## UI Definition of Done
 
@@ -155,6 +163,10 @@ Dependency changes are done only when:
 ```txt
 - Dependency is justified.
 - Manifest package entries are updated.
+- Package versions are centralized in the catalog version policy.
+- Caret ranges are used by default; exact pins include a documented reason.
+- Generated templates do not use latest, *, or empty dependency versions.
+- Tailwind output uses Tailwind v4 with @tailwindcss/vite, not PostCSS/autoprefixer or legacy Tailwind v3 directives.
 - Lockfile is updated if applicable.
 - DittoJs builds.
 - Generated templates build.

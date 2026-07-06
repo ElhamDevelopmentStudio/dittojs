@@ -339,13 +339,13 @@ component.button.shadcn and component.button.custom both provide ui.button.
 
 The resolver should collect packages from all effective selections.
 
-If the same package is requested with different versions, resolver should:
+If the same package is requested with different ranges, resolver should:
 
-1. Prefer exact compatible versions if possible.
+1. Prefer compatible ranges if possible.
 2. Return a warning or error for incompatible version requirements.
 3. Avoid silently choosing arbitrary versions.
 
-Early MVP may allow `"latest"`, but long-term behavior should be more strict.
+Manifest package ranges must come from the central catalog version policy. Generated package output must not use `"latest"`, `"*"`, or empty version strings.
 
 ## File merging
 
