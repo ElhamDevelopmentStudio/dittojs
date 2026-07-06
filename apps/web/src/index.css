@@ -1296,6 +1296,8 @@ li {
   gap: var(--space-4);
   max-height: min(48rem, 90vh);
   max-width: 56rem;
+  min-height: 0;
+  overflow: hidden;
   padding: var(--space-5);
   width: min(100%, 56rem);
 }
@@ -1320,6 +1322,8 @@ li {
 }
 
 .customization-modal {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  max-height: min(46rem, calc(100vh - (var(--space-5) * 2)));
   max-width: 64rem;
   width: min(100%, 64rem);
 }
@@ -1327,8 +1331,12 @@ li {
 .customization-section-stack {
   display: grid;
   gap: var(--space-5);
-  overflow: auto;
-  padding-right: var(--space-1);
+  margin: calc(var(--space-2) * -1);
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: var(--space-2);
+  padding-right: calc(var(--space-2) + var(--space-1));
 }
 
 .customization-section {
