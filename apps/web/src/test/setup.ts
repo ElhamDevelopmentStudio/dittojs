@@ -21,6 +21,7 @@ Object.defineProperty(URL, "revokeObjectURL", {
 })
 
 beforeEach(() => {
+  window.history.replaceState({}, "", "/")
   clipboard.writeText.mockResolvedValue(undefined)
   vi.mocked(URL.createObjectURL).mockReturnValue("blob:ditto-template")
 })

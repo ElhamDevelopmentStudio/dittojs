@@ -4,7 +4,7 @@ import { catalog } from "@dittojs/catalog"
 import { resolveRecipe } from "@dittojs/core"
 import { describe, expect, test, vi } from "vitest"
 
-import { App } from "./App"
+import { App } from "./app"
 import type {
   GenerationClient,
   GenerationRequest,
@@ -87,6 +87,16 @@ describe("DittoJs web builder", () => {
     expect(screen.getByRole("heading", { name: "Custom" })).toBeTruthy()
   })
 
+  test("Templates navigation opens Core Configuration", async () => {
+    const user = userEvent.setup()
+
+    render(<App generationClient={resolvingGenerationClient()} />)
+    await user.click(screen.getByRole("button", { name: "Templates" }))
+
+    expect(screen.getByRole("heading", { name: "Core Configuration" })).toBeTruthy()
+    await waitFor(() => expect(window.location.pathname).toBe("/templates/core"))
+  })
+
   test("coming soon options are disabled and do not change selections", async () => {
     await customizePreset("Custom")
 
@@ -113,13 +123,154 @@ describe("DittoJs web builder", () => {
     await customizePreset("React Recommended")
 
     expect(screen.getByRole("heading", { name: "Core Configuration" })).toBeTruthy()
+    await waitFor(() => expect(window.location.pathname).toBe("/templates/core"))
   })
 
-  test("Core Configuration shows Live Stack Summary", async () => {
+  test("builder steps are reflected in the URL", async () => {
+    const user = await customizePreset("React Recommended")
+
+    await waitFor(() => expect(window.location.pathname).toBe("/templates/core"))
+    await user.click(screen.getByRole("button", { name: /Continue/ }))
+    await waitFor(() => expect(window.location.pathname).toBe("/templates/features"))
+    await user.click(screen.getByRole("button", { name: /Continue/ }))
+    await waitFor(() => expect(window.location.pathname).toBe("/templates/structure"))
+    await user.click(screen.getByRole("button", { name: /Continue/ }))
+    await waitFor(() => expect(window.location.pathname).toBe("/templates/review"))
+  })
+
+  test("direct builder URLs open the matching page", () => {
+    window.history.replaceState({}, "", "/templates/structure")
+
+    render(<App generationClient={resolvingGenerationClient()} />)
+
+    expect(screen.getByRole("heading", { name: "Project Structure" })).toBeTruthy()
+    expect(window.location.pathname).toBe("/templates/structure")
+  })
+
+  test("Core Configuration shows Resolver Ledger sections", async () => {
     await customizePreset("React Recommended")
 
-    expect(screen.getByRole("complementary", { name: "Live stack summary" })).toBeTruthy()
+    expect(screen.getByRole("complementary", { name: "Resolver ledger" })).toBeTruthy()
     expect(screen.getByText("Selected by you")).toBeTruthy()
+    expect(screen.getByText("Added automatically")).toBeTruthy()
+    expect(screen.getByText("Locked dependencies")).toBeTruthy()
+  })
+
+  test("Core Configuration keeps implementation details inside customization modals", async () => {
+    await customizePreset("React Recommended")
+
+    expect(
+      screen.getByRole("button", {
+        name: /Fast React build tooling with TypeScript defaults nested inside/,
+      }),
+    ).toBeTruthy()
+    expect(
+      screen.getByRole("button", {
+        name: /Copy-and-own component conventions with Base UI primitives/,
+      }),
+    ).toBeTruthy()
+    expect(
+      screen.getByRole("button", {
+        name: /Supported generated form state and validation stack/,
+      }),
+    ).toBeTruthy()
+    expect(
+      screen.queryByRole("button", { name: /Typed source and generated project checks/ }),
+    ).toBeNull()
+    expect(
+      screen.queryByRole("button", { name: /Accessible unstyled primitive engine/ }),
+    ).toBeNull()
+    expect(screen.queryByRole("button", { name: /Supported form state engine/ })).toBeNull()
+  })
+
+  test("Core customization modals expose nested selections without enabling unsupported options", async () => {
+    const user = await customizePreset("React Recommended")
+
+    await user.click(screen.getByRole("button", { name: "Customize Vite" }))
+    const viteDialog = screen.getByRole("dialog", { name: "Customize Vite" })
+    const typescriptButton = within(viteDialog).getByRole("button", { name: /TypeScript/ })
+    const bunButton = within(viteDialog).getByRole("button", { name: /Bun/ }) as HTMLButtonElement
+
+    expect(typescriptButton.getAttribute("aria-pressed")).toBe("true")
+    expect(bunButton.disabled).toBe(true)
+    expect(
+      within(viteDialog).getByLabelText(
+        "Recommended: Recommended because generated MVP templates are currently TypeScript-first.",
+      ),
+    ).toBeTruthy()
+
+    await user.click(within(viteDialog).getByRole("button", { name: "Close customization" }))
+    await user.click(screen.getByRole("button", { name: "Customize shadcn-style UI" }))
+    const uiDialog = screen.getByRole("dialog", { name: "Customize shadcn-style UI" })
+    const baseUiButton = within(uiDialog).getByRole("button", { name: /Base UI/ })
+    const radixButton = within(uiDialog).getByRole("button", {
+      name: /Radix UI/,
+    }) as HTMLButtonElement
+
+    expect(baseUiButton.getAttribute("aria-pressed")).toBe("true")
+    expect(radixButton.disabled).toBe(true)
+  })
+
+  test("recommendation badges use metadata-backed tooltip labels", async () => {
+    await customizePreset("React Recommended")
+
+    expect(
+      screen.getByLabelText(
+        "Recommended: Recommended because React is the supported MVP framework.",
+      ),
+    ).toBeTruthy()
+  })
+
+  test("customize icon opens the modal without toggling the parent option", async () => {
+    const user = await customizePreset("Custom")
+
+    await user.click(screen.getByRole("button", { name: "Customize React Hook Form + Zod" }))
+    const dialog = screen.getByRole("dialog", { name: "Customize Forms & Validation" })
+
+    expect(screen.queryByRole("status")).toBeNull()
+    expect(
+      within(dialog)
+        .getByRole("button", { name: /React Hook Form/ })
+        .getAttribute("aria-pressed"),
+    ).toBe("false")
+    expect(within(dialog).getByRole("button", { name: /Zod/ }).getAttribute("aria-pressed")).toBe(
+      "false",
+    )
+  })
+
+  test("combined Forms and Validation parent selects both resolver modules", async () => {
+    const user = await customizePreset("Custom")
+
+    await user.click(
+      screen.getByRole("button", {
+        name: /Supported generated form state and validation stack/,
+      }),
+    )
+    await user.click(screen.getByRole("button", { name: "Customize React Hook Form + Zod" }))
+    const dialog = screen.getByRole("dialog", { name: "Customize Forms & Validation" })
+
+    expect(
+      within(dialog)
+        .getByRole("button", { name: /React Hook Form/ })
+        .getAttribute("aria-pressed"),
+    ).toBe("true")
+    expect(within(dialog).getByRole("button", { name: /Zod/ }).getAttribute("aria-pressed")).toBe(
+      "true",
+    )
+  })
+
+  test("Resolver Ledger can be hidden and expanded", async () => {
+    const user = await customizePreset("React Recommended")
+    const summary = screen.getByRole("complementary", { name: "Resolver ledger" })
+
+    await user.click(within(summary).getByRole("button", { name: "Hide resolver ledger" }))
+
+    expect(within(summary).getByText("Summary hidden.")).toBeTruthy()
+    expect(within(summary).queryByText("Selected by you")).toBeNull()
+
+    await user.click(within(summary).getByRole("button", { name: "Show resolver ledger" }))
+
+    expect(within(summary).getByText("Selected by you")).toBeTruthy()
   })
 
   test("selecting Navbar causes required dependencies to appear locked", async () => {
@@ -128,6 +279,12 @@ describe("DittoJs web builder", () => {
     await user.click(screen.getByRole("button", { name: /Continue/ }))
     await user.click(screen.getByRole("button", { name: /Navbar/ }))
 
+    expect(
+      screen.getByText(
+        "Button, Input, Avatar, and Dropdown are locked because Navbar requires them.",
+      ),
+    ).toBeTruthy()
+    expect(screen.getAllByText("Locked by Navbar").length).toBeGreaterThan(0)
     expect(screen.getAllByText(/Navbar uses Button for navigation actions/).length).toBeGreaterThan(
       0,
     )
@@ -172,8 +329,8 @@ describe("DittoJs web builder", () => {
     )
 
     expect(screen.getByText("Resolved Template")).toBeTruthy()
-    expect(screen.getByText("Resolver Decisions")).toBeTruthy()
-    expect(screen.getByText("Template Checks")).toBeTruthy()
+    expect(screen.getByText("Resolver Ledger")).toBeTruthy()
+    expect(screen.getByText("Stamped Checks")).toBeTruthy()
   })
 
   test("View JSON Manifest opens a manifest modal", async () => {
