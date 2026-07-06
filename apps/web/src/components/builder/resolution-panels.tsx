@@ -1,3 +1,4 @@
+import { useState } from "react"
 import type { ResolvedRecipe } from "@dittojs/core"
 
 import {
@@ -9,15 +10,32 @@ import {
 } from "../../builder/resolver-view-model"
 import { AppIcon } from "../icons"
 
-function ListBlock({ title, values, empty }: { title: string; values: string[]; empty: string }) {
+function visibleSummaryItems(values: string[]) {
+  const visible = values.slice(0, 8)
+  const hiddenCount = Math.max(values.length - visible.length, 0)
+
+  return { visible, hiddenCount }
+}
+
+function LedgerBlock({ title, values, empty }: { title: string; values: string[]; empty: string }) {
+  const { visible, hiddenCount } = visibleSummaryItems(values)
+
   return (
     <div className="summary-block">
-      <h3>{title}</h3>
+      <div className="summary-block-heading">
+        <h3>{title}</h3>
+        {values.length > 0 ? <span>{values.length} items</span> : null}
+      </div>
       {values.length > 0 ? (
-        <ul>
-          {values.map((value, index) => (
-            <li key={`${title}-${value}-${index}`}>{value}</li>
+        <ul className="summary-value-list">
+          {visible.map((value, index) => (
+            <li className="summary-value" key={`${title}-${value}-${index}`}>
+              {value}
+            </li>
           ))}
+          {hiddenCount > 0 ? (
+            <li className="summary-value summary-value-muted">+{hiddenCount} more</li>
+          ) : null}
         </ul>
       ) : (
         <p>{empty}</p>
@@ -27,42 +45,66 @@ function ListBlock({ title, values, empty }: { title: string; values: string[]; 
 }
 
 export function LiveStackSummary({ recipe }: { recipe: ResolvedRecipe }) {
+  const [expanded, setExpanded] = useState(true)
+
+  return (
+    <aside
+      className={`side-panel resolver-ledger${expanded ? "" : " is-collapsed"}`}
+      aria-label="Resolver ledger"
+    >
+      <div className="panel-header">
+        <div>
+          <p className="eyebrow">Resolver output</p>
+          <h2>Resolver Ledger</h2>
+        </div>
+        <button
+          type="button"
+          className="summary-toggle"
+          aria-label={expanded ? "Hide resolver ledger" : "Show resolver ledger"}
+          aria-expanded={expanded}
+          title={expanded ? "Hide resolver ledger" : "Show resolver ledger"}
+          onClick={() => setExpanded((current) => !current)}
+        >
+          <AppIcon name={expanded ? "close" : "arrow-right"} />
+        </button>
+      </div>
+      {expanded ? (
+        <ResolverLedgerBody recipe={recipe} />
+      ) : (
+        <p className="summary-collapsed-copy">Summary hidden.</p>
+      )}
+    </aside>
+  )
+}
+
+function ResolverLedgerBody({ recipe }: { recipe: ResolvedRecipe }) {
   const locks = lockSummaries(recipe)
   const errors = blockingConflicts(recipe)
 
   return (
-    <aside className="side-panel" aria-label="Live stack summary">
-      <div className="panel-header">
-        <p className="eyebrow">Resolver output</p>
-        <h2>Live Stack Summary</h2>
-      </div>
-      <ListBlock
+    <>
+      <LedgerBlock
         title="Selected by you"
         values={selectedByIntent(recipe)}
         empty="No explicit selections yet."
       />
-      <ListBlock
+      <LedgerBlock
         title="Added automatically"
         values={addedAutomatically(recipe)}
         empty="No resolver additions."
       />
+      <LedgerBlock
+        title="Locked dependencies"
+        values={locks.map((lock) => lock.label)}
+        empty="No locked dependencies."
+      />
       <div className="summary-block">
-        <h3>Locked dependencies</h3>
-        {locks.length > 0 ? (
-          <ul>
-            {locks.map((lock) => (
-              <li key={lock.moduleId}>
-                <span>{lock.label}</span>
-                <small>{lock.reasons.map((reason) => reason.reason).join(" ")}</small>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No locked dependencies.</p>
-        )}
-      </div>
-      <div className="summary-block">
-        <h3>Warnings / conflicts</h3>
+        <div className="summary-block-heading">
+          <h3>Warnings / conflicts</h3>
+          {errors.length + recipe.warnings.length > 0 ? (
+            <span>{errors.length + recipe.warnings.length} items</span>
+          ) : null}
+        </div>
         {errors.length > 0 || recipe.warnings.length > 0 ? (
           <ul>
             {errors.map((conflict, index) => (
@@ -79,50 +121,18 @@ export function LiveStackSummary({ recipe }: { recipe: ResolvedRecipe }) {
           <p>No resolver warnings or conflicts.</p>
         )}
       </div>
-    </aside>
+    </>
   )
 }
 
 export function DependencyNotes({ recipe }: { recipe: ResolvedRecipe }) {
   return (
-    <aside className="side-panel" aria-label="Dependency notes">
+    <aside className="side-panel resolver-ledger" aria-label="Resolver ledger">
       <div className="panel-header">
-        <p className="eyebrow">Dependency notes</p>
-        <h2>Resolver Decisions</h2>
+        <p className="eyebrow">Manifest ledger</p>
+        <h2>Resolver Ledger</h2>
       </div>
-      <ListBlock
-        title="Selected by you"
-        values={selectedByIntent(recipe)}
-        empty="No explicit selections yet."
-      />
-      <ListBlock
-        title="Added automatically"
-        values={addedAutomatically(recipe)}
-        empty="No automatic additions yet."
-      />
-      <div className="summary-block">
-        <h3>Locked dependencies</h3>
-        {lockSummaries(recipe).length > 0 ? (
-          <ul>
-            {lockSummaries(recipe).map((lock, index) => (
-              <li key={`${lock.moduleId}-${index}`}>
-                {lock.label}
-                <small>{lock.reasons.map((reason) => reason.reason).join(" ")}</small>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No locked dependencies.</p>
-        )}
-      </div>
-      <ListBlock
-        title="Resolver warnings/errors"
-        values={[
-          ...blockingConflicts(recipe).map((conflict) => conflict.message),
-          ...recipe.warnings.map((warning) => warning.message),
-        ]}
-        empty="No resolver warnings or errors."
-      />
+      <ResolverLedgerBody recipe={recipe} />
     </aside>
   )
 }
@@ -161,10 +171,10 @@ export function ValidationCard({ recipe }: { recipe: ResolvedRecipe }) {
   ]
 
   return (
-    <div className="review-card">
+    <div className="review-card validation-stamp">
       <div className="panel-header">
         <p className="eyebrow">Validation</p>
-        <h2>Template Checks</h2>
+        <h2>Stamped Checks</h2>
       </div>
       <ul className="check-list">
         {checks.map((check) => (

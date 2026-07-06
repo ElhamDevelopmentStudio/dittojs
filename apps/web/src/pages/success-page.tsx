@@ -5,7 +5,7 @@ import {
   selectedProjectStructureId,
 } from "../builder/resolver-view-model"
 import type { GenerationResponse } from "../services/generation-client"
-import { ManifestModal } from "../components/builder/ManifestModal"
+import { ManifestModal } from "../components/builder/manifest-modal"
 import { AppIcon } from "../components/icons"
 
 export function SuccessPage({

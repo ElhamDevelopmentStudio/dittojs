@@ -1,6 +1,6 @@
 import type { PresetOption } from "../../builder/builder-options"
-import { RecommendedBadge } from "./Badges"
-import { AppIcon } from "../icons"
+import { RecommendedBadge } from "./badges"
+import { AppIcon, isAppIconName } from "../icons"
 
 export function PresetCard({
   preset,
@@ -11,28 +11,34 @@ export function PresetCard({
   onCreate: (presetId: string) => void
   onCustomize: (presetId: string) => void
 }) {
+  const iconName = isAppIconName(preset.icon) ? preset.icon : "react"
+
   return (
     <article className="preset-card">
       <div className="preset-card-header">
+        <span className="preset-card-icon" aria-hidden="true">
+          <AppIcon name={iconName} />
+        </span>
         <div>
+          <p className="preset-card-kicker">Preset Manifest</p>
           <h2>{preset.title}</h2>
-          <p>{preset.stack}</p>
         </div>
-        {preset.recommended === true ? <RecommendedBadge /> : null}
+        {preset.recommended === true && preset.recommendationReason !== undefined ? (
+          <RecommendedBadge reason={preset.recommendationReason} />
+        ) : null}
       </div>
       <p className="preset-card-copy">{preset.description}</p>
+      <p className="preset-card-stack">{preset.stack}</p>
       <div className="preset-card-actions">
-        <button type="button" className="button button-dark" onClick={() => onCreate(preset.id)}>
-          <AppIcon name="play" />
+        <button type="button" className="text-button" onClick={() => onCreate(preset.id)}>
           Create
         </button>
         <button
           type="button"
-          className="button button-light"
+          className="text-button text-button-muted"
           onClick={() => onCustomize(preset.id)}
         >
           Customize
-          <AppIcon name="arrow-right" />
         </button>
       </div>
     </article>

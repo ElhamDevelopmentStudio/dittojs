@@ -3,9 +3,9 @@ import type { ResolvedRecipe } from "@dittojs/core"
 import type { BuilderOption } from "../builder/builder-options"
 import { projectStructureOptions } from "../builder/builder-options"
 import { selectedProjectStructureId } from "../builder/resolver-view-model"
-import { OptionCard } from "../components/builder/OptionCard"
+import { OptionCard } from "../components/builder/option-card"
 import { AppIcon } from "../components/icons"
-import { FooterActions, StepHeader } from "../components/layout/AppShell"
+import { FooterActions, StepHeader } from "../components/layout/app-shell"
 
 const treePreviews: Record<string, string[]> = {
   "structure.react.simple": ["src/components", "src/pages", "src/stores", "src/lib"],
@@ -36,7 +36,7 @@ export function ProjectStructurePage({
         <StepHeader
           eyebrow="Step 3"
           title="Project Structure"
-          description="Choose exactly one layout. Explicit selection overrides preset defaults."
+          description="Choose the generated source layout."
         />
         <div className="structure-grid">
           {projectStructureOptions.map((option) => {
@@ -54,11 +54,11 @@ export function ProjectStructurePage({
           })}
         </div>
         <FooterActions>
-          <button type="button" className="button button-inverted-outline" onClick={onBack}>
+          <button type="button" className="button button-light" onClick={onBack}>
             <AppIcon name="arrow-left" />
             Back
           </button>
-          <button type="button" className="button button-inverted" onClick={onContinue}>
+          <button type="button" className="button button-dark" onClick={onContinue}>
             Continue
             <AppIcon name="arrow-right" />
           </button>

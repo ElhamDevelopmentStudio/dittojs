@@ -1,14 +1,14 @@
 import type { ResolvedRecipe } from "@dittojs/core"
 
 import { blockingConflicts, canGenerate } from "../builder/resolver-view-model"
-import { ManifestModal } from "../components/builder/ManifestModal"
+import { ManifestModal } from "../components/builder/manifest-modal"
 import {
   DependencyNotes,
   StackSummaryTable,
   ValidationCard,
-} from "../components/builder/ResolutionPanels"
+} from "../components/builder/resolution-panels"
 import { AppIcon } from "../components/icons"
-import { FooterActions, StepHeader } from "../components/layout/AppShell"
+import { FooterActions, StepHeader } from "../components/layout/app-shell"
 
 export function ReviewManifestPage({
   recipe,
@@ -38,7 +38,7 @@ export function ReviewManifestPage({
         <StepHeader
           eyebrow="Step 4"
           title="Your Template Is Ready."
-          description="Review the resolved manifest, dependency decisions, validation checks, and generation command."
+          description="Review the resolved stack and generate the archive."
         />
         <div className="review-grid">
           <div className="review-card review-card-wide">

@@ -87,6 +87,12 @@ export function lockExplanation(recipe: ResolvedRecipe, moduleId: string): strin
   return reasons.map((reason) => `${labelForModule(reason.requiredBy)}: ${reason.reason}`).join(" ")
 }
 
+export function lockedLabelsRequiredBy(recipe: ResolvedRecipe, requiredBy: string): string[] {
+  return lockSummaries(recipe)
+    .filter((lock) => lock.reasons.some((reason) => reason.requiredBy === requiredBy))
+    .map((lock) => lock.label)
+}
+
 function labelsByType(recipe: ResolvedRecipe, type: ModuleManifest["type"]): string {
   const labels = recipe.effectiveSelections
     .filter((moduleId) => moduleType(moduleId) === type)
