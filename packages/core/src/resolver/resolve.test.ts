@@ -17,7 +17,7 @@ const testCatalog: ModuleManifest[] = [
     provides: ["styling.tailwind"],
     packages: {
       devDependencies: {
-        tailwindcss: "latest",
+        tailwindcss: "^4.3.2",
       },
     },
   },
@@ -33,7 +33,7 @@ const testCatalog: ModuleManifest[] = [
     },
     packages: {
       dependencies: {
-        "@base-ui-components/react": "latest",
+        "@base-ui/react": "^1.6.0",
       },
     },
   },
@@ -65,7 +65,7 @@ const testCatalog: ModuleManifest[] = [
     },
     packages: {
       dependencies: {
-        "class-variance-authority": "latest",
+        "class-variance-authority": "^0.7.1",
       },
     },
   },
@@ -198,7 +198,7 @@ const testCatalog: ModuleManifest[] = [
     ],
     packages: {
       dependencies: {
-        "react-hook-form": "latest",
+        "react-hook-form": "^7.81.0",
       },
     },
   },
@@ -546,11 +546,11 @@ describe("resolveRecipe", () => {
     const result = resolve(["ui.shadcn"])
 
     expect(result.packages.dependencies).toMatchObject({
-      "@base-ui-components/react": "latest",
-      "class-variance-authority": "latest",
+      "@base-ui/react": "^1.6.0",
+      "class-variance-authority": "^0.7.1",
     })
     expect(result.packages.devDependencies).toMatchObject({
-      tailwindcss: "latest",
+      tailwindcss: "^4.3.2",
     })
   })
 
