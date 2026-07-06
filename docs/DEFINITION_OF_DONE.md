@@ -123,14 +123,24 @@ UI changes are done only when:
 ```txt
 - UI reads resolver output.
 - UI does not hardcode dependency rules.
+- Explicit user selections and effective selections remain separate.
 - Locked dependencies are explained.
 - Conflicts are actionable.
 - Recommended defaults are clear.
+- Coming soon options are disabled and do not update state.
+- Every enabled action works or is removed.
+- JSON manifest viewing works from the resolved recipe.
+- Copy CLI writes the current command to the clipboard.
+- Generation loading, success, and error states are handled.
+- Download ZIP is wired to the real archive response after generation.
 - Advanced options are hidden until requested.
 - Empty/loading/error states are handled.
 - Keyboard/accessibility basics are considered.
 - Manual UI review is complete if required.
 ```
+
+Web builder UI changes are not done if auth, saved templates, pricing, or AI
+recommendations are presented as enabled behavior before those systems exist.
 
 ## Testing Definition of Done
 

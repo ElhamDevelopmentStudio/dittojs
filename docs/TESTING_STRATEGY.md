@@ -155,13 +155,35 @@ UI tests should verify:
 
 * preset cards render
 * selecting preset updates summary
+* preset Create reaches review with a resolved recipe
+* preset Customize reaches core configuration
+* coming soon options are disabled and do not mutate selections
 * selecting shadcn locks Tailwind
 * selecting Navbar locks Button/Input/Avatar/Dropdown
 * locked items cannot be deselected directly
+* project structure selection overrides preset defaults
 * conflicts are displayed
 * advanced customization can be opened
 * review screen shows correct stack
 * create button is disabled on error conflicts
+* JSON manifest modal opens with resolver output
+* Copy CLI calls the clipboard API
+* generation success reaches Success / Download
+* generation failure shows Retry and Back to Review
+* Download ZIP is backed by a generated archive response
+
+The current MVP uses Vitest and Testing Library component/integration tests for
+the browser flow. Playwright can be added later for full browser E2E coverage.
+
+## Generation API tests
+
+Generation API tests should verify:
+
+* requests are resolved through `resolveRecipe`
+* resolver conflicts are returned as blocking generation errors
+* `generateProject` writes a real temporary project
+* ZIP creation returns an `application/zip` archive
+* returned metadata matches the resolved manifest used by the UI
 
 ## End-to-end tests
 

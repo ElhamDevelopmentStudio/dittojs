@@ -46,6 +46,34 @@ Download ZIP
 Optional: sign in to save
 ```
 
+## Web Builder MVP flow
+
+The MVP web builder uses the Stitch editorial scaffolder flow:
+
+```txt
+Landing & Presets
+  ↓
+Step 1: Core Configuration
+  ↓
+Step 2: Features & Blocks
+  ↓
+Step 3: Project Structure
+  ↓
+Step 4: Review & Manifest
+  ↓
+Generating Template
+  ↓
+Success / Download
+```
+
+Every enabled control must perform a real action. Unsupported features such as
+auth, saved templates, pricing, AI recommendations, unsupported frameworks,
+unsupported form engines, unsupported validators, and database generation must
+be disabled or removed until implemented.
+
+Coming soon controls must be visibly disabled and non-interactive. They must not
+enter `userSelections` or reach the resolver.
+
 ## Homepage
 
 Homepage should answer:
@@ -241,6 +269,16 @@ Warnings:
 None
 ```
 
+Review must also provide:
+
+* View JSON Manifest, backed by the current resolved recipe.
+* Copy CLI, backed by the current preset and explicit user selections.
+* Generate Template, disabled when resolver conflicts have severity `error`.
+
+The manifest view should show formatted JSON from resolver output, including
+`userSelections`, `effectiveSelections`, `locks`, `conflicts`, `warnings`,
+`packages`, `files`, and `metadata`.
+
 ## Guest vs logged-in UX
 
 Generation must work without login.
@@ -255,6 +293,21 @@ Your template is ready.
 ```
 
 Do not block generation with authentication.
+
+The success screen must keep value creation first:
+
+```txt
+Template generated.
+Your DittoJs template is ready to download.
+
+[Download ZIP]
+[View JSON Manifest]
+[Copy CLI Command]
+[Sign in to save] Coming soon
+```
+
+Download ZIP must be wired to the real generation archive response. Sign in to
+save remains disabled until authentication and saved templates are implemented.
 
 ## AI recommendation UX
 
