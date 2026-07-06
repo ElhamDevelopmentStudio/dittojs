@@ -1,5 +1,6 @@
 import type { ResolvedPackageSet } from "@dittojs/core"
 
+import { GENERATED_NODE_ENGINE } from "./node-policy"
 import type { GeneratedPackageJson } from "./types"
 
 function sortPackageMap(packageMap: Record<string, string> | undefined): Record<string, string> {
@@ -41,6 +42,9 @@ export function createPackageJson(input: {
       build: "tsc -b && vite build",
       preview: "vite preview",
       typecheck: "tsc --noEmit",
+    },
+    engines: {
+      node: GENERATED_NODE_ENGINE,
     },
     dependencies,
     devDependencies,

@@ -39,6 +39,9 @@ export type GeneratedPackageJson = {
     preview: string
     typecheck: string
   }
+  engines: {
+    node: string
+  }
   dependencies: Record<string, string>
   devDependencies: Record<string, string>
   peerDependencies?: Record<string, string>
