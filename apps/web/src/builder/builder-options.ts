@@ -1,3 +1,5 @@
+import { catalog } from "@dittojs/catalog"
+
 export type BuilderStep =
   "landing" | "core" | "features" | "structure" | "review" | "generating" | "success"
 
@@ -6,6 +8,8 @@ export type PresetOption = {
   title: string
   description: string
   stack: string
+  icon?: string
+  recommendationReason?: string | undefined
   recommended?: boolean
 }
 
@@ -14,11 +18,15 @@ export type BuilderOption = {
   label: string
   description: string
   moduleId?: string
+  moduleIds?: string[]
   groupId: string
   groupMode?: "toggle" | "exactly-one"
   recommended?: boolean
+  recommendationReason?: string | undefined
   comingSoon?: boolean
   meta?: string
+  icon?: string
+  customization?: OptionCustomization
 }
 
 export type OptionGroup = {
@@ -28,12 +36,52 @@ export type OptionGroup = {
   options: BuilderOption[]
 }
 
+export type CustomizationSection = {
+  id: string
+  title: string
+  description?: string
+  options: BuilderOption[]
+}
+
+export type OptionCustomization = {
+  title: string
+  description: string
+  sections: CustomizationSection[]
+}
+
+export function moduleIdsForOption(option: BuilderOption): string[] {
+  return Array.from(
+    new Set([
+      ...(option.moduleId === undefined ? [] : [option.moduleId]),
+      ...(option.moduleIds ?? []),
+    ]),
+  )
+}
+
+function iconForModule(moduleId: string | undefined, fallback: string): string {
+  if (moduleId === undefined) {
+    return fallback
+  }
+
+  return catalog.find((manifest) => manifest.id === moduleId)?.ui?.icon ?? fallback
+}
+
+function recommendationReasonForModule(moduleId: string | undefined): string | undefined {
+  if (moduleId === undefined) {
+    return undefined
+  }
+
+  return catalog.find((manifest) => manifest.id === moduleId)?.ui?.recommendationReason
+}
+
 export const presetOptions: PresetOption[] = [
   {
     id: "preset.react-recommended",
     title: "React Recommended",
     description: "A production-ready React baseline with shadcn-style UI, forms, state, and HTTP.",
     stack: "React + Vite + TypeScript + Tailwind v4",
+    icon: iconForModule("preset.react-recommended", "react"),
+    recommendationReason: "Recommended because it is the default dependency-correct React starter.",
     recommended: true,
   },
   {
@@ -41,6 +89,9 @@ export const presetOptions: PresetOption[] = [
     title: "SaaS Dashboard",
     description: "Dashboard composition with navigation, settings, and durable defaults.",
     stack: "Recommended stack + dashboard composition",
+    icon: iconForModule("preset.saas-dashboard", "dashboard"),
+    recommendationReason:
+      "Recommended because it extends the supported stack with dashboard composition.",
     recommended: true,
   },
   {
@@ -48,6 +99,9 @@ export const presetOptions: PresetOption[] = [
     title: "Chat App",
     description: "Messaging-focused composition with chat blocks and presence primitives.",
     stack: "Recommended stack + messaging composition",
+    icon: iconForModule("preset.chat-app", "chat"),
+    recommendationReason:
+      "Recommended because it extends the supported stack with messaging composition.",
     recommended: true,
   },
   {
@@ -55,6 +109,7 @@ export const presetOptions: PresetOption[] = [
     title: "Custom",
     description: "Minimal React foundation for choosing each supported module yourself.",
     stack: "React + Vite + TypeScript + Tailwind v4",
+    icon: iconForModule("preset.custom", "settings"),
   },
 ]
 
@@ -70,6 +125,8 @@ export const coreOptionGroups: OptionGroup[] = [
         description: "Supported MVP framework.",
         moduleId: "framework.react",
         groupId: "framework",
+        icon: iconForModule("framework.react", "react"),
+        recommendationReason: recommendationReasonForModule("framework.react"),
         recommended: true,
       },
       {
@@ -77,6 +134,7 @@ export const coreOptionGroups: OptionGroup[] = [
         label: "Vue",
         description: "Not part of the MVP generator surface.",
         groupId: "framework",
+        icon: "vue",
         comingSoon: true,
       },
       {
@@ -84,37 +142,94 @@ export const coreOptionGroups: OptionGroup[] = [
         label: "Svelte",
         description: "Not part of the MVP generator surface.",
         groupId: "framework",
+        icon: "svelte",
         comingSoon: true,
       },
     ],
   },
   {
     id: "tooling",
-    title: "Build & Language",
-    description: "Compiler and project tooling.",
+    title: "Build Tool",
+    description: "Primary compiler and React development server.",
     options: [
       {
         id: "vite",
         label: "Vite",
-        description: "Fast React build tooling.",
+        description: "Fast React build tooling with TypeScript defaults nested inside.",
         moduleId: "tooling.vite",
         groupId: "tooling",
+        icon: iconForModule("tooling.vite", "flash"),
+        recommendationReason: recommendationReasonForModule("tooling.vite"),
         recommended: true,
-      },
-      {
-        id: "typescript",
-        label: "TypeScript",
-        description: "Typed source and generated project checks.",
-        moduleId: "tooling.typescript",
-        groupId: "tooling",
-        recommended: true,
-      },
-      {
-        id: "bun",
-        label: "Bun",
-        description: "Runtime tooling is not enabled in this MVP.",
-        groupId: "tooling",
-        comingSoon: true,
+        customization: {
+          title: "Customize Vite",
+          description:
+            "Language and package-manager choices are nested under the selected build tool.",
+          sections: [
+            {
+              id: "language",
+              title: "Language",
+              options: [
+                {
+                  id: "typescript",
+                  label: "TypeScript",
+                  description: "Typed source and generated project checks.",
+                  moduleId: "tooling.typescript",
+                  groupId: "language",
+                  icon: iconForModule("tooling.typescript", "code"),
+                  recommendationReason: recommendationReasonForModule("tooling.typescript"),
+                  recommended: true,
+                },
+                {
+                  id: "javascript",
+                  label: "JavaScript",
+                  description: "A JavaScript template variant is not generated yet.",
+                  groupId: "language",
+                  icon: "code",
+                  comingSoon: true,
+                },
+              ],
+            },
+            {
+              id: "package-manager",
+              title: "Package manager",
+              options: [
+                {
+                  id: "pnpm",
+                  label: "pnpm",
+                  description: "Package-manager selection is not generated yet.",
+                  groupId: "package-manager",
+                  icon: "terminal",
+                  comingSoon: true,
+                },
+                {
+                  id: "npm",
+                  label: "npm",
+                  description: "Package-manager selection is not generated yet.",
+                  groupId: "package-manager",
+                  icon: "terminal",
+                  comingSoon: true,
+                },
+                {
+                  id: "bun",
+                  label: "Bun",
+                  description: "Bun runtime tooling is not enabled in this MVP.",
+                  groupId: "package-manager",
+                  icon: "terminal",
+                  comingSoon: true,
+                },
+                {
+                  id: "yarn",
+                  label: "yarn",
+                  description: "Package-manager selection is not generated yet.",
+                  groupId: "package-manager",
+                  icon: "terminal",
+                  comingSoon: true,
+                },
+              ],
+            },
+          ],
+        },
       },
     ],
   },
@@ -130,6 +245,8 @@ export const coreOptionGroups: OptionGroup[] = [
         moduleId: "styling.tailwind",
         groupId: "styling",
         groupMode: "exactly-one",
+        icon: iconForModule("styling.tailwind", "tailwind"),
+        recommendationReason: recommendationReasonForModule("styling.tailwind"),
         recommended: true,
       },
       {
@@ -137,6 +254,7 @@ export const coreOptionGroups: OptionGroup[] = [
         label: "CSS Modules",
         description: "Alternative styling outputs are not implemented yet.",
         groupId: "styling",
+        icon: "file",
         comingSoon: true,
       },
       {
@@ -144,6 +262,7 @@ export const coreOptionGroups: OptionGroup[] = [
         label: "Styled Components",
         description: "Runtime CSS-in-JS output is not implemented yet.",
         groupId: "styling",
+        icon: "palette",
         comingSoon: true,
       },
     ],
@@ -151,83 +270,166 @@ export const coreOptionGroups: OptionGroup[] = [
   {
     id: "ui",
     title: "UI System",
-    description: "Component conventions and primitive engine.",
+    description: "Component conventions with nested primitive settings.",
     options: [
       {
         id: "shadcn",
         label: "shadcn-style UI",
-        description: "Copy-and-own component conventions.",
+        description: "Copy-and-own component conventions with Base UI primitives.",
         moduleId: "ui.shadcn",
         groupId: "ui",
+        icon: iconForModule("ui.shadcn", "palette"),
+        recommendationReason: recommendationReasonForModule("ui.shadcn"),
         recommended: true,
-      },
-      {
-        id: "base-ui",
-        label: "Base UI",
-        description: "Accessible unstyled primitive engine.",
-        moduleId: "primitive-engine.base-ui",
-        groupId: "ui",
-        recommended: true,
-      },
-      {
-        id: "radix",
-        label: "Radix UI",
-        description: "Not connected to generator templates in this MVP.",
-        groupId: "ui",
-        comingSoon: true,
+        customization: {
+          title: "Customize shadcn-style UI",
+          description:
+            "Primitive engine, style, and theme settings are nested under the selected UI system.",
+          sections: [
+            {
+              id: "primitive-engine",
+              title: "Primitive engine",
+              options: [
+                {
+                  id: "base-ui",
+                  label: "Base UI",
+                  description: "Accessible unstyled primitive engine.",
+                  moduleId: "primitive-engine.base-ui",
+                  groupId: "primitive-engine",
+                  groupMode: "exactly-one",
+                  icon: iconForModule("primitive-engine.base-ui", "box"),
+                  recommendationReason: recommendationReasonForModule("primitive-engine.base-ui"),
+                  recommended: true,
+                },
+                {
+                  id: "radix",
+                  label: "Radix UI",
+                  description: "Radix templates are not connected to generator output yet.",
+                  groupId: "primitive-engine",
+                  icon: "box",
+                  comingSoon: true,
+                },
+              ],
+            },
+            {
+              id: "style",
+              title: "Style",
+              options: ["Nova", "Vega", "Maia", "Lyra", "Mira", "Luma", "Sera", "Rhea"].map(
+                (label) => ({
+                  id: `style-${label.toLowerCase()}`,
+                  label,
+                  description: "Style variants are not wired to generator output yet.",
+                  groupId: "style",
+                  icon: "palette",
+                  comingSoon: true,
+                }),
+              ),
+            },
+            {
+              id: "theme",
+              title: "Theme",
+              options: ["Neutral", "Slate", "Zinc"].map((label) => ({
+                id: `theme-${label.toLowerCase()}`,
+                label,
+                description: "Theme variants are not wired to generator output yet.",
+                groupId: "theme",
+                icon: "palette",
+                comingSoon: true,
+              })),
+            },
+          ],
+        },
       },
     ],
   },
   {
     id: "forms",
     title: "Forms & Validation",
-    description: "Form state and schema validation.",
+    description: "Supported form and schema stack.",
     options: [
       {
-        id: "react-hook-form",
-        label: "React Hook Form",
-        description: "Supported form state engine.",
-        moduleId: "form.react-hook-form",
-        groupId: "form-engine",
-        groupMode: "exactly-one",
+        id: "react-hook-form-zod",
+        label: "React Hook Form + Zod",
+        description: "Supported generated form state and validation stack.",
+        moduleIds: ["form.react-hook-form", "validation.zod"],
+        groupId: "forms-validation",
+        icon: iconForModule("form.react-hook-form", "form"),
+        recommendationReason:
+          "Recommended because it is the supported form and validation stack for generated templates.",
         recommended: true,
-      },
-      {
-        id: "zod",
-        label: "Zod",
-        description: "Supported schema validation engine.",
-        moduleId: "validation.zod",
-        groupId: "validation-schema",
-        groupMode: "exactly-one",
-        recommended: true,
-      },
-      {
-        id: "tanstack-form",
-        label: "TanStack Form",
-        description: "Alternative form engines are disabled until supported.",
-        groupId: "form-engine",
-        comingSoon: true,
-      },
-      {
-        id: "conform",
-        label: "Conform",
-        description: "Alternative form engines are disabled until supported.",
-        groupId: "form-engine",
-        comingSoon: true,
-      },
-      {
-        id: "yup",
-        label: "Yup",
-        description: "Alternative validators are disabled until supported.",
-        groupId: "validation-schema",
-        comingSoon: true,
-      },
-      {
-        id: "valibot",
-        label: "Valibot",
-        description: "Alternative validators are disabled until supported.",
-        groupId: "validation-schema",
-        comingSoon: true,
+        customization: {
+          title: "Customize Forms & Validation",
+          description:
+            "Form engine and schema choices are grouped as one generated stack decision.",
+          sections: [
+            {
+              id: "form-engine",
+              title: "Form engine",
+              options: [
+                {
+                  id: "react-hook-form",
+                  label: "React Hook Form",
+                  description: "Supported form state engine.",
+                  moduleId: "form.react-hook-form",
+                  groupId: "form-engine",
+                  groupMode: "exactly-one",
+                  icon: iconForModule("form.react-hook-form", "form"),
+                  recommendationReason: recommendationReasonForModule("form.react-hook-form"),
+                  recommended: true,
+                },
+                {
+                  id: "tanstack-form",
+                  label: "TanStack Form",
+                  description: "Alternative form engines are disabled until supported.",
+                  groupId: "form-engine",
+                  icon: "form",
+                  comingSoon: true,
+                },
+                {
+                  id: "conform",
+                  label: "Conform",
+                  description: "Alternative form engines are disabled until supported.",
+                  groupId: "form-engine",
+                  icon: "form",
+                  comingSoon: true,
+                },
+              ],
+            },
+            {
+              id: "validation-schema",
+              title: "Validation",
+              options: [
+                {
+                  id: "zod",
+                  label: "Zod",
+                  description: "Supported schema validation engine.",
+                  moduleId: "validation.zod",
+                  groupId: "validation-schema",
+                  groupMode: "exactly-one",
+                  icon: iconForModule("validation.zod", "code"),
+                  recommendationReason: recommendationReasonForModule("validation.zod"),
+                  recommended: true,
+                },
+                {
+                  id: "yup",
+                  label: "Yup",
+                  description: "Alternative validators are disabled until supported.",
+                  groupId: "validation-schema",
+                  icon: "code",
+                  comingSoon: true,
+                },
+                {
+                  id: "valibot",
+                  label: "Valibot",
+                  description: "Alternative validators are disabled until supported.",
+                  groupId: "validation-schema",
+                  icon: "code",
+                  comingSoon: true,
+                },
+              ],
+            },
+          ],
+        },
       },
     ],
   },
@@ -243,6 +445,8 @@ export const coreOptionGroups: OptionGroup[] = [
         moduleId: "state.zustand",
         groupId: "state-client",
         groupMode: "exactly-one",
+        icon: iconForModule("state.zustand", "stack"),
+        recommendationReason: recommendationReasonForModule("state.zustand"),
         recommended: true,
       },
       {
@@ -252,6 +456,8 @@ export const coreOptionGroups: OptionGroup[] = [
         moduleId: "http.axios",
         groupId: "http-client",
         groupMode: "exactly-one",
+        icon: iconForModule("http.axios", "cloud"),
+        recommendationReason: recommendationReasonForModule("http.axios"),
         recommended: true,
       },
       {
@@ -259,6 +465,7 @@ export const coreOptionGroups: OptionGroup[] = [
         label: "PostgreSQL",
         description: "Database generation is outside the MVP.",
         groupId: "database",
+        icon: "database",
         comingSoon: true,
       },
       {
@@ -266,6 +473,7 @@ export const coreOptionGroups: OptionGroup[] = [
         label: "Prisma",
         description: "ORM generation is outside the MVP.",
         groupId: "database",
+        icon: "database",
         comingSoon: true,
       },
     ],
@@ -279,6 +487,7 @@ export const componentOptions: BuilderOption[] = [
     description: "Action primitive generated from the selected UI library.",
     moduleId: "component.button",
     groupId: "components",
+    icon: iconForModule("component.button", "box"),
   },
   {
     id: "input",
@@ -286,6 +495,7 @@ export const componentOptions: BuilderOption[] = [
     description: "Text input primitive for forms and block requirements.",
     moduleId: "component.input",
     groupId: "components",
+    icon: iconForModule("component.input", "input"),
   },
   {
     id: "textarea",
@@ -293,6 +503,7 @@ export const componentOptions: BuilderOption[] = [
     description: "Multi-line text input primitive.",
     moduleId: "component.textarea",
     groupId: "components",
+    icon: iconForModule("component.textarea", "text"),
   },
   {
     id: "label",
@@ -300,6 +511,7 @@ export const componentOptions: BuilderOption[] = [
     description: "Accessible form label primitive.",
     moduleId: "component.label",
     groupId: "components",
+    icon: iconForModule("component.label", "text"),
   },
   {
     id: "avatar",
@@ -307,6 +519,7 @@ export const componentOptions: BuilderOption[] = [
     description: "Identity primitive for account and presence surfaces.",
     moduleId: "component.avatar",
     groupId: "components",
+    icon: iconForModule("component.avatar", "user"),
   },
   {
     id: "dropdown",
@@ -314,6 +527,7 @@ export const componentOptions: BuilderOption[] = [
     description: "Composite menu and account action primitive.",
     moduleId: "component.dropdown",
     groupId: "components",
+    icon: iconForModule("component.dropdown", "menu"),
   },
   {
     id: "sheet",
@@ -321,6 +535,7 @@ export const componentOptions: BuilderOption[] = [
     description: "Slide-over panel for responsive navigation.",
     moduleId: "component.sheet",
     groupId: "components",
+    icon: iconForModule("component.sheet", "layout"),
   },
   {
     id: "form",
@@ -328,6 +543,7 @@ export const componentOptions: BuilderOption[] = [
     description: "Form helpers wired to React Hook Form and Zod.",
     moduleId: "component.form",
     groupId: "components",
+    icon: iconForModule("component.form", "form"),
   },
 ]
 
@@ -338,6 +554,7 @@ export const blockOptions: BuilderOption[] = [
     description: "Top navigation with search and account controls.",
     moduleId: "block.navbar",
     groupId: "blocks",
+    icon: iconForModule("block.navbar", "layout"),
   },
   {
     id: "sidebar",
@@ -345,6 +562,7 @@ export const blockOptions: BuilderOption[] = [
     description: "Application sidebar navigation.",
     moduleId: "block.sidebar",
     groupId: "blocks",
+    icon: iconForModule("block.sidebar", "sidebar"),
   },
   {
     id: "messaging-input",
@@ -352,6 +570,7 @@ export const blockOptions: BuilderOption[] = [
     description: "Chat composer with input and send action.",
     moduleId: "block.messaging-input",
     groupId: "blocks",
+    icon: iconForModule("block.messaging-input", "message"),
   },
   {
     id: "typing-indicator",
@@ -359,6 +578,7 @@ export const blockOptions: BuilderOption[] = [
     description: "Activity indicator for chat threads.",
     moduleId: "block.typing-indicator",
     groupId: "blocks",
+    icon: iconForModule("block.typing-indicator", "chat"),
   },
   {
     id: "online-presence",
@@ -366,6 +586,7 @@ export const blockOptions: BuilderOption[] = [
     description: "Presence indicator paired with Avatar.",
     moduleId: "block.online-presence",
     groupId: "blocks",
+    icon: iconForModule("block.online-presence", "user"),
   },
   {
     id: "settings-form",
@@ -373,12 +594,14 @@ export const blockOptions: BuilderOption[] = [
     description: "Workspace settings form backed by Form, RHF, and Zod.",
     moduleId: "block.settings-form",
     groupId: "blocks",
+    icon: iconForModule("block.settings-form", "settings"),
   },
   {
     id: "auth-form",
     label: "Auth Form",
     description: "Authentication flows are outside this MVP.",
     groupId: "blocks",
+    icon: "form",
     comingSoon: true,
   },
   {
@@ -386,6 +609,7 @@ export const blockOptions: BuilderOption[] = [
     label: "Data Table",
     description: "Table generation is not implemented yet.",
     groupId: "blocks",
+    icon: "table",
     comingSoon: true,
   },
   {
@@ -393,6 +617,7 @@ export const blockOptions: BuilderOption[] = [
     label: "Dashboard Shell",
     description: "Shell-level dashboard generation is not implemented yet.",
     groupId: "blocks",
+    icon: "dashboard",
     comingSoon: true,
   },
   {
@@ -400,6 +625,7 @@ export const blockOptions: BuilderOption[] = [
     label: "Command Menu",
     description: "Command menu generation is not implemented yet.",
     groupId: "blocks",
+    icon: "command",
     comingSoon: true,
   },
 ]
@@ -413,7 +639,10 @@ export const projectStructureOptions: BuilderOption[] = [
     groupId: "project-structure",
     groupMode: "exactly-one",
     recommended: true,
+    recommendationReason:
+      "Recommended because it is the default compact structure for MVP templates.",
     meta: "Default for React Recommended and Custom",
+    icon: iconForModule("structure.react.simple", "folder"),
   },
   {
     id: "feature-based",
@@ -423,6 +652,7 @@ export const projectStructureOptions: BuilderOption[] = [
     groupId: "project-structure",
     groupMode: "exactly-one",
     meta: "Default for SaaS Dashboard and Chat App",
+    icon: iconForModule("structure.react.feature-based", "stack"),
   },
   {
     id: "route-colocated",
@@ -432,11 +662,17 @@ export const projectStructureOptions: BuilderOption[] = [
     groupId: "project-structure",
     groupMode: "exactly-one",
     meta: "For route-first source ownership",
+    icon: iconForModule("structure.react.route-colocated", "route"),
   },
 ]
 
 export const allSelectableOptions = [
   ...coreOptionGroups.flatMap((group) => group.options),
+  ...coreOptionGroups.flatMap((group) =>
+    group.options.flatMap(
+      (option) => option.customization?.sections.flatMap((section) => section.options) ?? [],
+    ),
+  ),
   ...componentOptions,
   ...blockOptions,
   ...projectStructureOptions,

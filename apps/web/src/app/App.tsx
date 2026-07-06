@@ -3,26 +3,38 @@ import { catalog } from "@dittojs/catalog"
 import { resolveRecipe } from "@dittojs/core"
 
 import type { BuilderOption, BuilderStep } from "../builder/builder-options"
-import { allSelectableOptions } from "../builder/builder-options"
+import { allSelectableOptions, moduleIdsForOption } from "../builder/builder-options"
 import { canGenerate, cliCommand, isLocked, lockExplanation } from "../builder/resolver-view-model"
-import { AppShell, Header } from "../components/layout/AppShell"
+import { AppShell, Header } from "../components/layout/app-shell"
 import {
   archiveUrlFromBase64,
   fetchGenerationClient,
   type GenerationClient,
   type GenerationResponse,
 } from "../services/generation-client"
-import { CoreConfigurationPage } from "../pages/CoreConfigurationPage"
-import { FeaturesBlocksPage } from "../pages/FeaturesBlocksPage"
-import { GeneratingPage, generationSteps } from "../pages/GeneratingPage"
-import { LandingPage } from "../pages/LandingPage"
-import { ProjectStructurePage } from "../pages/ProjectStructurePage"
-import { ReviewManifestPage } from "../pages/ReviewManifestPage"
-import { SuccessPage } from "../pages/SuccessPage"
+import { CoreConfigurationPage } from "../pages/core-configuration-page"
+import { FeaturesBlocksPage } from "../pages/features-blocks-page"
+import { GeneratingPage, generationSteps } from "../pages/generating-page"
+import { LandingPage } from "../pages/landing-page"
+import { ProjectStructurePage } from "../pages/project-structure-page"
+import { ReviewManifestPage } from "../pages/review-manifest-page"
+import { SuccessPage } from "../pages/success-page"
 
 type GeneratedTemplateState = {
   response: GenerationResponse
   archiveUrl: string
+}
+
+const defaultRoutePresetId = "preset.react-recommended"
+
+const stepPaths: Record<BuilderStep, string> = {
+  landing: "/",
+  core: "/templates/core",
+  features: "/templates/features",
+  structure: "/templates/structure",
+  review: "/templates/review",
+  generating: "/templates/generating",
+  success: "/templates/success",
 }
 
 export type AppProps = {
@@ -30,6 +42,36 @@ export type AppProps = {
   initialStep?: BuilderStep
   initialPresetId?: string
   initialUserSelections?: string[]
+}
+
+function stepFromPath(pathname: string): BuilderStep | undefined {
+  switch (pathname.replace(/\/+$/, "") || "/") {
+    case "/":
+      return "landing"
+    case "/templates":
+    case "/templates/core":
+      return "core"
+    case "/templates/features":
+      return "features"
+    case "/templates/structure":
+      return "structure"
+    case "/templates/review":
+      return "review"
+    case "/templates/generating":
+      return "generating"
+    case "/templates/success":
+      return "success"
+    default:
+      return undefined
+  }
+}
+
+function currentPathStep(): BuilderStep | undefined {
+  if (typeof window === "undefined") {
+    return undefined
+  }
+
+  return stepFromPath(window.location.pathname)
 }
 
 function resolveForState(presetId: string | undefined, userSelections: string[]) {
@@ -51,8 +93,8 @@ function resolveForState(presetId: string | undefined, userSelections: string[])
 
 function moduleIdsForGroup(groupId: string): string[] {
   return allSelectableOptions
-    .filter((option) => option.groupId === groupId && option.moduleId !== undefined)
-    .map((option) => option.moduleId as string)
+    .filter((option) => option.groupId === groupId)
+    .flatMap((option) => moduleIdsForOption(option))
 }
 
 function errorMessage(error: unknown): string {
@@ -63,12 +105,19 @@ function errorMessage(error: unknown): string {
 
 export function App({
   generationClient = fetchGenerationClient,
-  initialStep = "landing",
+  initialStep,
   initialPresetId,
   initialUserSelections = [],
 }: AppProps) {
-  const [step, setStep] = useState<BuilderStep>(initialStep)
-  const [presetId, setPresetId] = useState<string | undefined>(initialPresetId)
+  const resolvedInitialStep = initialStep ?? currentPathStep() ?? "landing"
+  const shouldSeedRoutePreset =
+    resolvedInitialStep !== "landing" &&
+    initialPresetId === undefined &&
+    initialUserSelections.length === 0
+  const [step, setStep] = useState<BuilderStep>(resolvedInitialStep)
+  const [presetId, setPresetId] = useState<string | undefined>(
+    shouldSeedRoutePreset ? defaultRoutePresetId : initialPresetId,
+  )
   const [userSelections, setUserSelections] = useState<string[]>(initialUserSelections)
   const [notice, setNotice] = useState<string | undefined>()
   const [copyState, setCopyState] = useState<string | undefined>()
@@ -84,6 +133,43 @@ export function App({
   const command = useMemo(() => cliCommand(presetId, userSelections), [presetId, userSelections])
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    const path = stepPaths[step]
+
+    if (window.location.pathname !== path) {
+      window.history.pushState({ step }, "", path)
+    }
+  }, [step])
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    const handlePopState = () => {
+      const nextStep = currentPathStep() ?? "landing"
+
+      setStep(nextStep)
+      if (nextStep !== "landing") {
+        setPresetId((currentPresetId) => currentPresetId ?? defaultRoutePresetId)
+      }
+    }
+
+    window.addEventListener("popstate", handlePopState)
+
+    return () => window.removeEventListener("popstate", handlePopState)
+  }, [])
+
+  useEffect(() => {
+    if (step === "success" && generatedTemplate === undefined) {
+      setStep("review")
+    }
+  }, [generatedTemplate, step])
+
+  useEffect(() => {
     return () => {
       if (generatedTemplate !== undefined) {
         URL.revokeObjectURL(generatedTemplate.archiveUrl)
@@ -93,8 +179,11 @@ export function App({
 
   const resetToLanding = useCallback(() => {
     setStep("landing")
+    setPresetId(undefined)
+    setUserSelections([])
     setManifestOpen(false)
     setGenerationError(undefined)
+    setGeneratedTemplate(undefined)
   }, [])
 
   const createPreset = useCallback((nextPresetId: string) => {
@@ -127,16 +216,24 @@ export function App({
         return
       }
 
-      if (option.moduleId === undefined) {
+      const optionModuleIds = moduleIdsForOption(option)
+
+      if (optionModuleIds.length === 0) {
         return
       }
 
-      const moduleId = option.moduleId
-      const selected = recipe.effectiveSelections.includes(moduleId)
-      const userSelected = userSelections.includes(moduleId)
+      const selected = optionModuleIds.every((moduleId) =>
+        recipe.effectiveSelections.includes(moduleId),
+      )
+      const userSelected = optionModuleIds.every((moduleId) => userSelections.includes(moduleId))
+      const lockedModuleId = selected
+        ? optionModuleIds.find((moduleId) => isLocked(recipe, moduleId))
+        : undefined
 
-      if (selected && isLocked(recipe, moduleId)) {
-        setNotice(lockExplanation(recipe, moduleId) ?? `${option.label} is locked by the resolver.`)
+      if (lockedModuleId !== undefined) {
+        setNotice(
+          lockExplanation(recipe, lockedModuleId) ?? `${option.label} is locked by the resolver.`,
+        )
         return
       }
 
@@ -147,8 +244,10 @@ export function App({
 
       setNotice(undefined)
       setUserSelections((currentSelections) => {
-        if (currentSelections.includes(moduleId)) {
-          return currentSelections.filter((selection) => selection !== moduleId)
+        const optionModuleIdSet = new Set(optionModuleIds)
+
+        if (optionModuleIds.every((moduleId) => currentSelections.includes(moduleId))) {
+          return currentSelections.filter((selection) => !optionModuleIdSet.has(selection))
         }
 
         const groupModuleIds =
@@ -160,7 +259,9 @@ export function App({
             ? currentSelections
             : currentSelections.filter((selection) => !groupModuleIds.has(selection))
 
-        return [...withoutGroup, moduleId]
+        const withoutOption = withoutGroup.filter((selection) => !optionModuleIdSet.has(selection))
+
+        return [...withoutOption, ...optionModuleIds]
       })
     },
     [recipe, userSelections],
@@ -245,7 +346,7 @@ export function App({
 
   return (
     <AppShell>
-      <Header onHome={resetToLanding} />
+      <Header onHome={resetToLanding} onTemplates={startGenerating} />
       {notice !== undefined ? (
         <div className="notice" role="status">
           {notice}
