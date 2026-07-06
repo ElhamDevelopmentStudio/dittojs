@@ -6,8 +6,14 @@
     "declarationMap": true,
     "outDir": "dist",
     "rootDir": "src",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "types": ["node"],
+    "paths": {
+      "@dittojs/core": ["../../packages/core/dist/index.d.ts"],
+      "@dittojs/catalog": ["../../packages/catalog/dist/index.d.ts"],
+      "@dittojs/generator": ["../../packages/generator/dist/index.d.ts"]
+    }
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules", "src/**/*.test.ts"]
 }
