@@ -28,7 +28,10 @@ export const httpManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Axios",
+      icon: "cloud",
       recommended: true,
+      recommendationReason:
+        "Recommended because it is the supported HTTP client for generated templates.",
       category: "HTTP",
       tags: ["http", "client"],
     },

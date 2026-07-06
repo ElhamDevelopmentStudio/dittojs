@@ -37,7 +37,9 @@ export const frameworkManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "React",
+      icon: "react",
       recommended: true,
+      recommendationReason: "Recommended because React is the supported MVP framework.",
       category: "Framework",
       tags: ["react", "vite"],
     },

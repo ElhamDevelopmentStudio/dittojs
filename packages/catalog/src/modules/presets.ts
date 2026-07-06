@@ -33,7 +33,10 @@ export const presetManifests: ModuleManifest[] = [
     },
     ui: {
       label: "React Recommended",
+      icon: "react",
       recommended: true,
+      recommendationReason:
+        "Recommended because it is the default dependency-correct React starter.",
       category: "Presets",
       tags: ["react", "recommended"],
     },
@@ -50,7 +53,10 @@ export const presetManifests: ModuleManifest[] = [
     },
     ui: {
       label: "SaaS Dashboard",
+      icon: "dashboard",
       recommended: true,
+      recommendationReason:
+        "Recommended because it extends the supported stack with dashboard composition.",
       category: "Presets",
       tags: ["saas", "dashboard"],
     },
@@ -66,7 +72,10 @@ export const presetManifests: ModuleManifest[] = [
     },
     ui: {
       label: "Chat App",
+      icon: "chat",
       recommended: true,
+      recommendationReason:
+        "Recommended because it extends the supported stack with messaging composition.",
       category: "Presets",
       tags: ["chat", "messaging"],
     },
@@ -89,6 +98,7 @@ export const presetManifests: ModuleManifest[] = [
     },
     ui: {
       label: "Custom",
+      icon: "settings",
       category: "Presets",
       tags: ["react", "minimal"],
     },

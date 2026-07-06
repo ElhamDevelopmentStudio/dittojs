@@ -79,7 +79,9 @@ export type FileMapping = DirectFileMapping | SlotFileMapping
 export type UiMetadata = {
   label: string
   description?: string
+  icon?: string
   recommended?: boolean
+  recommendationReason?: string | undefined
   hidden?: boolean
   category?: string
   tags?: string[]

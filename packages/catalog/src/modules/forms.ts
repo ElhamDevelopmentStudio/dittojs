@@ -21,7 +21,10 @@ export const formManifests: ModuleManifest[] = [
     },
     ui: {
       label: "React Hook Form",
+      icon: "form",
       recommended: true,
+      recommendationReason:
+        "Recommended because it is the supported form engine for generated templates.",
       category: "Forms",
       tags: ["forms", "react"],
     },

@@ -28,7 +28,10 @@ export const stateManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Zustand",
+      icon: "stack",
       recommended: true,
+      recommendationReason:
+        "Recommended because it is the supported client state module for MVP templates.",
       category: "State",
       tags: ["state", "client"],
     },

@@ -21,7 +21,10 @@ export const validationManifests: ModuleManifest[] = [
     },
     ui: {
       label: "Zod",
+      icon: "code",
       recommended: true,
+      recommendationReason:
+        "Recommended because it is the supported schema validator for generated templates.",
       category: "Validation",
       tags: ["schema", "typescript"],
     },

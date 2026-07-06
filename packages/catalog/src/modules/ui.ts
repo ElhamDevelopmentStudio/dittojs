@@ -36,7 +36,9 @@ export const uiLibraryManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "shadcn",
+      icon: "palette",
       recommended: true,
+      recommendationReason: "Recommended because it works with the generated component registry.",
       category: "UI library",
       tags: ["components", "tailwind"],
     },

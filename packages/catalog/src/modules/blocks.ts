@@ -39,6 +39,7 @@ export const blockManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Navbar",
+      icon: "layout",
       category: "Blocks",
       tags: ["navigation", "layout"],
     },
@@ -71,6 +72,7 @@ export const blockManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Sidebar",
+      icon: "sidebar",
       category: "Blocks",
       tags: ["navigation", "layout"],
     },
@@ -103,6 +105,7 @@ export const blockManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Messaging Input",
+      icon: "message",
       category: "Blocks",
       tags: ["chat", "input"],
     },
@@ -123,6 +126,7 @@ export const blockManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Typing Indicator",
+      icon: "chat",
       category: "Blocks",
       tags: ["chat", "status"],
     },
@@ -150,6 +154,7 @@ export const blockManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Online Presence",
+      icon: "user",
       category: "Blocks",
       tags: ["chat", "status"],
     },
@@ -198,6 +203,7 @@ export const blockManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Settings Form",
+      icon: "settings",
       category: "Blocks",
       tags: ["settings", "form"],
     },

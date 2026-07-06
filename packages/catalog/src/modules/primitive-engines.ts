@@ -21,7 +21,10 @@ export const primitiveEngineManifests: ModuleManifest[] = [
     },
     ui: {
       label: "Base UI",
+      icon: "box",
       recommended: true,
+      recommendationReason:
+        "Recommended because it is the supported primitive engine for MVP templates.",
       category: "Primitive engine",
       tags: ["accessibility", "unstyled"],
     },

@@ -28,7 +28,10 @@ export const stylingManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Tailwind CSS",
+      icon: "tailwind",
       recommended: true,
+      recommendationReason:
+        "Recommended because DittoJs templates currently generate Tailwind v4 styles.",
       category: "Styling",
       tags: ["tailwind", "css"],
     },

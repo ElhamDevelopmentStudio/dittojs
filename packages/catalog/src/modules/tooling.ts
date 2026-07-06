@@ -28,7 +28,10 @@ export const toolingManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Vite",
+      icon: "flash",
       recommended: true,
+      recommendationReason:
+        "Recommended because it provides the fastest supported React build path.",
       category: "Tooling",
       tags: ["vite", "build"],
     },
@@ -52,7 +55,10 @@ export const toolingManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "TypeScript",
+      icon: "code",
       recommended: true,
+      recommendationReason:
+        "Recommended because generated MVP templates are currently TypeScript-first.",
       category: "Tooling",
       tags: ["typescript", "types"],
     },

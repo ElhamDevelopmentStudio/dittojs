@@ -25,6 +25,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Button",
+      icon: "box",
       category: "Components",
       tags: ["primitive", "action"],
     },
@@ -51,6 +52,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Input",
+      icon: "input",
       category: "Components",
       tags: ["primitive", "form"],
     },
@@ -77,6 +79,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Textarea",
+      icon: "text",
       category: "Components",
       tags: ["primitive", "form"],
     },
@@ -103,6 +106,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Label",
+      icon: "text",
       category: "Components",
       tags: ["primitive", "form"],
     },
@@ -129,6 +133,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Avatar",
+      icon: "user",
       category: "Components",
       tags: ["primitive", "identity"],
     },
@@ -155,6 +160,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Dropdown",
+      icon: "menu",
       category: "Components",
       tags: ["composite", "menu"],
     },
@@ -181,6 +187,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Sheet",
+      icon: "layout",
       category: "Components",
       tags: ["composite", "overlay"],
     },
@@ -237,6 +244,7 @@ export const componentManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Form",
+      icon: "form",
       category: "Components",
       tags: ["composite", "form"],
     },

@@ -23,7 +23,10 @@ export const projectStructureManifests: ModuleManifest[] = [
     group: reactProjectStructureGroup,
     ui: {
       label: "Simple",
+      icon: "folder",
       recommended: true,
+      recommendationReason:
+        "Recommended because it is the compact default structure for MVP templates.",
       category: "Project structure",
       tags: ["react", "simple"],
     },
@@ -44,6 +47,7 @@ export const projectStructureManifests: ModuleManifest[] = [
     group: reactProjectStructureGroup,
     ui: {
       label: "Feature based",
+      icon: "stack",
       category: "Project structure",
       tags: ["react", "features"],
     },
@@ -64,6 +68,7 @@ export const projectStructureManifests: ModuleManifest[] = [
     group: reactProjectStructureGroup,
     ui: {
       label: "Route colocated",
+      icon: "route",
       category: "Project structure",
       tags: ["react", "routes"],
     },

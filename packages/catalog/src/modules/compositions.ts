@@ -23,6 +23,7 @@ export const compositionManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "React Recommended",
+      icon: "react",
       category: "Compositions",
       tags: ["react", "recommended"],
     },
@@ -64,6 +65,7 @@ export const compositionManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "SaaS Dashboard",
+      icon: "dashboard",
       category: "Compositions",
       tags: ["saas", "dashboard"],
     },
@@ -110,6 +112,7 @@ export const compositionManifests: ModuleManifest[] = [
     ],
     ui: {
       label: "Chat App",
+      icon: "chat",
       category: "Compositions",
       tags: ["chat", "messaging"],
     },
