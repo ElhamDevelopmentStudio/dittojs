@@ -1,3 +1,2 @@
-export const webApp = {
-  name: "@dittojs/web",
-} as const
+export { App } from "./app/App"
+export type { AppProps } from "./app/App"
