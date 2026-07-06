@@ -28,6 +28,8 @@ const RESERVED_GENERATED_TARGETS = new Set([PACKAGE_JSON_TARGET, METADATA_TARGET
 type ResolvedFileMapping = {
   from: string
   to: string
+  importToken?: string
+  importSpecifier?: string
 }
 
 function summarizeResolverErrors(conflicts: ResolveConflict[]): string {
@@ -66,6 +68,34 @@ function hasStringProperty(file: FileMapping, key: string): boolean {
 
 function usesStructureSlot(file: FileMapping): boolean {
   return hasStringProperty(file, "slot")
+}
+
+function importToken(slot: string, name: string): string {
+  const tokenBody = `${slot}_${name}`
+    .replace(/[^A-Za-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .toUpperCase()
+
+  return `__DITTO_IMPORT_${tokenBody}__`
+}
+
+function importSpecifier(
+  targetPath: string,
+  adapter: ProjectStructureAdapter | undefined,
+): string | undefined {
+  if (adapter === undefined) {
+    return undefined
+  }
+
+  const sourcePrefix = `${adapter.sourceRoot}/`
+
+  if (!targetPath.startsWith(sourcePrefix)) {
+    return undefined
+  }
+
+  const sourceRelativePath = targetPath.slice(sourcePrefix.length).replace(/\.(tsx|ts|jsx|js)$/, "")
+
+  return `${adapter.importAlias}/${sourceRelativePath}`
 }
 
 function resolveFileMappingTarget(
@@ -141,12 +171,37 @@ function resolveFileMappings(
       from: file.from,
       to: targetPath,
     }
+    const slotFile = file as { slot?: string; name?: string }
+
+    if (
+      slotFile.slot !== undefined &&
+      slotFile.name !== undefined &&
+      slotFile.name.trim().length > 0
+    ) {
+      resolvedFile.importToken = importToken(slotFile.slot, slotFile.name)
+      const specifier = importSpecifier(targetPath, adapter)
+
+      if (specifier !== undefined) {
+        resolvedFile.importSpecifier = specifier
+      }
+    }
 
     targets.set(targetPath, resolvedFile)
     resolvedFiles.push(resolvedFile)
   }
 
   return resolvedFiles
+}
+
+function importReplacements(resolvedFiles: ResolvedFileMapping[]): Record<string, string> {
+  return Object.fromEntries(
+    resolvedFiles
+      .filter(
+        (file): file is ResolvedFileMapping & { importToken: string; importSpecifier: string } =>
+          file.importToken !== undefined && file.importSpecifier !== undefined,
+      )
+      .map((file) => [file.importToken, file.importSpecifier]),
+  )
 }
 
 function projectName(input: GenerateProjectInput, outputDir: string): string {
@@ -160,6 +215,7 @@ export async function generateProject(input: GenerateProjectInput): Promise<Gene
     ? requireProjectStructureAdapter(input.resolvedRecipe)
     : selectedProjectStructureAdapter(input.resolvedRecipe)
   const resolvedFiles = resolveFileMappings(input.resolvedRecipe.files, adapter)
+  const replacements = importReplacements(resolvedFiles)
 
   if (
     input.resolvedRecipe.files.length > 0 &&
@@ -210,6 +266,7 @@ export async function generateProject(input: GenerateProjectInput): Promise<Gene
         templateRoot: input.templateRoot ?? "",
         outputDir,
         file,
+        replacements,
       }),
     )
   }
