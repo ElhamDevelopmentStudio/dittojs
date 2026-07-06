@@ -1,31 +1,33 @@
 import type { ModuleManifest } from "@dittojs/core"
 
+const reactRecommendedBaseSelections = [
+  "framework.react",
+  "tooling.vite",
+  "tooling.typescript",
+  "styling.tailwind",
+  "ui.shadcn",
+  "primitive-engine.base-ui",
+  "form.react-hook-form",
+  "validation.zod",
+  "http.axios",
+  "state.zustand",
+  "component.button",
+  "component.input",
+  "component.textarea",
+  "component.label",
+  "component.avatar",
+  "component.dropdown",
+  "component.sheet",
+  "component.form",
+]
+
 export const presetManifests: ModuleManifest[] = [
   {
     id: "preset.react-recommended",
     type: "preset",
     label: "React Recommended",
     description: "Recommended React application baseline with shadcn, forms, state, and HTTP.",
-    selections: [
-      "framework.react",
-      "tooling.vite",
-      "tooling.typescript",
-      "styling.tailwind",
-      "ui.shadcn",
-      "primitive-engine.base-ui",
-      "form.react-hook-form",
-      "validation.zod",
-      "http.axios",
-      "state.zustand",
-      "component.button",
-      "component.input",
-      "component.textarea",
-      "component.label",
-      "component.avatar",
-      "component.dropdown",
-      "component.sheet",
-      "component.form",
-    ],
+    selections: [...reactRecommendedBaseSelections, "composition.react-recommended"],
     defaults: {
       "project-structure": "structure.react.simple",
     },
@@ -40,8 +42,9 @@ export const presetManifests: ModuleManifest[] = [
     id: "preset.saas-dashboard",
     type: "preset",
     label: "SaaS Dashboard",
-    description: "Dashboard preset with the recommended React baseline, navbar, and sidebar.",
-    selections: ["preset.react-recommended", "block.navbar", "block.sidebar"],
+    description:
+      "Dashboard preset with the recommended React baseline and SaaS dashboard composition.",
+    selections: [...reactRecommendedBaseSelections, "composition.saas-dashboard"],
     defaults: {
       "project-structure": "structure.react.feature-based",
     },
@@ -56,14 +59,8 @@ export const presetManifests: ModuleManifest[] = [
     id: "preset.chat-app",
     type: "preset",
     label: "Chat App",
-    description: "Chat preset with the recommended React baseline and messaging blocks.",
-    selections: [
-      "preset.react-recommended",
-      "block.navbar",
-      "block.messaging-input",
-      "block.typing-indicator",
-      "block.online-presence",
-    ],
+    description: "Chat preset with the recommended React baseline and chat app composition.",
+    selections: [...reactRecommendedBaseSelections, "composition.chat-app"],
     defaults: {
       "project-structure": "structure.react.feature-based",
     },

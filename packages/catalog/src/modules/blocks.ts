@@ -154,4 +154,52 @@ export const blockManifests: ModuleManifest[] = [
       tags: ["chat", "status"],
     },
   },
+  {
+    id: "block.settings-form",
+    type: "block",
+    label: "Settings Form",
+    description: "Workspace settings form with React Hook Form and Zod validation.",
+    provides: ["block.settings-form"],
+    requires: [
+      {
+        capability: "ui.form",
+        reason: "Settings Form uses generated form helpers.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.input",
+        reason: "Settings Form uses Input for workspace fields.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.button",
+        reason: "Settings Form uses Button for submit actions.",
+        strength: "hard",
+      },
+      {
+        capability: "form.engine",
+        reason: "Settings Form needs a form state engine.",
+        strength: "hard",
+      },
+      {
+        capability: "validation.schema",
+        reason: "Settings Form validates settings with a schema engine.",
+        strength: "hard",
+      },
+    ],
+    files: [
+      {
+        from: "blocks/settings-form/files/settings-form.tsx",
+        slot: "form-component",
+        name: "settings-form",
+        feature: "settings",
+        route: "settings",
+      },
+    ],
+    ui: {
+      label: "Settings Form",
+      category: "Blocks",
+      tags: ["settings", "form"],
+    },
+  },
 ]

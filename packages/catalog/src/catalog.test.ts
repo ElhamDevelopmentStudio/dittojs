@@ -9,7 +9,12 @@ import {
 } from "@dittojs/core"
 
 import { catalog } from "./catalog"
-import { packageVersions, type PackageDependencyType } from "./package-versions"
+import {
+  MVP_PACKAGE_NAMES,
+  packageVersions,
+  type PackageDependencyType,
+  type PackageVersionPolicy,
+} from "./package-versions"
 
 const requiredCapabilities = new Set([
   "component-library.shadcn",
@@ -27,8 +32,11 @@ const invalidPackageVersions = new Set(["latest", "*", ""])
 const packageVersionIndex: Record<
   string,
   {
+    version: string
     range: string
+    policy: PackageVersionPolicy
     dependencyType: PackageDependencyType
+    notes?: string
   }
 > = packageVersions
 
@@ -150,6 +158,35 @@ describe("catalog", () => {
     }
   })
 
+  it("defines valid centralized package version policy entries", () => {
+    expect(Object.keys(packageVersions).sort()).toEqual([...MVP_PACKAGE_NAMES].sort())
+
+    for (const [packageName, packageVersion] of Object.entries(packageVersions)) {
+      expect(packageVersion.name, `${packageName} should identify itself`).toBe(packageName)
+      expect(packageVersion.version, `${packageName} should use a concrete npm version`).toMatch(
+        /^\d+\.\d+\.\d+$/,
+      )
+      expect(
+        invalidPackageVersions.has(packageVersion.version),
+        `${packageName} should not use an invalid concrete version`,
+      ).toBe(false)
+
+      if (packageVersion.policy === "caret") {
+        expect(packageVersion.range, `${packageName} should use the caret policy range`).toBe(
+          `^${packageVersion.version}`,
+        )
+      } else {
+        expect(packageVersion.range, `${packageName} exact pins must match version`).toBe(
+          packageVersion.version,
+        )
+        expect(
+          "notes" in packageVersion ? packageVersion.notes : undefined,
+          `${packageName} exact pins must explain why`,
+        ).toBeTruthy()
+      }
+    }
+  })
+
   it("resolves every preset without blocking conflicts", () => {
     expect(presets().map((preset) => preset.id)).toEqual(
       expect.arrayContaining([
@@ -183,6 +220,7 @@ describe("catalog", () => {
         "validation.zod",
         "http.axios",
         "state.zustand",
+        "composition.react-recommended",
       ]),
     )
     expect(result.selectionReasons["component.button"]).toEqual(
@@ -284,28 +322,35 @@ describe("catalog", () => {
     )
   })
 
-  it("resolves dashboard and chat presets through nested presets", () => {
+  it("resolves dashboard and chat presets through their app compositions", () => {
     const dashboard = resolvePreset("preset.saas-dashboard")
     const chat = resolvePreset("preset.chat-app")
 
     expect(errorMessages(dashboard)).toEqual([])
     expect(dashboard.effectiveSelections).toEqual(
       expect.arrayContaining([
-        "preset.react-recommended",
+        "composition.saas-dashboard",
         "block.navbar",
         "block.sidebar",
+        "block.settings-form",
         "component.button",
       ]),
     )
+    expect(dashboard.effectiveSelections).not.toContain("composition.react-recommended")
+    expect(dashboard.effectiveSelections).not.toContain("preset.react-recommended")
+
+    expect(errorMessages(chat)).toEqual([])
     expect(chat.effectiveSelections).toEqual(
       expect.arrayContaining([
-        "preset.react-recommended",
+        "composition.chat-app",
         "block.navbar",
         "block.messaging-input",
         "block.typing-indicator",
         "block.online-presence",
       ]),
     )
+    expect(chat.effectiveSelections).not.toContain("composition.react-recommended")
+    expect(chat.effectiveSelections).not.toContain("preset.react-recommended")
   })
 
   it("locks Tailwind when shadcn is selected", () => {

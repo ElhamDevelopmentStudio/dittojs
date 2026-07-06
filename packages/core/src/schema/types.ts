@@ -5,6 +5,7 @@ export const MODULE_TYPES = [
   "primitive-engine",
   "primitive",
   "composite",
+  "composition",
   "block",
   "form-engine",
   "validation",

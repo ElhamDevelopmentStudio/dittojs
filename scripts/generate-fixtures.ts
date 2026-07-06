@@ -6,6 +6,7 @@ import { argv, cwd } from "node:process"
 import { catalog } from "../packages/catalog/src/catalog"
 import { PACKAGE_VERSION_POLICY } from "../packages/catalog/src/package-versions"
 import { resolveRecipe } from "../packages/core/src/resolver/resolve"
+import type { ResolvedRecipe } from "../packages/core/src/resolver/types"
 import { generateProject } from "../packages/generator/src/generate"
 
 type FixtureRecipe = {
@@ -22,6 +23,8 @@ const defaultFixtureRecipes = [
   "react-recommended-simple",
   "react-recommended-feature-based",
   "react-recommended-route-colocated",
+  "saas-dashboard",
+  "chat-app",
 ]
 
 async function readRecipe(recipeName: string): Promise<FixtureRecipe> {
@@ -54,6 +57,9 @@ async function generateFixture(recipeName: string) {
     presetId: recipe.presetId,
     userSelections: recipe.selections,
   })
+
+  assertResolvable(recipeName, resolved)
+
   const resolvedRecipe = {
     ...resolved,
     metadata: {
@@ -78,6 +84,22 @@ async function generateFixture(recipeName: string) {
   })
 }
 
+function assertResolvable(recipeName: string, resolved: ResolvedRecipe): void {
+  const errorConflicts = resolved.conflicts.filter((conflict) => conflict.severity === "error")
+
+  if (errorConflicts.length === 0) {
+    return
+  }
+
+  const summary = errorConflicts
+    .map((conflict) => `- ${conflict.message} ${conflict.reason}`)
+    .join("\n")
+
+  throw new Error(
+    `Cannot generate fixture "${recipeName}" because resolver errors exist:\n${summary}`,
+  )
+}
+
 async function clearOutputDir(outputDir: string): Promise<void> {
   await mkdir(outputDir, { recursive: true })
 
@@ -92,11 +114,18 @@ async function clearOutputDir(outputDir: string): Promise<void> {
 
 const requestedRecipes = argv.slice(2)
 const fixtureRecipes = requestedRecipes.length > 0 ? requestedRecipes : defaultFixtureRecipes
+const generatedFixtures: string[] = []
 
 for (const fixtureRecipe of fixtureRecipes) {
   const result = await generateFixture(fixtureRecipe)
+  const relativeOutputDir = path.relative(rootDir, result.outputDir)
 
-  log(
-    `Generated ${path.relative(rootDir, result.outputDir)} with ${result.filesWritten.length} files.`,
-  )
+  generatedFixtures.push(relativeOutputDir)
+  log(`Generated ${relativeOutputDir} with ${result.filesWritten.length} files.`)
+}
+
+log(`Generated ${generatedFixtures.length} fixture${generatedFixtures.length === 1 ? "" : "s"}:`)
+
+for (const generatedFixture of generatedFixtures) {
+  log(`- ${generatedFixture}`)
 }

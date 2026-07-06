@@ -1,6 +1,7 @@
 import type { ModuleManifest } from "@dittojs/core"
 
 import { blockManifests } from "./modules/blocks"
+import { compositionManifests } from "./modules/compositions"
 import { componentManifests } from "./modules/components"
 import { formManifests } from "./modules/forms"
 import { frameworkManifests } from "./modules/framework"
@@ -23,6 +24,7 @@ export const catalog: ModuleManifest[] = [
   ...primitiveEngineManifests,
   ...componentManifests,
   ...blockManifests,
+  ...compositionManifests,
   ...formManifests,
   ...validationManifests,
   ...stateManifests,

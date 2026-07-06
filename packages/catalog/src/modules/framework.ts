@@ -34,11 +34,6 @@ export const frameworkManifests: ModuleManifest[] = [
         slot: "app-entry",
         name: "main",
       },
-      {
-        from: "react/files/src/App.tsx",
-        slot: "app-root",
-        name: "app",
-      },
     ],
     ui: {
       label: "React",
