@@ -98,28 +98,24 @@ CTA to start
 Recommended layout:
 
 ```txt
-Left sidebar:
-- Preset
-- Framework
-- Styling
-- UI
-- Components
-- Blocks
-- Forms
-- State
-- Review
-
-Center:
-- Current category options
+Main area:
+- Current step header
+- Numbered decision sections
+- Editorial decision plates
+- Back / Continue actions aligned to the right
 
 Right panel:
-- Live stack summary
+- Resolver Ledger
 - Selected by you
 - Added automatically
 - Locked dependencies
 - Conflicts/warnings
 - Packages/files summary
 ```
+
+The builder should feel like an architect's manifest or drafting desk: quiet
+grid, thin rules, precise type, and compact resolver notes. Avoid generic SaaS
+cards, heavy black borders, and noisy tag-like status pills.
 
 ## Preset cards
 
@@ -140,7 +136,7 @@ Example:
 
 ```txt
 shadcn
-Recommended: Base UI, Nova style, Neutral theme
+Recommendation icon: "Works with the generated component registry."
 
 [Customize]
 ```
@@ -150,18 +146,30 @@ Clicking Customize reveals:
 ```txt
 Primitive engine:
 - Base UI recommended
-- Radix UI
+- Radix UI coming soon
 
 Style:
-- Nova recommended
-- Maia
-- Lyra
+- Nova coming soon
+- Maia coming soon
+- Lyra coming soon
 
 Theme:
-- Neutral recommended
-- Slate
-- Zinc
+- Neutral coming soon
+- Slate coming soon
+- Zinc coming soon
 ```
+
+Core Configuration should keep only primary decisions at the top level:
+Framework, Build Tool, Styling, UI System, Forms & Validation, and Client Data.
+Secondary choices such as TypeScript, package manager, primitive engine, style,
+theme, form engine, and validator belong inside the relevant customization
+modal. Coming soon nested choices must remain disabled and must not enter
+`userSelections`.
+
+Recommended states should use a subtle icon with a tooltip sourced from
+manifest metadata (`ui.recommendationReason`) or builder metadata derived from
+the catalog. Do not hardcode recommendation tooltip copy inside presentation
+components.
 
 ## Locked dependency UI
 

@@ -81,11 +81,20 @@ Users should be able to:
 
 - Choose a preset.
 - Customize selected features.
+- Configure Core through primary top-level decisions.
+- Open nested customization for supported parent decisions.
 - See automatically included dependencies.
 - See locked dependencies with explanations.
 - Generate a project.
 - Download a ZIP.
 - View the generated stack summary.
+
+Core Configuration top-level decisions must stay focused on primary choices:
+Framework, Build Tool, Styling, UI System, Forms & Validation, and Client Data.
+TypeScript, package manager, primitive engine, style, theme, form engine, and
+validator choices should appear inside their parent customization modals.
+Unsupported nested choices must remain disabled and non-functional until the
+resolver and generator support them.
 
 ### Authentication
 

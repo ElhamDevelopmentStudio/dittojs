@@ -9,6 +9,11 @@ Every framework, styling system, UI library, primitive component, block, composi
 
 The resolver and generator use manifests as their source of truth.
 
+UI metadata is also the source of truth for builder presentation. Recommended
+badges must use `ui.recommendationReason` for tooltip copy instead of hardcoded
+component text. Icons must come from `ui.icon` and resolve through the web app's
+centralized icon map.
+
 ## Manifest goals
 
 Manifests must allow DittoJs to understand:
@@ -161,7 +166,9 @@ export type FileMapping = DirectFileMapping | SlotFileMapping
 export type UiMetadata = {
   label: string
   description?: string
+  icon?: string
   recommended?: boolean
+  recommendationReason?: string
   hidden?: boolean
   category?: string
   tags?: string[]
