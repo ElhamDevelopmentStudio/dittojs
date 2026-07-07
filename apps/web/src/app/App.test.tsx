@@ -81,6 +81,7 @@ describe("DittoJs web builder", () => {
   test("landing renders the four MVP presets", () => {
     render(<App generationClient={resolvingGenerationClient()} />)
 
+    expect(screen.getByText("Name inspired by Ben 10's Ditto.")).toBeTruthy()
     expect(screen.getByRole("heading", { name: "React Recommended" })).toBeTruthy()
     expect(screen.getByRole("heading", { name: "SaaS Dashboard" })).toBeTruthy()
     expect(screen.getByRole("heading", { name: "Chat App" })).toBeTruthy()
