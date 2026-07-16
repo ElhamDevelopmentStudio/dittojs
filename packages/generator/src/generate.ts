@@ -73,12 +73,21 @@ function usesStructureSlot(file: FileMapping): boolean {
   return hasStringProperty(file, "slot")
 }
 
+function trimCharacter(value: string, character: string): string {
+  let start = 0
+  let end = value.length
+
+  while (value[start] === character) start += 1
+  while (end > start && value[end - 1] === character) end -= 1
+
+  return value.slice(start, end)
+}
+
 function importToken(slot: string, name: string): string {
-  const tokenBody = `${slot}_${name}`
-    .replace(/[^A-Za-z0-9]+/g, "_")
-    .replace(/^_+/, "")
-    .replace(/_+$/, "")
-    .toUpperCase()
+  const tokenBody = trimCharacter(
+    `${slot}_${name}`.replace(/[^A-Za-z0-9]+/g, "_"),
+    "_",
+  ).toUpperCase()
 
   return `__DITTO_IMPORT_${tokenBody}__`
 }
@@ -238,7 +247,7 @@ function routeIdentifier(route: string, index: number): string {
 }
 
 function routePath(route: string): string {
-  const trimmed = route.trim().replace(/^\/+/, "").replace(/\/+$/, "")
+  const trimmed = trimCharacter(route.trim(), "/")
 
   return trimmed.length === 0 ? "/" : `/${trimmed}`
 }
