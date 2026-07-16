@@ -1,0 +1,60 @@
+name: Feature request
+description: Propose a user-facing capability or project improvement.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Start with the problem and user value. Implementation-only requests without a clear use case are difficult to evaluate.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Web builder
+        - Resolver or schema
+        - Catalog or registry
+        - Generator or structures
+        - Generation API
+        - Developer experience
+        - Documentation or community
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: Who experiences the problem, and what are they trying to accomplish?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe observable behavior, not only an implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Existing workarounds, libraries, or smaller approaches you evaluated.
+  - type: textarea
+    id: architecture
+    attributes:
+      label: Architecture and compatibility impact
+      description: Note resolver, manifest, generator, package-version, migration, or generated-output concerns.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues, discussions, and the roadmap.
+          required: true
+        - label: This request does not move dependency logic into the UI.
+          required: true
+        - label: I agree to follow the Code of Conduct.
+          required: true

@@ -12,7 +12,7 @@ DittoJs handles what is required.
 I can customize when I care.
 I understand why things are included.
 The generated project is trustworthy.
-````
+```
 
 ## Core UX principles
 

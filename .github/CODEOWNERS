@@ -1,0 +1,14 @@
+# Default ownership
+* @ElhamDevelopmentStudio
+
+# Architecture and core generation boundaries
+/packages/core/ @ElhamDevelopmentStudio
+/packages/catalog/ @ElhamDevelopmentStudio
+/packages/generator/ @ElhamDevelopmentStudio
+/packages/registry/ @ElhamDevelopmentStudio
+/docs/ @ElhamDevelopmentStudio
+
+# Security, automation, and project governance
+/.github/ @ElhamDevelopmentStudio
+/SECURITY.md @ElhamDevelopmentStudio
+/GOVERNANCE.md @ElhamDevelopmentStudio

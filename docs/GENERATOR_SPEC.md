@@ -20,7 +20,7 @@ type GenerateInput = {
   outputDir: string
   options?: GenerateOptions
 }
-````
+```
 
 ## Outputs
 

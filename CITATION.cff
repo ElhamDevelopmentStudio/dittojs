@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+title: DittoJs
+message: If you use DittoJs in research or teaching, please cite the repository.
+type: software
+authors:
+  - family-names: Hossaini
+    given-names: Elhamullah
+repository-code: https://github.com/ElhamDevelopmentStudio/dittojs
+url: https://github.com/ElhamDevelopmentStudio/dittojs
+license: MIT
+keywords:
+  - react
+  - template-generator
+  - dependency-resolver
+  - typescript
+  - scaffolding

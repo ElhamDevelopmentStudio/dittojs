@@ -42,7 +42,7 @@ docs/MANIFEST_SPEC.md
 docs/RESOLVER_SPEC.md
 docs/TESTING_STRATEGY.md
 docs/DEFINITION_OF_DONE.md
-````
+```
 
 ### Generator task
 

@@ -103,7 +103,7 @@ packages/registry/
       nova/
       maia/
       lyra/
-````
+```
 
 ## Registry module requirement
 

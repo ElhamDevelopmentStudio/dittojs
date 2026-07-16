@@ -48,7 +48,7 @@ Generator
 Generated project files
    ↓
 ZIP/download/saved template
-````
+```
 
 ## Recommended monorepo structure
 

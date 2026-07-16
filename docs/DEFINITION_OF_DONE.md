@@ -22,7 +22,7 @@ A PR is done only when:
 - Generated fixtures are updated if output changed.
 - CI passes.
 - Manual UI review is complete if required.
-````
+```
 
 ## Resolver Definition of Done
 

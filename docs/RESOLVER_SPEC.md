@@ -33,7 +33,7 @@ type ResolveInput = {
   catalog: ModuleManifest[]
   options?: ResolveOptions
 }
-````
+```
 
 ## Outputs
 

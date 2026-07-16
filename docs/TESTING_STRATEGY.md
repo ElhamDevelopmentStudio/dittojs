@@ -23,7 +23,7 @@ Test DittoJs and test DittoJs output.
 6. Web UI component tests
 7. End-to-end tests
 8. Dependency update CI tests
-````
+```
 
 ## Schema tests
 

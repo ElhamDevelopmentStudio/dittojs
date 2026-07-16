@@ -41,7 +41,7 @@ export type PresetManifest = {
     summary?: string
   }
 }
-````
+```
 
 ## Preset rules
 

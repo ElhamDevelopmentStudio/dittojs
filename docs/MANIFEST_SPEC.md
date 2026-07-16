@@ -53,7 +53,7 @@ state.zustand
 http.axios
 structure.react.simple
 preset.react-recommended
-````
+```
 
 IDs should be stable. Avoid renaming IDs after release.
 
