@@ -20,7 +20,8 @@ function toPackageName(projectName: string | undefined, outputDir: string): stri
   const packageName = rawName
     .toLowerCase()
     .replace(/[^a-z0-9._~-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "")
 
   return packageName.length > 0 ? packageName : "ditto-generated-project"
 }

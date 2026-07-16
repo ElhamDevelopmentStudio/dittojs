@@ -76,7 +76,8 @@ function usesStructureSlot(file: FileMapping): boolean {
 function importToken(slot: string, name: string): string {
   const tokenBody = `${slot}_${name}`
     .replace(/[^A-Za-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "")
+    .replace(/^_+/, "")
+    .replace(/_+$/, "")
     .toUpperCase()
 
   return `__DITTO_IMPORT_${tokenBody}__`
@@ -237,7 +238,7 @@ function routeIdentifier(route: string, index: number): string {
 }
 
 function routePath(route: string): string {
-  const trimmed = route.trim().replace(/^\/+|\/+$/g, "")
+  const trimmed = route.trim().replace(/^\/+/, "").replace(/\/+$/, "")
 
   return trimmed.length === 0 ? "/" : `/${trimmed}`
 }

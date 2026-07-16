@@ -92,7 +92,8 @@ function slugifyProjectName(projectName?: string): string {
       ?.trim()
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "") ?? ""
+      .replace(/^-+/, "")
+      .replace(/-+$/, "") ?? ""
 
   return slug.length > 0 ? slug : "ditto-template"
 }

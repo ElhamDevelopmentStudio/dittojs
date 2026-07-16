@@ -23,7 +23,7 @@ describe("generateTemplateArchive", () => {
         {
           presetId: "preset.custom",
           userSelections: ["block.navbar"],
-          projectName: "ditto-template",
+          projectName: "---ditto-template---",
         },
         {
           temporaryRoot,
@@ -35,6 +35,7 @@ describe("generateTemplateArchive", () => {
 
       expect(archive.subarray(0, 2).toString("utf8")).toBe("PK")
       expect(result.mimeType).toBe("application/zip")
+      expect(result.fileName).toBe("ditto-template.zip")
       expect(result.generation.filesGenerated).toBeGreaterThan(0)
       expect(result.resolvedRecipe.effectiveSelections).toContain("block.navbar")
       expect(result.resolvedRecipe.metadata.packageVersionPolicy).toBe("caret")
