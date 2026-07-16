@@ -37,7 +37,6 @@ export function OptionCard({
   const className = [
     "relative isolate grid min-h-42 w-full items-stretch overflow-hidden border bg-[rgba(255,255,255,0.64)] text-left text-(--color-foreground) transition-[background,border-color,box-shadow,transform] duration-150 before:absolute before:inset-y-0 before:left-0 before:w-[0.3rem] before:bg-(--builder-accent) before:content-['']",
     selected ? "border-(--builder-ink) bg-(--color-paper)" : "border-[#cfd3d0]",
-    locked || automatic ? "[&_.option-icon]:text-(--color-muted-foreground)" : "",
     disabled
       ? "cursor-not-allowed border-(--color-border) bg-(--color-disabled-background) text-(--color-disabled-text) opacity-70"
       : "hover:-translate-y-px hover:border-(--builder-ink)",
@@ -78,7 +77,7 @@ export function OptionCard({
               {option.label}
             </span>
             <span
-              className={`option-icon inline-flex size-[1.8rem] items-center justify-center text-white ${selected ? "bg-(--builder-accent)" : "bg-(--builder-ink)"}`}
+              className={`option-icon inline-flex size-8 items-center justify-center text-white [&_.icon]:size-[1.1rem] ${selected ? "bg-(--builder-accent)" : "bg-(--builder-ink)"}`}
               aria-hidden="true"
             >
               <AppIcon name={iconName} />

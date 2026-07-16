@@ -37,7 +37,7 @@ export function Header({
 
   return (
     <header
-      className={`sticky top-0 z-20 grid min-h-18 grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-(--color-border) bg-[rgba(250,250,248,0.92)] px-8 max-[980px]:px-4 ${isLanding ? "max-[767px]:grid-cols-[auto_1fr]" : ""}`}
+      className={`sticky top-0 z-20 grid grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-(--color-border) bg-[rgba(250,250,248,0.92)] px-8 max-[980px]:px-4 ${isLanding ? "min-h-18 max-[767px]:grid-cols-[auto_1fr]" : "min-h-20 max-[600px]:grid-cols-[auto_minmax(0,1fr)_auto] max-[600px]:gap-3 max-[600px]:px-3"}`}
     >
       <button
         type="button"
@@ -54,7 +54,10 @@ export function Header({
       </button>
       {isLanding ? (
         <>
-          <nav className="flex items-center gap-6" aria-label="Landing navigation">
+          <nav
+            className="flex items-center justify-center gap-8 max-[767px]:justify-self-end max-[767px]:gap-4"
+            aria-label="Landing navigation"
+          >
             <button
               type="button"
               className="border-0 bg-transparent py-2 text-[0.8125rem] font-semibold text-(--color-muted-foreground) hover:text-(--color-foreground)"
@@ -70,7 +73,7 @@ export function Header({
               Starting points
             </button>
           </nav>
-          <div className="flex items-center gap-6 max-[767px]:hidden">
+          <div className="flex items-center justify-self-end gap-6 max-[767px]:hidden">
             <button
               type="button"
               className="inline-flex min-h-11 items-center justify-center gap-2 border border-(--builder-ink) bg-(--builder-ink) px-4 font-(family-name:--font-mono) text-[0.68rem] font-bold uppercase text-white transition hover:shadow-(--shadow-card)"
@@ -84,27 +87,27 @@ export function Header({
       ) : (
         <>
           <div
-            className="builder-progress mx-auto grid w-full max-w-84 grid-cols-[auto_minmax(7rem,1fr)_auto] items-center gap-3 max-[980px]:grid-cols-[minmax(7rem,12rem)_auto]"
+            className="builder-progress mx-auto grid w-[min(32rem,48vw)] grid-cols-[auto_minmax(12rem,1fr)_auto] items-center gap-5 max-[980px]:w-[min(19rem,48vw)] max-[980px]:grid-cols-[minmax(5rem,1fr)_auto] max-[980px]:gap-3 max-[600px]:w-full max-[600px]:gap-2"
             aria-label={`Builder step ${currentStep ?? 1} of 4`}
           >
-            <span className="font-(family-name:--font-mono) text-[0.62rem] font-bold uppercase text-(--color-muted-foreground) max-[980px]:hidden">
+            <span className="font-(family-name:--font-mono) text-[0.75rem] font-bold tracking-[0.04em] uppercase text-(--color-foreground) max-[980px]:hidden">
               Template builder
             </span>
-            <span className="grid grid-cols-4 gap-1" aria-hidden="true">
+            <span className="grid grid-cols-4 gap-1.5" aria-hidden="true">
               {[1, 2, 3, 4].map((item) => (
                 <i
-                  className={`h-0.5 ${item <= (currentStep ?? 1) ? "bg-(--builder-accent)" : "bg-(--color-border)"}`}
+                  className={`h-1 ${item <= (currentStep ?? 1) ? "bg-(--builder-accent)" : "bg-(--color-border)"}`}
                   key={item}
                 />
               ))}
             </span>
-            <span className="font-(family-name:--font-mono) text-[0.62rem] font-bold text-(--builder-accent)">
+            <span className="whitespace-nowrap font-(family-name:--font-mono) text-[0.75rem] font-bold tracking-[0.04em] text-(--builder-accent)">
               0{currentStep ?? 1} / 04
             </span>
           </div>
           <button
             type="button"
-            className="min-h-11 border border-(--builder-ink) bg-(--builder-ink) px-4 font-(family-name:--font-mono) text-[0.64rem] font-bold uppercase text-white hover:shadow-(--shadow-card)"
+            className="min-h-11 justify-self-end border border-(--builder-ink) bg-(--builder-ink) px-4 font-(family-name:--font-mono) text-[0.64rem] font-bold uppercase text-white hover:shadow-(--shadow-card)"
             onClick={onHome}
           >
             Exit builder
