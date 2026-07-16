@@ -3,6 +3,8 @@ dist
 coverage
 .turbo
 .omx
+.codex
 docs
 fixtures/generated
+template
 pnpm-lock.yaml
