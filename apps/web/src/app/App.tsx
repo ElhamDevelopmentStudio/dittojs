@@ -383,16 +383,24 @@ function BuilderApp({
         onTemplates={startGenerating}
       />
       {notice !== undefined ? (
-        <div className="notice" role="status" aria-live="polite">
-          <span className="notice-icon" aria-hidden="true">
+        <div
+          className="sticky top-18 z-[19] grid grid-cols-[auto_1fr_auto] items-center gap-3 border-b border-(--color-border) bg-(--color-notice-background) px-8 py-3 text-[0.8125rem] text-(--color-notice-foreground) max-[640px]:px-4"
+          role="status"
+          aria-live="polite"
+        >
+          <span
+            className="inline-flex size-6 items-center justify-center bg-(--color-notice-foreground) font-(family-name:--font-mono) text-[0.65rem] font-bold text-white"
+            aria-hidden="true"
+          >
             i
           </span>
-          <div>
-            <strong>Resolver note</strong>
+          <div className="flex flex-wrap gap-x-2">
+            <strong className="font-bold">Resolver note</strong>
             <span>{notice}</span>
           </div>
           <button
             type="button"
+            className="border-0 bg-transparent font-(family-name:--font-mono) text-[0.65rem] font-bold uppercase underline underline-offset-2"
             aria-label="Dismiss resolver note"
             onClick={() => setNotice(undefined)}
           >

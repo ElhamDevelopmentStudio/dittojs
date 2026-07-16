@@ -9,7 +9,12 @@ import { OptionCard } from "../components/builder/option-card"
 import { PreviewModal } from "../components/builder/preview-modal"
 import { DependencyNotes } from "../components/builder/resolution-panels"
 import { AppIcon } from "../components/icons"
-import { FooterActions, SectionHeader, StepHeader } from "../components/layout/app-shell"
+import {
+  buttonStyles,
+  FooterActions,
+  SectionHeader,
+  StepHeader,
+} from "../components/layout/app-shell"
 
 function formatInlineList(values: string[]): string {
   if (values.length <= 1) {
@@ -45,15 +50,18 @@ function OptionGrid({
   const titleId = `${title.replace(/\s+/g, "-")}-title`
 
   return (
-    <section className="option-group" aria-labelledby={titleId}>
+    <section
+      className="grid gap-5 border-t-2 border-(--builder-ink) pt-5"
+      aria-labelledby={titleId}
+    >
       <SectionHeader id={titleId} number={number} title={title} description={description} />
       {resolverNote !== undefined ? (
-        <p className="resolver-note">
+        <p className="flex items-center gap-2 border-l-4 border-(--builder-accent) bg-(--builder-accent-soft) px-4 py-3 text-sm text-[#623326]">
           <AppIcon name="lock" />
           {resolverNote}
         </p>
       ) : null}
-      <div className="option-grid compact-grid">
+      <div className="grid grid-cols-3 gap-3 max-[1180px]:grid-cols-2 max-[980px]:grid-cols-1">
         {options.map((option) => {
           const state = stateForOption(recipe, option)
 
@@ -96,14 +104,14 @@ export function FeaturesBlocksPage({
       : undefined
 
   return (
-    <main className="builder-page two-column-page features-blocks-page">
-      <section className="builder-main">
+    <main className="builder-page mx-auto grid max-w-440 grid-cols-[minmax(0,1fr)_minmax(21rem,23rem)] items-start gap-[clamp(1.5rem,2.5vw,2.75rem)] p-[clamp(1.5rem,4vw,3.5rem)] max-[980px]:grid-cols-1 max-[980px]:p-4">
+      <section className="grid gap-[clamp(2rem,4vw,3.25rem)] border border-(--color-border-strong) bg-[rgba(255,254,250,0.94)] p-[clamp(1.5rem,3vw,3rem)] shadow-[0.6rem_0.6rem_0_rgba(23,26,25,0.045)] max-[980px]:p-5">
         <StepHeader
           eyebrow="Step 2"
           title="Features & Blocks"
           description="Choose generated components and product blocks."
         />
-        <div className="option-group-stack">
+        <div className="grid gap-10">
           {featureOptionGroups.map((group, index) => (
             <OptionGrid
               key={group.id}
@@ -119,11 +127,11 @@ export function FeaturesBlocksPage({
           ))}
         </div>
         <FooterActions>
-          <button type="button" className="button button-light" onClick={onBack}>
+          <button type="button" className={buttonStyles.light} onClick={onBack}>
             <AppIcon name="arrow-left" />
             Back
           </button>
-          <button type="button" className="button button-dark" onClick={onContinue}>
+          <button type="button" className={buttonStyles.dark} onClick={onContinue}>
             Continue
             <AppIcon name="arrow-right" />
           </button>

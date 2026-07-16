@@ -21,24 +21,31 @@ function LedgerBlock({ title, values, empty }: { title: string; values: string[]
   const { visible, hiddenCount } = visibleSummaryItems(values)
 
   return (
-    <div className="summary-block">
-      <div className="summary-block-heading">
-        <h3>{title}</h3>
-        {values.length > 0 ? <span>{values.length} items</span> : null}
+    <div className="grid gap-3 border-t border-white/15 pt-4 first:border-t-0 first:pt-0">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="font-(family-name:--font-display) text-[0.86rem] font-bold text-[#f8f8f4]">
+          {title}
+        </h3>
+        {values.length > 0 ? (
+          <span className="text-[0.7rem] text-[#b9bfbb]">{values.length} items</span>
+        ) : null}
       </div>
       {values.length > 0 ? (
-        <ul className="summary-value-list">
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-white/10 pt-3 max-[980px]:grid-cols-2">
           {visible.map((value, index) => (
-            <li className="summary-value" key={`${title}-${value}-${index}`}>
+            <li
+              className="flex items-start gap-2 text-[0.75rem] leading-5 text-[#b9bfbb] before:mt-2 before:h-[0.18rem] before:w-2 before:flex-none before:bg-(--builder-accent) before:content-['']"
+              key={`${title}-${value}-${index}`}
+            >
               {value}
             </li>
           ))}
           {hiddenCount > 0 ? (
-            <li className="summary-value summary-value-muted">+{hiddenCount} more</li>
+            <li className="text-[0.75rem] italic text-[#b9bfbb]">+{hiddenCount} more</li>
           ) : null}
         </ul>
       ) : (
-        <p>{empty}</p>
+        <p className="text-[0.75rem] leading-5 text-[#b9bfbb]">{empty}</p>
       )}
     </div>
   )
@@ -49,17 +56,21 @@ export function LiveStackSummary({ recipe }: { recipe: ResolvedRecipe }) {
 
   return (
     <aside
-      className={`side-panel resolver-ledger${expanded ? "" : " is-collapsed"}`}
+      className={`sticky top-26 grid max-h-[calc(100dvh-7.5rem)] gap-4 overflow-auto bg-(--builder-ink) p-5 text-white shadow-[0.35rem_0.35rem_0_rgba(232,81,47,0.7)] max-[980px]:static max-[980px]:max-h-none ${expanded ? "" : "self-start"}`}
       aria-label="Resolver ledger"
     >
-      <div className="panel-header">
+      <div className="flex items-start justify-between gap-4 border-b border-white/15 pb-4">
         <div>
-          <p className="eyebrow">Resolver output</p>
-          <h2>Resolver Ledger</h2>
+          <p className="font-(family-name:--font-mono) text-[0.68rem] font-bold uppercase text-(--builder-accent)">
+            Resolver output
+          </p>
+          <h2 className="font-(family-name:--font-display) text-lg font-bold text-[#f8f8f4]">
+            Resolver Ledger
+          </h2>
         </div>
         <button
           type="button"
-          className="summary-toggle"
+          className="inline-flex size-10 items-center justify-center border border-[#3a403c] bg-[#252a27] text-[#f8f8f4] hover:border-(--builder-accent)"
           aria-label={expanded ? "Hide resolver ledger" : "Show resolver ledger"}
           aria-expanded={expanded}
           title={expanded ? "Hide resolver ledger" : "Show resolver ledger"}
@@ -71,7 +82,7 @@ export function LiveStackSummary({ recipe }: { recipe: ResolvedRecipe }) {
       {expanded ? (
         <ResolverLedgerBody recipe={recipe} />
       ) : (
-        <p className="summary-collapsed-copy">Summary hidden.</p>
+        <p className="text-[0.75rem] text-[#b9bfbb]">Summary hidden.</p>
       )}
     </aside>
   )
@@ -98,17 +109,21 @@ function ResolverLedgerBody({ recipe }: { recipe: ResolvedRecipe }) {
         values={locks.map((lock) => lock.label)}
         empty="No locked dependencies."
       />
-      <div className="summary-block">
-        <div className="summary-block-heading">
-          <h3>Warnings / conflicts</h3>
+      <div className="grid gap-3 border-t border-white/15 pt-4">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="font-(family-name:--font-display) text-[0.86rem] font-bold text-[#f8f8f4]">
+            Warnings / conflicts
+          </h3>
           {errors.length + recipe.warnings.length > 0 ? (
-            <span>{errors.length + recipe.warnings.length} items</span>
+            <span className="text-[0.7rem] text-[#b9bfbb]">
+              {errors.length + recipe.warnings.length} items
+            </span>
           ) : null}
         </div>
         {errors.length > 0 || recipe.warnings.length > 0 ? (
-          <ul>
+          <ul className="grid gap-2 text-[0.75rem] leading-5 text-[#b9bfbb]">
             {errors.map((conflict, index) => (
-              <li key={`${conflict.message}-${index}`} className="issue-line">
+              <li key={`${conflict.message}-${index}`} className="flex gap-2 text-[#ffb09e]">
                 <AppIcon name="warning" />
                 {conflict.message}
               </li>
@@ -118,7 +133,7 @@ function ResolverLedgerBody({ recipe }: { recipe: ResolvedRecipe }) {
             ))}
           </ul>
         ) : (
-          <p>No resolver warnings or conflicts.</p>
+          <p className="text-[0.75rem] text-[#b9bfbb]">No resolver warnings or conflicts.</p>
         )}
       </div>
     </>
@@ -127,10 +142,17 @@ function ResolverLedgerBody({ recipe }: { recipe: ResolvedRecipe }) {
 
 export function DependencyNotes({ recipe }: { recipe: ResolvedRecipe }) {
   return (
-    <aside className="side-panel resolver-ledger" aria-label="Resolver ledger">
-      <div className="panel-header">
-        <p className="eyebrow">Manifest ledger</p>
-        <h2>Resolver Ledger</h2>
+    <aside
+      className="sticky top-26 grid max-h-[calc(100dvh-7.5rem)] gap-4 overflow-auto bg-(--builder-ink) p-5 text-white shadow-[0.35rem_0.35rem_0_rgba(232,81,47,0.7)] max-[980px]:static max-[980px]:max-h-none"
+      aria-label="Resolver ledger"
+    >
+      <div className="border-b border-white/15 pb-4">
+        <p className="font-(family-name:--font-mono) text-[0.68rem] font-bold uppercase text-(--builder-accent)">
+          Manifest ledger
+        </p>
+        <h2 className="font-(family-name:--font-display) text-lg font-bold text-[#f8f8f4]">
+          Resolver Ledger
+        </h2>
       </div>
       <ResolverLedgerBody recipe={recipe} />
     </aside>
@@ -139,11 +161,16 @@ export function DependencyNotes({ recipe }: { recipe: ResolvedRecipe }) {
 
 export function StackSummaryTable({ recipe }: { recipe: ResolvedRecipe }) {
   return (
-    <div className="summary-table">
+    <div className="grid border-t border-(--color-border-strong)">
       {stackSummary(recipe).map((row) => (
-        <div className="summary-row" key={row.label}>
-          <span>{row.label}</span>
-          <strong>{row.value}</strong>
+        <div
+          className="grid grid-cols-[minmax(9rem,0.55fr)_minmax(0,1fr)] gap-4 border-b border-(--color-border-strong) py-4 max-[640px]:grid-cols-1"
+          key={row.label}
+        >
+          <span className="font-(family-name:--font-mono) text-[0.62rem] font-bold uppercase text-(--color-muted-foreground)">
+            {row.label}
+          </span>
+          <strong className="text-sm">{row.value}</strong>
         </div>
       ))}
     </div>
@@ -171,14 +198,19 @@ export function ValidationCard({ recipe }: { recipe: ResolvedRecipe }) {
   ]
 
   return (
-    <div className="review-card validation-stamp">
-      <div className="panel-header">
-        <p className="eyebrow">Validation</p>
-        <h2>Stamped Checks</h2>
+    <div className="relative grid gap-4 border border-l-4 border-(--color-border-strong) border-l-(--builder-accent) bg-(--color-paper) p-5 after:absolute after:top-4 after:right-4 after:rotate-[-4deg] after:border after:border-(--builder-accent) after:px-2 after:py-1 after:font-(family-name:--font-mono) after:text-[0.65rem] after:font-bold after:text-(--builder-accent) after:content-['PASSED']">
+      <div>
+        <p className="font-(family-name:--font-mono) text-[0.68rem] font-bold uppercase text-(--builder-accent)">
+          Validation
+        </p>
+        <h2 className="font-(family-name:--font-display) text-xl font-bold">Stamped Checks</h2>
       </div>
-      <ul className="check-list">
+      <ul className="grid gap-2">
         {checks.map((check) => (
-          <li key={check.label}>
+          <li
+            className="flex items-center gap-2 border-t border-(--color-border) pt-2 text-sm first:border-t-0 first:pt-0"
+            key={check.label}
+          >
             <AppIcon name={check.passed ? "check" : "warning"} />
             <span>{check.label}</span>
           </li>
