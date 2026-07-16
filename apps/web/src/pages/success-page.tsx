@@ -33,6 +33,9 @@ export function SuccessPage({
   return (
     <main className="success-page">
       <section className="success-card">
+        <span className="success-mark" aria-hidden="true">
+          <AppIcon name="check" />
+        </span>
         <p className="eyebrow">Success</p>
         <h1>Template generated.</h1>
         <p>Your DittoJs template is ready to download.</p>

@@ -38,6 +38,15 @@ const stepPaths: Record<BuilderStep, string> = {
   success: "/templates/success",
 }
 
+const builderStepNumbers: Partial<Record<BuilderStep, number>> = {
+  core: 1,
+  features: 2,
+  structure: 3,
+  review: 4,
+  generating: 4,
+  success: 4,
+}
+
 export type AppProps = {
   generationClient?: GenerationClient
   initialStep?: BuilderStep
@@ -369,6 +378,7 @@ function BuilderApp({
     <AppShell>
       <Header
         isLanding={step === "landing"}
+        currentStep={builderStepNumbers[step]}
         onHome={resetToLanding}
         onTemplates={startGenerating}
       />

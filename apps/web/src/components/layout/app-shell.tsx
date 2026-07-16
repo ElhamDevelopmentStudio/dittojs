@@ -8,10 +8,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 export function Header({
   isLanding,
+  currentStep,
   onHome,
   onTemplates,
 }: {
   isLanding: boolean
+  currentStep?: number | undefined
   onHome: () => void
   onTemplates: () => void
 }) {
@@ -46,7 +48,15 @@ export function Header({
         </>
       ) : (
         <>
-          <p className="builder-header-label">Template builder</p>
+          <div className="builder-progress" aria-label={`Builder step ${currentStep ?? 1} of 4`}>
+            <span className="builder-progress-label">Template builder</span>
+            <span className="builder-progress-track" aria-hidden="true">
+              {[1, 2, 3, 4].map((item) => (
+                <i className={item <= (currentStep ?? 1) ? "is-active" : ""} key={item} />
+              ))}
+            </span>
+            <span className="builder-progress-count">0{currentStep ?? 1} / 04</span>
+          </div>
           <button type="button" className="header-home-button" onClick={onHome}>
             Exit builder
           </button>

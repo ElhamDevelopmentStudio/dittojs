@@ -24,7 +24,7 @@ export function CoreConfigurationPage({
   const [customizationOption, setCustomizationOption] = useState<BuilderOption | undefined>()
 
   return (
-    <main className="builder-page two-column-page">
+    <main className="builder-page two-column-page core-configuration-page">
       <section className="builder-main">
         <StepHeader
           eyebrow="Step 1"

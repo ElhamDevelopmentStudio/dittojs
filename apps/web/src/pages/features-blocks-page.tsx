@@ -96,7 +96,7 @@ export function FeaturesBlocksPage({
       : undefined
 
   return (
-    <main className="builder-page two-column-page">
+    <main className="builder-page two-column-page features-blocks-page">
       <section className="builder-main">
         <StepHeader
           eyebrow="Step 2"
