@@ -7,22 +7,19 @@ changelog:
   categories:
     - title: Breaking changes
       labels:
-        - breaking-change
+        - breaking
     - title: Features
       labels:
         - enhancement
-        - feature
     - title: Fixes
       labels:
         - bug
-        - fix
     - title: Documentation
       labels:
         - documentation
     - title: Dependencies and maintenance
       labels:
         - dependencies
-        - chore
     - title: Other changes
       labels:
         - "*"

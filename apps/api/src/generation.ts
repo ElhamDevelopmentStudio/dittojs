@@ -86,13 +86,24 @@ function assertRequest(input: unknown): asserts input is TemplateGenerationReque
   }
 }
 
+function trimCharacter(value: string, character: string): string {
+  let start = 0
+  let end = value.length
+
+  while (value[start] === character) start += 1
+  while (end > start && value[end - 1] === character) end -= 1
+
+  return value.slice(start, end)
+}
+
 function slugifyProjectName(projectName?: string): string {
-  const slug =
+  const slug = trimCharacter(
     projectName
       ?.trim()
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "") ?? ""
+      .replace(/[^a-z0-9]+/g, "-") ?? "",
+    "-",
+  )
 
   return slug.length > 0 ? slug : "ditto-template"
 }

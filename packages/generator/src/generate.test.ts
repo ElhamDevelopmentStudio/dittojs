@@ -118,7 +118,7 @@ describe("generateProject", () => {
     const result = await generateProject({
       resolvedRecipe: resolvedRecipe(),
       outputDir,
-      projectName: "Test App",
+      projectName: "---Test App---",
       createdAt,
     })
     const packageJson = await readJson<{

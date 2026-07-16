@@ -17,7 +17,7 @@ Files in the repository establish policy; GitHub settings enforce it. Repository
 - Require at least one approval; dismiss stale approvals after new commits.
 - Require review from CODEOWNERS.
 - Require conversation resolution.
-- Require status checks: `Quality and build`, `Generated project verification`, and `Dependency review`.
+- Require status checks: `Quality and build`, `Generated project verification`, `Dependency review`, and `CodeQL`.
 - Require branches to be up to date before merge.
 - Block force pushes and branch deletion.
 - Require linear history.
@@ -55,7 +55,7 @@ Create labels referenced by forms and release notes:
 - `bug`, `enhancement`, `documentation`
 - `dependencies`, `github-actions`
 - `feature`, `fix`, `chore`
-- `breaking-change`, `skip-changelog`
+- `breaking`, `skip-changelog`
 - `good first issue`, `help wanted`, `needs reproduction`
 - `area: resolver`, `area: generator`, `area: catalog`, `area: web`, `area: api`
 

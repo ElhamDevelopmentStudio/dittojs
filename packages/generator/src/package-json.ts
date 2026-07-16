@@ -9,6 +9,16 @@ function sortPackageMap(packageMap: Record<string, string> | undefined): Record<
   )
 }
 
+function trimCharacter(value: string, character: string): string {
+  let start = 0
+  let end = value.length
+
+  while (value[start] === character) start += 1
+  while (end > start && value[end - 1] === character) end -= 1
+
+  return value.slice(start, end)
+}
+
 function toPackageName(projectName: string | undefined, outputDir: string): string {
   const rawName =
     projectName?.trim() ||
@@ -17,10 +27,7 @@ function toPackageName(projectName: string | undefined, outputDir: string): stri
       .filter(Boolean)
       .at(-1) ||
     "ditto-generated-project"
-  const packageName = rawName
-    .toLowerCase()
-    .replace(/[^a-z0-9._~-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
+  const packageName = trimCharacter(rawName.toLowerCase().replace(/[^a-z0-9._~-]+/g, "-"), "-")
 
   return packageName.length > 0 ? packageName : "ditto-generated-project"
 }
