@@ -1,13 +1,9 @@
-import { Navbar } from "__DITTO_IMPORT_BLOCK_NAVBAR__"
 import { SettingsForm } from "__DITTO_IMPORT_FORM_COMPONENT_SETTINGS_FORM__"
-import { Sidebar } from "__DITTO_IMPORT_BLOCK_SIDEBAR__"
 
 export function App() {
   return (
     <div className="min-h-screen bg-muted text-foreground">
-      <Navbar />
-      <div className="flex min-h-[calc(100vh-73px)]">
-        <Sidebar />
+      <div className="flex min-h-screen">
         <main className="flex-1 p-6">
           <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1fr_22rem]">
             <section className="rounded-lg border border-border bg-background p-6 shadow-sm">

@@ -1,5 +1,4 @@
 import { MessagingInput } from "__DITTO_IMPORT_BLOCK_MESSAGING_INPUT__"
-import { Navbar } from "__DITTO_IMPORT_BLOCK_NAVBAR__"
 import { OnlinePresence } from "__DITTO_IMPORT_BLOCK_ONLINE_PRESENCE__"
 import { TypingIndicator } from "__DITTO_IMPORT_BLOCK_TYPING_INDICATOR__"
 
@@ -17,8 +16,7 @@ const messages = [
 export function App() {
   return (
     <div className="min-h-screen bg-muted text-foreground">
-      <Navbar />
-      <main className="mx-auto flex min-h-[calc(100vh-73px)] max-w-5xl flex-col gap-6 px-6 py-8">
+      <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 px-6 py-8">
         <section className="grid gap-6 lg:grid-cols-[1fr_18rem]">
           <div className="flex min-h-[32rem] flex-col rounded-lg border border-border bg-background shadow-sm">
             <header className="border-b border-border p-5">
