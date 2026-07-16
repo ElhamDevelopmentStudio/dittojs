@@ -5,11 +5,11 @@ import { cwd } from "node:process"
 
 import { afterEach, describe, expect, it } from "vitest"
 
-import { PACKAGE_VERSION_POLICY, catalog, packageVersions } from "@dittojs/catalog"
-import { resolveRecipe, type ResolvedRecipe } from "@dittojs/core"
+import { PACKAGE_VERSION_POLICY, catalog, packageVersions } from "@dittosh/catalog"
+import { resolveRecipe, type ResolvedRecipe } from "@dittosh/core"
 
-import { generateProject } from "./index"
-import { GENERATED_NODE_ENGINE, GENERATED_NODE_README_REQUIREMENT } from "./node-policy"
+import { generateProject } from "./index.js"
+import { GENERATED_NODE_ENGINE, GENERATED_NODE_README_REQUIREMENT } from "./node-policy.js"
 
 const createdAt = "2026-07-05T00:00:00.000Z"
 const tempDirs: string[] = []
@@ -171,7 +171,7 @@ describe("generateProject", () => {
 
     await expect(readJson(path.join(outputDir, "ditto.generated.json"))).resolves.toMatchObject({
       generator: "dittojs",
-      generatorPackage: "@dittojs/generator",
+      generatorPackage: "@dittosh/generator",
       generatorVersion: "test-version",
       createdAt,
       preset: "preset.custom",

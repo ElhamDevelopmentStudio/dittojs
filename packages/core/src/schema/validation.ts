@@ -1,5 +1,5 @@
-import { isValidCapabilityName, isValidModuleId } from "./ids"
-import { GROUP_MODES, MODULE_TYPES } from "./types"
+import { isValidCapabilityName, isValidModuleId } from "./ids.js"
+import { GROUP_MODES, MODULE_TYPES } from "./types.js"
 import type {
   Conflict,
   FileMapping,
@@ -8,7 +8,7 @@ import type {
   ModuleType,
   PresetManifest,
   Requirement,
-} from "./types"
+} from "./types.js"
 
 export type ManifestValidationIssue = {
   code: string

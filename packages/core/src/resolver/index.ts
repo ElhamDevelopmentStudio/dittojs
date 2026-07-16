@@ -1,2 +1,2 @@
-export * from "./resolve"
-export * from "./types"
+export * from "./resolve.js"
+export * from "./types.js"

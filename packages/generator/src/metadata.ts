@@ -1,8 +1,8 @@
-import type { CreateDittoMetadataInput, DittoGeneratedMetadata } from "./types"
+import type { CreateDittoMetadataInput, DittoGeneratedMetadata } from "./types.js"
 
 export const generatorPackage = {
   name: "dittojs",
-  packageName: "@dittojs/generator",
+  packageName: "@dittosh/generator",
   version: "0.0.0",
 } as const
 

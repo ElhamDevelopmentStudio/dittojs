@@ -14,7 +14,7 @@ This roadmap communicates direction, not a delivery promise. Accepted issues and
 ## Next: public extension model
 
 - Define stable public APIs for core, catalog, and generator packages.
-- Introduce a supported CLI generation workflow.
+- Harden and expand the supported `create-ditto` template-ID workflow.
 - Formalize catalog and registry validation tooling.
 - Add controlled package/version upgrade workflows.
 - Support reusable user recipes and import/export.

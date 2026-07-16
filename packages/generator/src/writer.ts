@@ -1,8 +1,8 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises"
 import path from "node:path"
 
-import { resolveSafeOutputPath, resolveSafeTemplatePath } from "./paths"
-import { GenerateProjectError } from "./types"
+import { resolveSafeOutputPath, resolveSafeTemplatePath } from "./paths.js"
+import { GenerateProjectError } from "./types.js"
 
 export type ResolvedCopyFileMapping = {
   from: string

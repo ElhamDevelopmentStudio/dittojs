@@ -1,4 +1,4 @@
-import type { ProjectStructureAdapter } from "./types"
+import type { ProjectStructureAdapter } from "./types.js"
 
 export const PROJECT_STRUCTURE_GROUP_ID = "project-structure"
 

@@ -171,6 +171,9 @@ UI tests should verify:
 * generation success reaches Success / Download
 * generation failure shows Retry and Back to Review
 * Download ZIP is backed by a generated archive response
+* project name reaches the generation request
+* saving a template returns an opaque ID
+* Copy CLI uses the saved template ID
 
 The current MVP uses Vitest and Testing Library component/integration tests for
 the browser flow. Playwright can be added later for full browser E2E coverage.
@@ -184,6 +187,13 @@ Generation API tests should verify:
 * `generateProject` writes a real temporary project
 * ZIP creation returns an `application/zip` archive
 * returned metadata matches the resolved manifest used by the UI
+* saved templates persist explicit selections rather than effective selections
+* unknown and incompatible template IDs fail clearly
+
+## create-ditto CLI tests
+
+CLI tests must verify argument parsing, project-name normalization, safe ZIP extraction, traversal
+rejection, destination collision behavior, and non-interactive flag behavior.
 
 ## End-to-end tests
 

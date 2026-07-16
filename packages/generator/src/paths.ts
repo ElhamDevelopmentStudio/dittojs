@@ -1,6 +1,6 @@
 import path from "node:path"
 
-import { GenerateProjectError } from "./types"
+import { GenerateProjectError } from "./types.js"
 
 export const PACKAGE_JSON_TARGET = "package.json"
 export const METADATA_TARGET = "ditto.generated.json"

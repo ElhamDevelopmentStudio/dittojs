@@ -1,9 +1,9 @@
-import type { ResolvedRecipe } from "@dittojs/core"
+import type { ResolvedRecipe } from "@dittosh/core"
 
-import { normalizeSafeRelativePath } from "../paths"
-import { GenerateProjectError } from "../types"
-import { getProjectStructureAdapter } from "./adapters"
-import type { ProjectStructureAdapter } from "./types"
+import { normalizeSafeRelativePath } from "../paths.js"
+import { GenerateProjectError } from "../types.js"
+import { getProjectStructureAdapter } from "./adapters.js"
+import type { ProjectStructureAdapter } from "./types.js"
 
 const PLACEHOLDER_PATTERN = /\{([A-Za-z][A-Za-z0-9-]*)\}/g
 const STRUCTURE_MODULE_PREFIX = "structure."

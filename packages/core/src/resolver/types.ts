@@ -1,4 +1,4 @@
-import type { FileMapping, ModuleManifest, PackageSet } from "../schema/index"
+import type { FileMapping, ModuleManifest, PackageSet } from "../schema/index.js"
 
 export type ResolveInput = {
   userSelections: string[]

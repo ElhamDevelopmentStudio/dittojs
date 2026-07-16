@@ -6,15 +6,15 @@ import {
   validateCatalog,
   type ModuleManifest,
   type PresetManifest,
-} from "@dittojs/core"
+} from "@dittosh/core"
 
-import { catalog } from "./catalog"
+import { catalog } from "./catalog.js"
 import {
   MVP_PACKAGE_NAMES,
   packageVersions,
   type PackageDependencyType,
   type PackageVersionPolicy,
-} from "./package-versions"
+} from "./package-versions.js"
 
 const requiredCapabilities = new Set([
   "component-library.shadcn",

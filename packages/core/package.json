@@ -1,7 +1,7 @@
 {
-  "name": "@dittojs/core",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@dittosh/core",
+  "version": "0.1.0",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,6 +11,20 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElhamDevelopmentStudio/dittojs.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/ElhamDevelopmentStudio/dittojs/tree/main/packages/core#readme",
+  "bugs": "https://github.com/ElhamDevelopmentStudio/dittojs/issues",
   "scripts": {
     "build": "tsc -b tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",

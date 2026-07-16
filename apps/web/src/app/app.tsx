@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { catalog } from "@dittojs/catalog"
-import { resolveRecipe } from "@dittojs/core"
+import { catalog } from "@dittosh/catalog"
+import { resolveRecipe } from "@dittosh/core"
 
 import type { BuilderOption, BuilderStep } from "../builder/builder-options"
 import { allSelectableOptions, moduleIdsForOption } from "../builder/builder-options"
@@ -151,6 +151,10 @@ function BuilderApp({
   const [userSelections, setUserSelections] = useState<string[]>(initialUserSelections)
   const [notice, setNotice] = useState<string | undefined>()
   const [copyState, setCopyState] = useState<string | undefined>()
+  const [projectName, setProjectName] = useState("ditto-template")
+  const [templateId, setTemplateId] = useState<string | undefined>()
+  const [templateSaveError, setTemplateSaveError] = useState<string | undefined>()
+  const [savingTemplate, setSavingTemplate] = useState(false)
   const [manifestOpen, setManifestOpen] = useState(false)
   const [generationStep, setGenerationStep] = useState(0)
   const [generationError, setGenerationError] = useState<string | undefined>()
@@ -160,7 +164,16 @@ function BuilderApp({
     () => resolveForState(presetId, userSelections),
     [presetId, userSelections],
   )
-  const command = useMemo(() => cliCommand(presetId, userSelections), [presetId, userSelections])
+  const command = useMemo(
+    () => (templateId === undefined ? undefined : cliCommand(templateId)),
+    [templateId],
+  )
+
+  useEffect(() => {
+    setTemplateId(undefined)
+    setTemplateSaveError(undefined)
+    setCopyState(undefined)
+  }, [presetId, userSelections])
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -214,6 +227,8 @@ function BuilderApp({
     setManifestOpen(false)
     setGenerationError(undefined)
     setGeneratedTemplate(undefined)
+    setProjectName("ditto-template")
+    setTemplateId(undefined)
   }, [])
 
   const createPreset = useCallback((nextPresetId: string) => {
@@ -298,6 +313,10 @@ function BuilderApp({
   )
 
   const copyCliCommand = useCallback(async () => {
+    if (command === undefined) {
+      setCopyState("Create a template ID before copying the CLI command.")
+      return
+    }
     if (navigator.clipboard?.writeText === undefined) {
       setCopyState("Clipboard is unavailable in this browser.")
       return
@@ -306,6 +325,30 @@ function BuilderApp({
     await navigator.clipboard.writeText(command)
     setCopyState("CLI command copied.")
   }, [command])
+
+  const saveCurrentTemplate = useCallback(async () => {
+    if (!canGenerate(recipe)) {
+      return
+    }
+
+    setSavingTemplate(true)
+    setTemplateSaveError(undefined)
+    setCopyState(undefined)
+
+    try {
+      const request = {
+        userSelections,
+        ...(presetId === undefined ? {} : { presetId }),
+      }
+      const response = await generationClient.saveTemplate(request)
+
+      setTemplateId(response.templateId)
+    } catch (error: unknown) {
+      setTemplateSaveError(errorMessage(error))
+    } finally {
+      setSavingTemplate(false)
+    }
+  }, [generationClient, presetId, recipe, userSelections])
 
   const downloadArchive = useCallback(() => {
     if (generatedTemplate === undefined) {
@@ -345,7 +388,7 @@ function BuilderApp({
         presetId?: string
       } = {
         userSelections,
-        projectName: "ditto-template",
+        projectName: projectName.trim() || "ditto-template",
       }
 
       if (presetId !== undefined) {
@@ -367,7 +410,7 @@ function BuilderApp({
       setGenerationError(errorMessage(error))
       setStep("generating")
     }
-  }, [generationClient, presetId, recipe, userSelections])
+  }, [generationClient, presetId, projectName, recipe, userSelections])
 
   const backToReview = useCallback(() => {
     setGenerationError(undefined)
@@ -444,8 +487,17 @@ function BuilderApp({
           recipe={recipe}
           manifestOpen={manifestOpen}
           copyState={copyState}
+          projectName={projectName}
+          templateId={templateId}
+          templateSaveError={templateSaveError}
+          savingTemplate={savingTemplate}
           onBack={() => setStep("structure")}
           onGenerate={runGeneration}
+          onProjectNameChange={(value) => {
+            setProjectName(value)
+            setCopyState(undefined)
+          }}
+          onSaveTemplate={saveCurrentTemplate}
           onOpenManifest={() => setManifestOpen(true)}
           onCloseManifest={() => setManifestOpen(false)}
           onCopyCli={copyCliCommand}

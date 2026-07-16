@@ -3,11 +3,11 @@ export {
   REQUIRED_PROJECT_STRUCTURE_SLOTS,
   getProjectStructureAdapter,
   projectStructureAdapters,
-} from "./adapters"
+} from "./adapters.js"
 export {
   requireProjectStructureAdapter,
   resolveStructurePath,
   selectedProjectStructureAdapter,
   selectedProjectStructureIds,
-} from "./resolve"
-export type { ProjectStructureAdapter } from "./types"
+} from "./resolve.js"
+export type { ProjectStructureAdapter } from "./types.js"

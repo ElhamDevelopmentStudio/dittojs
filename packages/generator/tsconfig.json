@@ -9,7 +9,7 @@
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "types": ["node"],
     "paths": {
-      "@dittojs/core": ["../core/dist/index.d.ts"]
+      "@dittosh/core": ["../core/dist/index.d.ts"]
     }
   },
   "include": ["src/**/*.ts"],

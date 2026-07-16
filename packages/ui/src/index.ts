@@ -1,3 +1,3 @@
 export const sharedUiPackage = {
-  name: "@dittojs/ui",
+  name: "@dittosh/ui",
 } as const

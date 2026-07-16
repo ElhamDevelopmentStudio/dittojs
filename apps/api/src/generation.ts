@@ -3,13 +3,13 @@ import { mkdir, mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
 
-import { catalog, PACKAGE_VERSION_POLICY } from "@dittojs/catalog"
-import type { ResolvedRecipe, ResolveConflict } from "@dittojs/core"
-import { resolveRecipe } from "@dittojs/core"
-import { generateProject, GenerateProjectError } from "@dittojs/generator"
-import type { GenerateProjectResult } from "@dittojs/generator"
+import { catalog, PACKAGE_VERSION_POLICY } from "@dittosh/catalog"
+import type { ResolvedRecipe, ResolveConflict } from "@dittosh/core"
+import { resolveRecipe } from "@dittosh/core"
+import { generateProject, GenerateProjectError } from "@dittosh/generator"
+import type { GenerateProjectResult } from "@dittosh/generator"
 
-import { createZipArchive, zipMimeType } from "./archive"
+import { createZipArchive, zipMimeType } from "./archive.js"
 
 export type TemplateGenerationRequest = {
   presetId?: string
@@ -81,6 +81,30 @@ function assertRequest(input: unknown): asserts input is TemplateGenerationReque
     throw new GenerationApiError(
       "Every user selection must be a module id string.",
       "invalid-request",
+      400,
+    )
+  }
+
+  if (
+    candidate.projectName !== undefined &&
+    (typeof candidate.projectName !== "string" ||
+      candidate.projectName.trim().length === 0 ||
+      candidate.projectName.length > 80)
+  ) {
+    throw new GenerationApiError(
+      "projectName must contain between 1 and 80 characters.",
+      "invalid-project-name",
+      400,
+    )
+  }
+
+  if (
+    candidate.packageManager !== undefined &&
+    !["pnpm", "npm", "yarn"].includes(candidate.packageManager)
+  ) {
+    throw new GenerationApiError(
+      "packageManager must be pnpm, npm, or yarn.",
+      "invalid-package-manager",
       400,
     )
   }

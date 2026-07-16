@@ -1,5 +1,5 @@
-import { catalog } from "@dittojs/catalog"
-import { isPresetManifest, type ModuleManifest } from "@dittojs/core"
+import { catalog } from "@dittosh/catalog"
+import { isPresetManifest, type ModuleManifest } from "@dittosh/core"
 
 export type BuilderStep =
   "landing" | "core" | "features" | "structure" | "review" | "generating" | "success"

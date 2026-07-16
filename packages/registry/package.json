@@ -1,7 +1,7 @@
 {
-  "name": "@dittojs/registry",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@dittosh/registry",
+  "version": "0.1.0",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,6 +11,30 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "blocks",
+    "compositions",
+    "hooks",
+    "http",
+    "pages",
+    "react",
+    "sample-data",
+    "shadcn",
+    "state",
+    "support"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElhamDevelopmentStudio/dittojs.git",
+    "directory": "packages/registry"
+  },
+  "homepage": "https://github.com/ElhamDevelopmentStudio/dittojs/tree/main/packages/registry#readme",
+  "bugs": "https://github.com/ElhamDevelopmentStudio/dittojs/issues",
   "scripts": {
     "build": "tsc -b tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",

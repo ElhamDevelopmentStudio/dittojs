@@ -1,0 +1,41 @@
+{
+  "name": "create-ditto",
+  "version": "0.1.0",
+  "description": "Create a DittoJs project from a saved template.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "create-ditto": "./bin/create-ditto.js"
+  },
+  "files": [
+    "bin",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElhamDevelopmentStudio/dittojs.git",
+    "directory": "packages/create-ditto"
+  },
+  "homepage": "https://github.com/ElhamDevelopmentStudio/dittojs/tree/main/packages/create-ditto#readme",
+  "bugs": "https://github.com/ElhamDevelopmentStudio/dittojs/issues",
+  "keywords": [
+    "dittojs",
+    "create",
+    "scaffold",
+    "template",
+    "react"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "node --check bin/create-ditto.js",
+    "typecheck": "node --check bin/create-ditto.js",
+    "lint": "node --check bin/create-ditto.js",
+    "test": "node --test test/*.test.js",
+    "clean": "rm -rf coverage"
+  }
+}

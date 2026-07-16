@@ -1,6 +1,7 @@
 # Releasing DittoJs
 
-DittoJs is currently pre-1.0. Workspace packages remain private until their public API, package boundaries, and publication policy are explicitly approved.
+DittoJs is currently pre-1.0. Public libraries use the `@dittosh` npm organization and may make
+breaking changes in minor releases until 1.0.
 
 ## Versioning
 
@@ -23,7 +24,15 @@ DittoJs is currently pre-1.0. Workspace packages remain private until their publ
 
 ## Package publication
 
-Do not remove `private: true` or publish `@dittojs/*` packages as part of an unrelated release. Package publication requires a separate proposal covering:
+The approved public package surface is:
+
+- `create-ditto`
+- `@dittosh/core`
+- `@dittosh/catalog`
+- `@dittosh/generator`
+- `@dittosh/registry`
+
+Web, API, testing, and UI workspaces remain private. Every package publication must cover:
 
 - Stable public exports and compatibility policy.
 - Package-specific README and metadata.

@@ -1,9 +1,9 @@
 import path from "node:path"
 
-import type { FileMapping, ResolveConflict } from "@dittojs/core"
+import type { FileMapping, ResolveConflict } from "@dittosh/core"
 
-import { createDittoMetadata } from "./metadata"
-import { createPackageJson } from "./package-json"
+import { createDittoMetadata } from "./metadata.js"
+import { createPackageJson } from "./package-json.js"
 import {
   METADATA_TARGET,
   PACKAGE_JSON_TARGET,
@@ -11,17 +11,17 @@ import {
   normalizeSafeRelativePath,
   resolveOutputDir,
   resolveSafeOutputPath,
-} from "./paths"
-import { createReadme } from "./readme"
+} from "./paths.js"
+import { createReadme } from "./readme.js"
 import {
   requireProjectStructureAdapter,
   resolveStructurePath,
   selectedProjectStructureAdapter,
   type ProjectStructureAdapter,
-} from "./structure"
-import type { GenerateProjectInput, GenerateProjectResult, GeneratorWarning } from "./types"
-import { GenerateProjectError } from "./types"
-import { copyTemplateFile, writeJsonFile, writeTextFile } from "./writer"
+} from "./structure/index.js"
+import type { GenerateProjectInput, GenerateProjectResult, GeneratorWarning } from "./types.js"
+import { GenerateProjectError } from "./types.js"
+import { copyTemplateFile, writeJsonFile, writeTextFile } from "./writer.js"
 
 const RESERVED_GENERATED_TARGETS = new Set([PACKAGE_JSON_TARGET, METADATA_TARGET, README_TARGET])
 

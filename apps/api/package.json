@@ -1,5 +1,5 @@
 {
-  "name": "@dittojs/api",
+  "name": "@dittosh/api",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -13,8 +13,8 @@
     "clean": "rm -rf dist coverage"
   },
   "dependencies": {
-    "@dittojs/catalog": "workspace:*",
-    "@dittojs/core": "workspace:*",
-    "@dittojs/generator": "workspace:*"
+    "@dittosh/catalog": "workspace:*",
+    "@dittosh/core": "workspace:*",
+    "@dittosh/generator": "workspace:*"
   }
 }

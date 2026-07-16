@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { resolveRecipe } from "./resolve"
-import type { ModuleManifest, ResolveConflict, ResolvedRecipe } from "../index"
+import { resolveRecipe } from "./resolve.js"
+import type { ModuleManifest, ResolveConflict, ResolvedRecipe } from "../index.js"
 
 const testCatalog: ModuleManifest[] = [
   {

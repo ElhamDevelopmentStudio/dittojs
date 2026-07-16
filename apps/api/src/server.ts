@@ -1,6 +1,10 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http"
+import path from "node:path"
 
-import { generateTemplateArchive, GenerationApiError } from "./generation"
+import { generateTemplateArchive, GenerationApiError } from "./generation.js"
+import type { TemplateGenerationOptions } from "./generation.js"
+import { FileTemplateStore, type TemplateStore } from "./template-store.js"
+import { generateSavedTemplate, requireSavedTemplate, saveTemplate } from "./templates.js"
 
 const MAX_REQUEST_BYTES = 1024 * 1024
 
@@ -41,7 +45,7 @@ function writeJson(response: ServerResponse, statusCode: number, value: unknown)
 
 function writeCors(response: ServerResponse): void {
   response.setHeader("access-control-allow-origin", "*")
-  response.setHeader("access-control-allow-methods", "POST, OPTIONS")
+  response.setHeader("access-control-allow-methods", "GET, POST, OPTIONS")
   response.setHeader("access-control-allow-headers", "content-type")
 }
 
@@ -71,7 +75,29 @@ function errorBody(error: unknown): { statusCode: number; body: Record<string, u
   }
 }
 
-export function createGenerationServer() {
+export type GenerationServerOptions = {
+  templateStore?: TemplateStore
+  generation?: TemplateGenerationOptions
+}
+
+function defaultTemplateStore(): TemplateStore {
+  const directory =
+    process.env.DITTO_TEMPLATE_STORE_DIR ?? path.resolve(process.cwd(), ".ditto-data", "templates")
+
+  return new FileTemplateStore(directory)
+}
+
+function templateRoute(url: string): { templateId: string; generate: boolean } | undefined {
+  const match = /^\/api\/templates\/([^/]+)(\/generate)?$/.exec(url)
+
+  return match?.[1] === undefined
+    ? undefined
+    : { templateId: decodeURIComponent(match[1]), generate: match[2] !== undefined }
+}
+
+export function createGenerationServer(options: GenerationServerOptions = {}) {
+  const templateStore = options.templateStore ?? defaultTemplateStore()
+
   return createServer(async (request, response) => {
     writeCors(response)
 
@@ -81,19 +107,56 @@ export function createGenerationServer() {
       return
     }
 
-    if (request.method !== "POST" || !["/api/generate", "/generate"].includes(request.url ?? "")) {
+    try {
+      const requestUrl = request.url ?? ""
+      const savedTemplateRoute = templateRoute(requestUrl)
+
+      if (request.method === "POST" && ["/api/generate", "/generate"].includes(requestUrl)) {
+        writeJson(
+          response,
+          200,
+          await generateTemplateArchive(await readJsonBody(request), options.generation),
+        )
+        return
+      }
+
+      if (request.method === "POST" && requestUrl === "/api/templates") {
+        writeJson(response, 201, await saveTemplate(await readJsonBody(request), templateStore))
+        return
+      }
+
+      if (
+        request.method === "GET" &&
+        savedTemplateRoute !== undefined &&
+        !savedTemplateRoute.generate
+      ) {
+        const template = await requireSavedTemplate(savedTemplateRoute.templateId, templateStore)
+
+        writeJson(response, 200, {
+          templateId: template.id,
+          createdAt: template.createdAt,
+          catalogVersion: template.catalogVersion,
+          presetId: template.presetId,
+        })
+        return
+      }
+
+      if (request.method === "POST" && savedTemplateRoute?.generate === true) {
+        const result = await generateSavedTemplate(
+          savedTemplateRoute.templateId,
+          await readJsonBody(request),
+          templateStore,
+          options.generation,
+        )
+
+        writeJson(response, 200, result)
+        return
+      }
+
       writeJson(response, 404, {
         error: "Not found.",
         code: "not-found",
       })
-      return
-    }
-
-    try {
-      const body = await readJsonBody(request)
-      const result = await generateTemplateArchive(body)
-
-      writeJson(response, 200, result)
     } catch (error: unknown) {
       const failure = errorBody(error)
 

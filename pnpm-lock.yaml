@@ -38,22 +38,22 @@ importers:
 
   apps/api:
     dependencies:
-      '@dittojs/catalog':
+      '@dittosh/catalog':
         specifier: workspace:*
         version: link:../../packages/catalog
-      '@dittojs/core':
+      '@dittosh/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@dittojs/generator':
+      '@dittosh/generator':
         specifier: workspace:*
         version: link:../../packages/generator
 
   apps/web:
     dependencies:
-      '@dittojs/catalog':
+      '@dittosh/catalog':
         specifier: workspace:*
         version: link:../../packages/catalog
-      '@dittojs/core':
+      '@dittosh/core':
         specifier: workspace:*
         version: link:../../packages/core
       '@fontsource-variable/geist':
@@ -105,19 +105,21 @@ importers:
 
   packages/catalog:
     dependencies:
-      '@dittojs/core':
+      '@dittosh/core':
         specifier: workspace:*
         version: link:../core
 
   packages/core: {}
 
+  packages/create-ditto: {}
+
   packages/generator:
     dependencies:
-      '@dittojs/core':
+      '@dittosh/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
-      '@dittojs/catalog':
+      '@dittosh/catalog':
         specifier: workspace:*
         version: link:../catalog
 

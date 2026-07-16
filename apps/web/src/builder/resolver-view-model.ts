@@ -1,5 +1,5 @@
-import { catalog } from "@dittojs/catalog"
-import type { LockReason, ModuleManifest, ResolvedRecipe, SelectionReason } from "@dittojs/core"
+import { catalog } from "@dittosh/catalog"
+import type { LockReason, ModuleManifest, ResolvedRecipe, SelectionReason } from "@dittosh/core"
 
 export type SummaryRow = {
   label: string
@@ -182,12 +182,6 @@ export function canGenerate(recipe: ResolvedRecipe): boolean {
   return blockingConflicts(recipe).length === 0
 }
 
-export function cliCommand(presetId: string | undefined, userSelections: string[]): string {
-  const presetFlag = presetId === undefined ? "" : ` --preset ${presetId.replace("preset.", "")}`
-  const selectionFlag =
-    userSelections.length === 0
-      ? ""
-      : ` --select ${userSelections.map((selection) => `"${selection}"`).join(",")}`
-
-  return `pnpm dlx dittojs generate${presetFlag}${selectionFlag} --out ./ditto-template`
+export function cliCommand(templateId: string): string {
+  return `npx create-ditto --template-id ${templateId}`
 }

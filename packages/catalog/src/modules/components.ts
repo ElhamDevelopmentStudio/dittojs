@@ -1,6 +1,6 @@
-import type { ModuleManifest } from "@dittojs/core"
+import type { ModuleManifest } from "@dittosh/core"
 
-import { packageRange, type KnownPackageName } from "../package-versions"
+import { packageRange, type KnownPackageName } from "../package-versions.js"
 
 type ComponentDefinition = {
   name: string

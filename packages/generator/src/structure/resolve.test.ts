@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest"
 
-import type { ResolvedRecipe } from "@dittojs/core"
+import type { ResolvedRecipe } from "@dittosh/core"
 
 import {
   projectStructureAdapters,
   resolveStructurePath,
   selectedProjectStructureAdapter,
-} from "./index"
+} from "./index.js"
 
 function recipeWithSelections(effectiveSelections: string[]): ResolvedRecipe {
   return {

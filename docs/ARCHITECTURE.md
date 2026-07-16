@@ -50,6 +50,10 @@ Generated project files
 ZIP/download/saved template
 ```
 
+Saved template IDs reference versioned explicit recipes, not generated ZIP blobs. Regeneration
+always passes the stored preset and user selections through the resolver. The template record keeps
+user intent separate from effective selections and records a catalog compatibility version.
+
 ## Recommended monorepo structure
 
 ```txt

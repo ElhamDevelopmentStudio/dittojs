@@ -9,9 +9,9 @@
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "types": ["node"],
     "paths": {
-      "@dittojs/core": ["../../packages/core/dist/index.d.ts"],
-      "@dittojs/catalog": ["../../packages/catalog/dist/index.d.ts"],
-      "@dittojs/generator": ["../../packages/generator/dist/index.d.ts"]
+      "@dittosh/core": ["../../packages/core/dist/index.d.ts"],
+      "@dittosh/catalog": ["../../packages/catalog/dist/index.d.ts"],
+      "@dittosh/generator": ["../../packages/generator/dist/index.d.ts"]
     }
   },
   "include": ["src/**/*.ts"],

@@ -1,6 +1,6 @@
-import type { ResolvedRecipe } from "@dittojs/core"
+import type { ResolvedRecipe } from "@dittosh/core"
 
-import { GENERATED_NODE_README_REQUIREMENT } from "./node-policy"
+import { GENERATED_NODE_README_REQUIREMENT } from "./node-policy.js"
 
 function command(packageManager: string, script: string): string {
   return packageManager === "npm" ? `npm run ${script}` : `${packageManager} ${script}`

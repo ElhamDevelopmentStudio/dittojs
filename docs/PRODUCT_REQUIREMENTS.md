@@ -88,6 +88,9 @@ Users should be able to:
 - Generate a project.
 - Download a ZIP.
 - View the generated stack summary.
+- Name the generated project before downloading it.
+- Save a resolved template recipe and receive an opaque template ID.
+- Recreate a saved template with `npx create-ditto --template-id TEMPLATE_ID`.
 
 Core Configuration top-level decisions must stay focused on primary choices:
 Framework, Build Tool, Styling, UI System, Forms & Validation, and Client Data.
@@ -99,6 +102,9 @@ resolver and generator support them.
 ### Authentication
 
 MVP may work without authentication.
+
+Anonymous saved template IDs may be stored without authentication. Deployments must apply an
+explicit retention and abuse-prevention policy before exposing template storage publicly.
 
 Authentication can be added after generation works.
 

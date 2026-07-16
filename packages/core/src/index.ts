@@ -1,3 +1,3 @@
-export * from "./schema/index"
-export * from "./recipe/index"
-export * from "./resolver/index"
+export * from "./schema/index.js"
+export * from "./recipe/index.js"
+export * from "./resolver/index.js"

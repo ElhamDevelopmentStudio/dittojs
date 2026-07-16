@@ -11,12 +11,12 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "paths": {
-      "@dittojs/core": ["./packages/core/src/index.ts"],
-      "@dittojs/generator": ["./packages/generator/src/index.ts"],
-      "@dittojs/catalog": ["./packages/catalog/src/index.ts"],
-      "@dittojs/registry": ["./packages/registry/src/index.ts"],
-      "@dittojs/ui": ["./packages/ui/src/index.ts"],
-      "@dittojs/testing": ["./packages/testing/src/index.ts"]
+      "@dittosh/core": ["./packages/core/src/index.ts"],
+      "@dittosh/generator": ["./packages/generator/src/index.ts"],
+      "@dittosh/catalog": ["./packages/catalog/src/index.ts"],
+      "@dittosh/registry": ["./packages/registry/src/index.ts"],
+      "@dittosh/ui": ["./packages/ui/src/index.ts"],
+      "@dittosh/testing": ["./packages/testing/src/index.ts"]
     }
   }
 }

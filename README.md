@@ -122,9 +122,21 @@ pnpm build
 - Multiple project-structure adapters
 - Catalog-backed components, blocks, pages, sample data, and compositions
 - Downloadable generated project archives
+- Saved template IDs and the `create-ditto` project CLI
 - Generated-template verification across six canonical recipes
 
 See [Product Requirements](docs/PRODUCT_REQUIREMENTS.md), [Architecture](docs/ARCHITECTURE.md), and the [Roadmap](ROADMAP.md) for exact scope and direction.
+
+### Create from a saved template
+
+After saving a resolved template in the web builder, create it from any terminal:
+
+```bash
+npx create-ditto my-project --template-id TEMPLATE_ID
+```
+
+The CLI uses the project name for the destination folder and generated package name. Set
+`DITTO_API_URL` to use a self-hosted API.
 
 ## Contributing
 

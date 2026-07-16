@@ -28,8 +28,8 @@
     "pnpm": ">=10.33.4"
   },
   "scripts": {
-    "dev:app": "pnpm --filter @dittojs/web dev",
-    "dev:api": "pnpm --filter @dittojs/api exec tsx watch src/index.ts",
+    "dev:app": "pnpm --filter @dittosh/web dev",
+    "dev:api": "pnpm --filter @dittosh/api exec tsx watch src/index.ts",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
@@ -55,5 +55,10 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.64.0",
     "vitest": "^4.1.10"
-  }
+  },
+  "main": "eslint.config.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "author": ""
 }

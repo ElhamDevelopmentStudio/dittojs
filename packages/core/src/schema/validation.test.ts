@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { validateCatalog, validateModuleManifest } from "./validation"
-import type { GroupMode, StandardModuleManifest } from "./types"
+import { validateCatalog, validateModuleManifest } from "./validation.js"
+import type { GroupMode, StandardModuleManifest } from "./types.js"
 
 function validManifest(overrides: Partial<StandardModuleManifest> = {}): StandardModuleManifest {
   return {

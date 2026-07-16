@@ -1,4 +1,4 @@
-import type { ResolvedRecipe } from "@dittojs/core"
+import type { ResolvedRecipe } from "@dittosh/core"
 
 import type { BuilderOption } from "./builder-options"
 import { moduleIdsForOption } from "./builder-options"

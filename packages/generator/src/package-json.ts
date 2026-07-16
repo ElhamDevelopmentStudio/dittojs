@@ -1,7 +1,7 @@
-import type { ResolvedPackageSet } from "@dittojs/core"
+import type { ResolvedPackageSet } from "@dittosh/core"
 
-import { GENERATED_NODE_ENGINE } from "./node-policy"
-import type { GeneratedPackageJson } from "./types"
+import { GENERATED_NODE_ENGINE } from "./node-policy.js"
+import type { GeneratedPackageJson } from "./types.js"
 
 function sortPackageMap(packageMap: Record<string, string> | undefined): Record<string, string> {
   return Object.fromEntries(

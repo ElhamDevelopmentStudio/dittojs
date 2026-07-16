@@ -1,6 +1,6 @@
-import type { ModuleManifest } from "@dittojs/core"
+import type { ModuleManifest } from "@dittosh/core"
 
-import { packageRange } from "../package-versions"
+import { packageRange } from "../package-versions.js"
 
 export const stylingManifests: ModuleManifest[] = [
   {

@@ -1,4 +1,4 @@
-import type { ModuleManifest } from "@dittojs/core"
+import type { ModuleManifest } from "@dittosh/core"
 
 export const sampleDataManifests: ModuleManifest[] = [
   {

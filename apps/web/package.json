@@ -1,5 +1,5 @@
 {
-  "name": "@dittojs/web",
+  "name": "@dittosh/web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -15,8 +15,8 @@
     "clean": "rm -rf dist coverage"
   },
   "dependencies": {
-    "@dittojs/catalog": "workspace:*",
-    "@dittojs/core": "workspace:*",
+    "@dittosh/catalog": "workspace:*",
+    "@dittosh/core": "workspace:*",
     "@fontsource-variable/geist": "^5.2.9",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@fontsource-variable/manrope": "^5.2.8",

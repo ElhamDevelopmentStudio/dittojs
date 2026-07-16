@@ -1,5 +1,5 @@
 import { useState } from "react"
-import type { ResolvedRecipe } from "@dittojs/core"
+import type { ResolvedRecipe } from "@dittosh/core"
 
 import {
   addedAutomatically,

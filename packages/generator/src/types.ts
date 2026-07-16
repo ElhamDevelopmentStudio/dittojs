@@ -1,4 +1,4 @@
-import type { ResolvedPackageSet, ResolvedRecipe } from "@dittojs/core"
+import type { ResolvedPackageSet, ResolvedRecipe } from "@dittosh/core"
 
 export type GeneratorWarning = {
   message: string

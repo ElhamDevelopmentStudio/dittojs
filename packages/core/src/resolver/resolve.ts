@@ -4,7 +4,7 @@ import type {
   ModuleManifest,
   PackageSet,
   Requirement,
-} from "../schema/index"
+} from "../schema/index.js"
 import type {
   AppliedDefault,
   LockReason,
@@ -14,7 +14,7 @@ import type {
   ResolveInput,
   ResolveWarning,
   SelectionReason,
-} from "./types"
+} from "./types.js"
 
 type PackageBucket = "dependencies" | "devDependencies" | "peerDependencies"
 

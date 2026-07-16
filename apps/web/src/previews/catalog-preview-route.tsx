@@ -1,4 +1,4 @@
-import { catalog } from "@dittojs/catalog"
+import { catalog } from "@dittosh/catalog"
 import type { ReactElement } from "react"
 
 type CatalogPreview = {

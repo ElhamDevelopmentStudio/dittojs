@@ -1,4 +1,4 @@
-import type { ResolvedRecipe } from "@dittojs/core"
+import type { ResolvedRecipe } from "@dittosh/core"
 
 import { AppIcon } from "../icons"
 import { iconButtonStyle } from "../layout/app-shell"

@@ -36,17 +36,23 @@ type GenerateResult = {
 
 ## CLI contract
 
-Early MVP should expose a CLI command:
+The supported hosted-template CLI command is:
 
 ```bash
-ditto generate --preset react-recommended --out ./fixtures/generated/react-recommended
+npx create-ditto my-project --template-id TEMPLATE_ID
 ```
 
-And:
+If the project name is omitted, the CLI prompts for it. The normalized name is used for both the
+destination folder and generated `package.json`. The CLI may install dependencies after extraction.
+
+For self-hosted deployments:
 
 ```bash
-ditto generate --recipe ./fixtures/recipes/chat-app.json --out ./fixtures/generated/chat-app
+DITTO_API_URL=https://templates.example.com npx create-ditto --template-id TEMPLATE_ID
 ```
+
+The CLI is a thin client. It does not resolve manifests locally; the API loads the saved explicit
+recipe, runs the resolver, and returns a freshly generated archive.
 
 ## Generator responsibilities
 

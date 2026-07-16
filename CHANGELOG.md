@@ -14,5 +14,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Web builder and generation API.
 - Generated-template verification across canonical recipes.
 - Open-source governance, security, contribution, automation, and release foundations.
+- Saved, versioned template recipes with opaque template IDs.
+- Project naming across ZIP filenames and generated package metadata.
+- The `create-ditto` CLI for safe template retrieval and extraction.
+- Public package namespace migration to `@dittosh/*`.
 
 [Unreleased]: https://github.com/ElhamDevelopmentStudio/dittojs/commits/main

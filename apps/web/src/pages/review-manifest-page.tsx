@@ -1,4 +1,4 @@
-import type { ResolvedRecipe } from "@dittojs/core"
+import type { ResolvedRecipe } from "@dittosh/core"
 
 import { blockingConflicts, canGenerate } from "../builder/resolver-view-model"
 import { ManifestModal } from "../components/builder/manifest-modal"
@@ -14,8 +14,14 @@ export function ReviewManifestPage({
   recipe,
   manifestOpen,
   copyState,
+  projectName,
+  templateId,
+  templateSaveError,
+  savingTemplate,
   onBack,
   onGenerate,
+  onProjectNameChange,
+  onSaveTemplate,
   onOpenManifest,
   onCloseManifest,
   onCopyCli,
@@ -23,8 +29,14 @@ export function ReviewManifestPage({
   recipe: ResolvedRecipe
   manifestOpen: boolean
   copyState?: string | undefined
+  projectName: string
+  templateId?: string | undefined
+  templateSaveError?: string | undefined
+  savingTemplate: boolean
   onBack: () => void
   onGenerate: () => void | Promise<void>
+  onProjectNameChange: (value: string) => void
+  onSaveTemplate: () => void | Promise<void>
   onOpenManifest: () => void
   onCloseManifest: () => void
   onCopyCli: () => void | Promise<void>
@@ -74,6 +86,38 @@ export function ReviewManifestPage({
             </div>
           </div>
         ) : null}
+        <div className="grid gap-3 border border-(--color-border-strong) bg-(--color-paper) p-5">
+          <label className="grid gap-2" htmlFor="project-name">
+            <span className="font-(family-name:--font-mono) text-[0.68rem] font-bold uppercase text-(--color-muted-foreground)">
+              Project name
+            </span>
+            <input
+              id="project-name"
+              className="min-h-11 border border-(--color-border-strong) bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-(--builder-accent)"
+              value={projectName}
+              maxLength={80}
+              autoComplete="off"
+              onChange={(event) => onProjectNameChange(event.target.value)}
+            />
+          </label>
+          <p className="text-sm text-(--color-muted-foreground)">
+            Used for the ZIP filename, project folder, and generated package.json name.
+          </p>
+          {templateId !== undefined ? (
+            <div
+              className="grid gap-2 border-l-4 border-(--builder-accent) bg-white p-4"
+              role="status"
+            >
+              <strong>Saved template ID</strong>
+              <code className="break-all font-(family-name:--font-mono) text-sm">{templateId}</code>
+            </div>
+          ) : null}
+          {templateSaveError !== undefined ? (
+            <p className="text-sm text-(--color-danger)" role="alert">
+              {templateSaveError}
+            </p>
+          ) : null}
+        </div>
         <FooterActions>
           <button type="button" className={buttonStyles.light} onClick={onBack}>
             <AppIcon name="arrow-left" />
@@ -86,15 +130,29 @@ export function ReviewManifestPage({
             disabled={!generateEnabled}
           >
             <AppIcon name="play" />
-            Generate Template
+            Download ZIP
+          </button>
+          <button
+            type="button"
+            className={buttonStyles.dark}
+            onClick={onSaveTemplate}
+            disabled={!generateEnabled || savingTemplate}
+          >
+            <AppIcon name="copy" />
+            {savingTemplate ? "Saving…" : "Get Template ID"}
           </button>
           <button type="button" className={buttonStyles.light} onClick={onOpenManifest}>
             <AppIcon name="code" />
             View JSON Manifest
           </button>
-          <button type="button" className={buttonStyles.light} onClick={onCopyCli}>
+          <button
+            type="button"
+            className={buttonStyles.light}
+            onClick={onCopyCli}
+            disabled={templateId === undefined}
+          >
             <AppIcon name="copy" />
-            Copy CLI
+            Copy CLI Command
           </button>
           {copyState !== undefined ? (
             <span className="self-center text-sm text-(--color-muted-foreground)">{copyState}</span>

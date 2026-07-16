@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { catalog } from "@dittojs/catalog"
-import { resolveRecipe } from "@dittojs/core"
+import { catalog } from "@dittosh/catalog"
+import { resolveRecipe } from "@dittosh/core"
 import { describe, expect, test, vi } from "vitest"
 
 import { App } from "./app"
@@ -52,6 +52,11 @@ function generationResponse(request: GenerationRequest): GenerationResponse {
 function resolvingGenerationClient(): GenerationClient {
   return {
     generate: vi.fn(async (request) => generationResponse(request)),
+    saveTemplate: vi.fn(async () => ({
+      templateId: "tpl_1234567890123456789012",
+      createdAt: "2026-07-16T00:00:00.000Z",
+      catalogVersion: "1",
+    })),
   }
 }
 
@@ -60,6 +65,9 @@ function rejectingGenerationClient(
 ): GenerationClient {
   return {
     generate: vi.fn(async () => {
+      throw new Error(message)
+    }),
+    saveTemplate: vi.fn(async () => {
       throw new Error(message)
     }),
   }
@@ -427,7 +435,7 @@ describe("DittoJs web builder", () => {
     expect(screen.getByText(/effectiveSelections/)).toBeTruthy()
   })
 
-  test("Copy CLI writes to clipboard", async () => {
+  test("saving a template returns an ID and copies the create-ditto command", async () => {
     const user = userEvent.setup()
     const clipboardWrite = vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue(undefined)
 
@@ -438,10 +446,12 @@ describe("DittoJs web builder", () => {
         initialPresetId="preset.react-recommended"
       />,
     )
-    await user.click(screen.getByRole("button", { name: /Copy CLI/ }))
+    await user.click(screen.getByRole("button", { name: /Get Template ID/ }))
+    expect(await screen.findByText("tpl_1234567890123456789012")).toBeTruthy()
+    await user.click(screen.getByRole("button", { name: /Copy CLI Command/ }))
 
     expect(clipboardWrite).toHaveBeenCalledWith(
-      expect.stringContaining("pnpm dlx dittojs generate"),
+      "npx create-ditto --template-id tpl_1234567890123456789012",
     )
     expect(screen.getByText("CLI command copied.")).toBeTruthy()
   })
@@ -456,7 +466,7 @@ describe("DittoJs web builder", () => {
     )
 
     const generateButton = screen.getByRole("button", {
-      name: /Generate Template/,
+      name: /Download ZIP/,
     }) as HTMLButtonElement
 
     expect(generateButton.disabled).toBe(true)
@@ -474,7 +484,13 @@ describe("DittoJs web builder", () => {
         initialPresetId="preset.react-recommended"
       />,
     )
-    await user.click(screen.getByRole("button", { name: /Generate Template/ }))
+    await user.clear(screen.getByLabelText("Project name"))
+    await user.type(screen.getByLabelText("Project name"), "My Dashboard")
+    await user.click(screen.getByRole("button", { name: /Download ZIP/ }))
+
+    expect(generationClient.generate).toHaveBeenCalledWith(
+      expect.objectContaining({ projectName: "My Dashboard" }),
+    )
 
     expect(await screen.findByRole("heading", { name: "Template generated." })).toBeTruthy()
     expect(screen.getByText("Your DittoJs template is ready to download.")).toBeTruthy()
@@ -490,7 +506,7 @@ describe("DittoJs web builder", () => {
         initialPresetId="preset.react-recommended"
       />,
     )
-    await user.click(screen.getByRole("button", { name: /Generate Template/ }))
+    await user.click(screen.getByRole("button", { name: /Download ZIP/ }))
 
     expect(await screen.findByRole("heading", { name: "Generation failed" })).toBeTruthy()
     expect(screen.getByRole("button", { name: "Retry" })).toBeTruthy()
@@ -511,7 +527,7 @@ describe("DittoJs web builder", () => {
         initialPresetId="preset.react-recommended"
       />,
     )
-    await user.click(screen.getByRole("button", { name: /Generate Template/ }))
+    await user.click(screen.getByRole("button", { name: /Download ZIP/ }))
     await screen.findByRole("heading", { name: "Template generated." })
     await user.click(screen.getByRole("button", { name: /Download ZIP/ }))
 

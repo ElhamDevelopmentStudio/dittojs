@@ -1,3 +1,3 @@
 export const testingPackage = {
-  name: "@dittojs/testing",
+  name: "@dittosh/testing",
 } as const

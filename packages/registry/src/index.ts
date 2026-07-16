@@ -1,3 +1,3 @@
 export const registryPackage = {
-  name: "@dittojs/registry",
+  name: "@dittosh/registry",
 } as const
