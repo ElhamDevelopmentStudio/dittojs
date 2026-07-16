@@ -1,9 +1,32 @@
 {
   "name": "dittojs",
   "version": "0.0.0",
+  "description": "Manifest-driven generation of dependency-correct, customizable React project starters.",
   "private": true,
+  "license": "MIT",
+  "homepage": "https://github.com/ElhamDevelopmentStudio/dittojs#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElhamDevelopmentStudio/dittojs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ElhamDevelopmentStudio/dittojs/issues"
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "template-generator",
+    "project-scaffolding",
+    "dependency-resolver",
+    "vite",
+    "tailwindcss"
+  ],
   "type": "module",
   "packageManager": "pnpm@10.33.4",
+  "engines": {
+    "node": ">=20.19.0",
+    "pnpm": ">=10.33.4"
+  },
   "scripts": {
     "dev:app": "pnpm --filter @dittojs/web dev",
     "dev:api": "pnpm --filter @dittojs/api exec tsx watch src/index.ts",
@@ -12,6 +35,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test && pnpm test:scripts",
     "test:scripts": "vitest run --config vitest.config.ts scripts",
+    "check:repository": "tsx scripts/check-repository-health.ts",
     "check:package-versions": "tsx scripts/check-package-versions.ts",
     "generate:fixtures": "tsx scripts/generate-fixtures.ts",
     "test:generated": "tsx scripts/test-generated.ts",
@@ -19,7 +43,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "clean": "turbo run clean && rm -rf .turbo coverage dist",
-    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build && pnpm check:generated"
+    "check": "pnpm lint && pnpm format:check && pnpm check:repository && pnpm typecheck && pnpm test && pnpm build && pnpm check:generated"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
