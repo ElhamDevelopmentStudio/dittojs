@@ -17,6 +17,7 @@ export const stylingManifests: ModuleManifest[] = [
     packages: {
       devDependencies: {
         tailwindcss: packageRange("tailwindcss"),
+        "tw-animate-css": packageRange("tw-animate-css"),
       },
     },
     files: [
@@ -24,6 +25,18 @@ export const stylingManifests: ModuleManifest[] = [
         from: "react/files/src/index.css",
         slot: "global-css",
         name: "index",
+      },
+      {
+        from: "react/files/src/styles/presets/brutalist.css",
+        to: "src/styles/presets/brutalist.css",
+      },
+      {
+        from: "react/files/src/styles/presets/soft-pop.css",
+        to: "src/styles/presets/soft-pop.css",
+      },
+      {
+        from: "react/files/src/styles/presets/tangerine.css",
+        to: "src/styles/presets/tangerine.css",
       },
     ],
     ui: {

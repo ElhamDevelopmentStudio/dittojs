@@ -1,80 +1,275 @@
 import type { ModuleManifest } from "@dittojs/core"
 
-export const blockManifests: ModuleManifest[] = [
+import { packageRange } from "../package-versions"
+
+const blockManifestDefinitions: ModuleManifest[] = [
   {
-    id: "block.navbar",
+    id: "block.dashboard-sidebar",
     type: "block",
-    label: "Navbar",
-    description: "Application top navigation with search and account controls.",
-    provides: ["block.navbar"],
+    label: "Template Dashboard Sidebar",
+    description: "Template dashboard sidebar navigation block.",
+    provides: ["block.dashboard-sidebar", "block.sidebar"],
     requires: [
       {
-        capability: "ui.button",
-        reason: "Navbar uses Button for navigation actions.",
-        strength: "hard",
-      },
-      {
-        capability: "ui.input",
-        reason: "Navbar uses Input for search.",
-        strength: "hard",
-      },
-      {
         capability: "ui.avatar",
-        reason: "Navbar uses Avatar for the user menu.",
+        reason: "Sidebar account controls render Avatar.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.badge",
+        reason: "Sidebar account controls render Badge.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.button",
+        reason: "Sidebar controls render Button.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.card",
+        reason: "Sidebar support card renders Card.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.collapsible",
+        reason: "Sidebar navigation groups use Collapsible.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.command",
+        reason: "Sidebar search uses Command.",
         strength: "hard",
       },
       {
         capability: "ui.dropdown",
-        reason: "Navbar uses Dropdown for account actions.",
+        reason: "Sidebar menus use Dropdown Menu.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.label",
+        reason: "Layout controls render Label.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.popover",
+        reason: "Layout controls render Popover.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.select",
+        reason: "Layout controls render Select.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.sidebar",
+        reason: "Sidebar block renders the shadcn Sidebar component.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.toggle-group",
+        reason: "Layout controls render ToggleGroup.",
+        strength: "hard",
+      },
+      {
+        moduleId: "support.app-config",
+        reason: "Sidebar displays template app configuration.",
+        strength: "hard",
+      },
+      {
+        moduleId: "support.preferences",
+        reason: "Sidebar reads and updates template preferences.",
+        strength: "hard",
+      },
+      {
+        moduleId: "support.sidebar-items",
+        reason: "Sidebar renders template navigation item data.",
+        strength: "hard",
+      },
+      {
+        moduleId: "support.simple-icon",
+        reason: "Sidebar support card renders SimpleIcon.",
+        strength: "hard",
+      },
+      {
+        moduleId: "support.users-data",
+        reason: "Sidebar renders template root user data.",
+        strength: "hard",
+      },
+      {
+        moduleId: "routing.react-router",
+        reason: "Sidebar navigation uses React Router links.",
         strength: "hard",
       },
     ],
+    packages: {
+      dependencies: {
+        "react-router-dom": packageRange("react-router-dom"),
+        zustand: packageRange("zustand"),
+        "simple-icons": packageRange("simple-icons"),
+        "lucide-react": packageRange("lucide-react"),
+      },
+    },
     files: [
       {
-        from: "blocks/navbar/files/navbar.tsx",
-        slot: "block",
-        name: "navbar",
-        feature: "layout",
+        from: "blocks/dashboard-sidebar/files/_components/sidebar/account-switcher.tsx",
+        to: "src/app/(main)/dashboard/_components/sidebar/account-switcher.tsx",
+      },
+      {
+        from: "blocks/dashboard-sidebar/files/_components/sidebar/app-sidebar.tsx",
+        to: "src/app/(main)/dashboard/_components/sidebar/app-sidebar.tsx",
+      },
+      {
+        from: "blocks/dashboard-sidebar/files/_components/sidebar/layout-controls.tsx",
+        to: "src/app/(main)/dashboard/_components/sidebar/layout-controls.tsx",
+      },
+      {
+        from: "blocks/dashboard-sidebar/files/_components/sidebar/nav-documents.tsx",
+        to: "src/app/(main)/dashboard/_components/sidebar/nav-documents.tsx",
+      },
+      {
+        from: "blocks/dashboard-sidebar/files/_components/sidebar/nav-main.tsx",
+        to: "src/app/(main)/dashboard/_components/sidebar/nav-main.tsx",
+      },
+      {
+        from: "blocks/dashboard-sidebar/files/_components/sidebar/nav-secondary.tsx",
+        to: "src/app/(main)/dashboard/_components/sidebar/nav-secondary.tsx",
+      },
+      {
+        from: "blocks/dashboard-sidebar/files/_components/sidebar/nav-user.tsx",
+        to: "src/app/(main)/dashboard/_components/sidebar/nav-user.tsx",
+      },
+      {
+        from: "blocks/dashboard-sidebar/files/_components/sidebar/search-dialog.tsx",
+        to: "src/app/(main)/dashboard/_components/sidebar/search-dialog.tsx",
+      },
+      {
+        from: "blocks/dashboard-sidebar/files/_components/sidebar/sidebar-support-card.tsx",
+        to: "src/app/(main)/dashboard/_components/sidebar/sidebar-support-card.tsx",
+      },
+      {
+        from: "blocks/dashboard-sidebar/files/_components/sidebar/theme-switcher.tsx",
+        to: "src/app/(main)/dashboard/_components/sidebar/theme-switcher.tsx",
       },
     ],
     ui: {
-      label: "Navbar",
-      icon: "layout",
+      label: "Dashboard sidebar",
+      icon: "sidebar",
       category: "Blocks",
-      tags: ["navigation", "layout"],
+      tags: ["template", "navigation", "layout"],
+    },
+  },
+  {
+    id: "block.dashboard-layout",
+    type: "block",
+    label: "Template Dashboard Layout",
+    description: "Template dashboard layout with sidebar provider and header controls.",
+    provides: ["block.dashboard-layout", "block.navbar"],
+    requires: [
+      {
+        capability: "ui.button",
+        reason: "Dashboard layout renders Button controls.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.separator",
+        reason: "Dashboard layout renders Separator.",
+        strength: "hard",
+      },
+      {
+        capability: "ui.sidebar",
+        reason: "Dashboard layout renders SidebarProvider and SidebarInset.",
+        strength: "hard",
+      },
+      {
+        moduleId: "block.dashboard-sidebar",
+        reason: "Dashboard layout renders the template dashboard sidebar.",
+        strength: "hard",
+      },
+      {
+        moduleId: "support.preferences",
+        reason: "Dashboard layout reads persisted preferences.",
+        strength: "hard",
+      },
+      {
+        moduleId: "support.simple-icon",
+        reason: "Dashboard layout renders SimpleIcon.",
+        strength: "hard",
+      },
+      {
+        moduleId: "support.users-data",
+        reason: "Dashboard layout renders account data.",
+        strength: "hard",
+      },
+    ],
+    packages: {
+      dependencies: {
+        "simple-icons": packageRange("simple-icons"),
+      },
+    },
+    files: [
+      {
+        from: "blocks/dashboard-layout/files/layout.tsx",
+        to: "src/app/(main)/dashboard/layout.tsx",
+      },
+    ],
+    metadata: {
+      preview: {
+        id: "preview.block.dashboard-layout",
+        kind: "block",
+        viewport: "desktop",
+      },
+    },
+    ui: {
+      label: "Dashboard layout",
+      icon: "layout-dashboard",
+      category: "Blocks",
+      tags: ["template", "layout", "navigation"],
     },
   },
   {
     id: "block.sidebar",
     type: "block",
     label: "Sidebar",
-    description: "Application sidebar navigation.",
+    description: "Compatibility selection for the template dashboard sidebar.",
     provides: ["block.sidebar"],
     requires: [
       {
-        capability: "ui.button",
-        reason: "Sidebar uses Button for navigation actions.",
-        strength: "hard",
-      },
-      {
-        capability: "ui.input",
-        reason: "Sidebar uses Input for filtering navigation.",
+        moduleId: "block.dashboard-sidebar",
+        reason: "Sidebar is provided by the template dashboard sidebar block.",
         strength: "hard",
       },
     ],
-    files: [
-      {
-        from: "blocks/sidebar/files/sidebar.tsx",
-        slot: "block",
-        name: "sidebar",
-        feature: "layout",
-      },
-    ],
+    metadata: {
+      compatibilityAliasFor: "block.dashboard-sidebar",
+    },
     ui: {
       label: "Sidebar",
       icon: "sidebar",
       category: "Blocks",
-      tags: ["navigation", "layout"],
+      tags: ["template", "navigation", "compatibility"],
+    },
+  },
+  {
+    id: "block.navbar",
+    type: "block",
+    label: "Navbar",
+    description: "Compatibility selection for the template dashboard layout header controls.",
+    provides: ["block.navbar"],
+    requires: [
+      {
+        moduleId: "block.dashboard-layout",
+        reason: "Navbar/header behavior is provided by the template dashboard layout block.",
+        strength: "hard",
+      },
+    ],
+    metadata: {
+      compatibilityAliasFor: "block.dashboard-layout",
+    },
+    ui: {
+      label: "Navbar",
+      icon: "layout",
+      category: "Blocks",
+      tags: ["template", "navigation", "compatibility"],
     },
   },
   {
@@ -209,3 +404,21 @@ export const blockManifests: ModuleManifest[] = [
     },
   },
 ]
+
+export const blockManifests: ModuleManifest[] = blockManifestDefinitions.map((manifest) => {
+  if (manifest.metadata?.preview !== undefined) {
+    return manifest
+  }
+
+  return {
+    ...manifest,
+    metadata: {
+      ...(manifest.metadata ?? {}),
+      preview: {
+        id: `preview.${manifest.id}`,
+        kind: "block",
+        viewport: "desktop",
+      },
+    },
+  }
+})

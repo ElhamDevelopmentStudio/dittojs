@@ -60,6 +60,99 @@ function resolvePreset(presetId: string) {
   })
 }
 
+const requestedTemplateComponentIds = [
+  "component.accordion",
+  "component.alert",
+  "component.alert-dialog",
+  "component.aspect-ratio",
+  "component.attachment",
+  "component.badge",
+  "component.breadcrumb",
+  "component.bubble",
+  "component.button-group",
+  "component.calendar",
+  "component.card",
+  "component.carousel",
+  "component.chart",
+  "component.checkbox",
+  "component.collapsible",
+  "component.combobox",
+  "component.command",
+  "component.context-menu",
+  "component.dialog",
+  "component.direction",
+  "component.drawer",
+  "component.empty",
+  "component.field",
+  "component.hover-card",
+  "component.input-group",
+  "component.input-otp",
+  "component.item",
+  "component.kbd",
+  "component.marker",
+  "component.menubar",
+  "component.message",
+  "component.message-scroller",
+  "component.native-select",
+  "component.navigation-menu",
+  "component.pagination",
+  "component.popover",
+  "component.progress",
+  "component.radio-group",
+  "component.resizable",
+  "component.scroll-area",
+  "component.select",
+  "component.separator",
+  "component.sidebar",
+  "component.skeleton",
+  "component.slider",
+  "component.sonner",
+  "component.spinner",
+  "component.switch",
+  "component.table",
+  "component.tabs",
+  "component.toggle",
+  "component.toggle-group",
+  "component.tooltip",
+]
+
+const replacedTemplateComponentIds = [
+  "component.avatar",
+  "component.button",
+  "component.dropdown",
+  "component.input",
+  "component.label",
+  "component.sheet",
+  "component.textarea",
+]
+
+const requestedTemplatePageCompositionIds = [
+  "composition.auth-v1-login",
+  "composition.auth-v1-register",
+  "composition.auth-v2-login",
+  "composition.auth-v2-register",
+  "composition.dashboard-default",
+  "composition.dashboard-analytics",
+  "composition.dashboard-crm",
+  "composition.dashboard-finance",
+  "composition.dashboard-ecommerce",
+  "composition.dashboard-productivity",
+  "composition.dashboard-users",
+  "composition.dashboard-roles",
+  "composition.dashboard-tasks",
+  "composition.dashboard-calendar",
+  "composition.dashboard-kanban",
+  "composition.dashboard-invoice",
+  "composition.dashboard-infrastructure",
+  "composition.dashboard-logistics",
+  "composition.dashboard-academy",
+  "composition.dashboard-chat",
+  "composition.dashboard-mail",
+  "composition.coming-soon",
+  "composition.unauthorized",
+  "composition.not-found",
+]
+
 function errorMessages(result: ReturnType<typeof resolveRecipe>): string[] {
   return result.conflicts
     .filter((conflict) => conflict.severity === "error")
@@ -239,6 +332,106 @@ describe("catalog", () => {
     expect(result.packages.devDependencies).not.toHaveProperty("autoprefixer")
   })
 
+  it("contains requested template-derived component manifests", () => {
+    const ids = moduleIds(catalog)
+
+    expect([...requestedTemplateComponentIds, ...replacedTemplateComponentIds]).toEqual(
+      expect.arrayContaining([
+        "component.button",
+        "component.dropdown",
+        "component.sidebar",
+        "component.sonner",
+      ]),
+    )
+
+    for (const componentId of [...requestedTemplateComponentIds, ...replacedTemplateComponentIds]) {
+      expect(ids.has(componentId), `Missing ${componentId}`).toBe(true)
+    }
+  })
+
+  it("resolves template component requirements through the resolver", () => {
+    const sidebar = resolveRecipe({
+      catalog,
+      userSelections: ["component.sidebar"],
+    })
+    const dropdown = resolveRecipe({
+      catalog,
+      userSelections: ["component.dropdown"],
+    })
+
+    expect(errorMessages(sidebar)).toEqual([])
+    expect(sidebar.effectiveSelections).toEqual(
+      expect.arrayContaining([
+        "component.sidebar",
+        "component.button",
+        "component.input",
+        "component.separator",
+        "component.sheet",
+        "component.skeleton",
+        "component.tooltip",
+        "hook.use-mobile",
+      ]),
+    )
+    expect(dropdown.effectiveSelections).toEqual(
+      expect.arrayContaining(["component.dropdown", "component.dropdown-menu"]),
+    )
+  })
+
+  it("contains template sample data manifests with generated files", () => {
+    const sampleData = catalog.filter((manifest) => manifest.id.startsWith("sample-data."))
+
+    expect(sampleData.length).toBeGreaterThanOrEqual(13)
+
+    for (const manifest of sampleData) {
+      expect(manifest.type, manifest.id).toBe("adapter")
+      expect(manifest.provides, manifest.id).toContain(manifest.id)
+      expect(manifest.files?.length, manifest.id).toBeGreaterThan(0)
+      expect(manifest.files?.every((file) => file.from.startsWith("sample-data/"))).toBe(true)
+    }
+  })
+
+  it("contains requested template page compositions with route-colocated routing", () => {
+    const ids = moduleIds(catalog)
+
+    for (const compositionId of requestedTemplatePageCompositionIds) {
+      expect(ids.has(compositionId), `Missing ${compositionId}`).toBe(true)
+
+      const result = resolveRecipe({
+        catalog,
+        userSelections: [compositionId],
+      })
+
+      expect(errorMessages(result), compositionId).toEqual([])
+      expect(result.effectiveSelections, compositionId).toEqual(
+        expect.arrayContaining([
+          "routing.react-router",
+          "structure.react.route-colocated",
+          compositionId,
+        ]),
+      )
+    }
+  })
+
+  it("routes legacy navbar and sidebar selections to template layout blocks", () => {
+    const navbar = resolveRecipe({
+      catalog,
+      userSelections: ["block.navbar"],
+    })
+    const sidebar = resolveRecipe({
+      catalog,
+      userSelections: ["block.sidebar"],
+    })
+
+    expect(errorMessages(navbar)).toEqual([])
+    expect(navbar.effectiveSelections).toEqual(
+      expect.arrayContaining(["block.navbar", "block.dashboard-layout", "block.dashboard-sidebar"]),
+    )
+    expect(errorMessages(sidebar)).toEqual([])
+    expect(sidebar.effectiveSelections).toEqual(
+      expect.arrayContaining(["block.sidebar", "block.dashboard-sidebar"]),
+    )
+  })
+
   it("contains React project structure manifests", () => {
     const structures = catalog.filter((manifest) => manifest.type === "project-structure")
 
@@ -368,42 +561,37 @@ describe("catalog", () => {
     ])
   })
 
-  it("locks Navbar component requirements", () => {
+  it("locks template Navbar compatibility requirements", () => {
     const result = resolveRecipe({
       userSelections: ["block.navbar"],
       catalog,
     })
 
     expect(errorMessages(result)).toEqual([])
+    expect(result.effectiveSelections).toEqual(
+      expect.arrayContaining(["block.navbar", "block.dashboard-layout", "block.dashboard-sidebar"]),
+    )
     expect(result.locks["component.button"]).toEqual(
       expect.arrayContaining([
         {
-          requiredBy: "block.navbar",
-          reason: "Navbar uses Button for navigation actions.",
-        },
-      ]),
-    )
-    expect(result.locks["component.input"]).toEqual(
-      expect.arrayContaining([
-        {
-          requiredBy: "block.navbar",
-          reason: "Navbar uses Input for search.",
+          requiredBy: "block.dashboard-layout",
+          reason: "Dashboard layout renders Button controls.",
         },
       ]),
     )
     expect(result.locks["component.avatar"]).toEqual(
       expect.arrayContaining([
         {
-          requiredBy: "block.navbar",
-          reason: "Navbar uses Avatar for the user menu.",
+          requiredBy: "block.dashboard-sidebar",
+          reason: "Sidebar account controls render Avatar.",
         },
       ]),
     )
     expect(result.locks["component.dropdown"]).toEqual(
       expect.arrayContaining([
         {
-          requiredBy: "block.navbar",
-          reason: "Navbar uses Dropdown for account actions.",
+          requiredBy: "block.dashboard-sidebar",
+          reason: "Sidebar menus use Dropdown Menu.",
         },
       ]),
     )

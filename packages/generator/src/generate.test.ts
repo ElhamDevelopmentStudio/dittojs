@@ -228,6 +228,26 @@ describe("generateProject", () => {
     expect(readme).toContain("pnpm build")
   })
 
+  it("documents selected mock data in README.md", async () => {
+    const outputDir = await createTempDir("readme-mock-data")
+
+    await generateProject({
+      resolvedRecipe: resolvedRecipe({
+        effectiveSelections: ["framework.react", "sample-data.main-dashboard-default"],
+      }),
+      outputDir,
+      projectName: "Mock Data App",
+      createdAt,
+    })
+
+    const readme = await readFile(path.join(outputDir, "README.md"), "utf8")
+
+    expect(readme).toContain("## Mock Data")
+    expect(readme).toContain("- sample-data.main-dashboard-default")
+    expect(readme).toContain("src/data/")
+    expect(readme).toContain("replace imports from these files with API calls")
+  })
+
   it("rejects unsafe target paths", async () => {
     const outputDir = await createTempDir("unsafe-target")
 
@@ -338,6 +358,110 @@ describe("generateProject", () => {
     )
     expect(result.filesWritten).toContain("src/features/layout/components/navbar.tsx")
     expect(result.filesWritten).toContain("src/App.tsx")
+  })
+
+  it("renders createBrowserRouter routes from selected page slot mappings", async () => {
+    const outputDir = await createTempDir("react-router-output")
+    const templateRoot = await createTempDir("react-router-template")
+
+    await mkdir(path.join(templateRoot, "pages"), { recursive: true })
+    await writeFile(
+      path.join(templateRoot, "pages", "dashboard.tsx"),
+      "export default function DashboardPage() { return <div>Dashboard</div> }\n",
+      "utf8",
+    )
+
+    await generateProject({
+      resolvedRecipe: resolvedRecipe({
+        effectiveSelections: ["framework.react", "structure.react.simple", "routing.react-router"],
+        packages: {
+          dependencies: {
+            "react-router-dom": packageVersions["react-router-dom"].range,
+          },
+          devDependencies: {},
+          peerDependencies: {},
+        },
+        files: [
+          {
+            from: "pages/dashboard.tsx",
+            slot: "page",
+            name: "dashboard",
+            route: "dashboard",
+          },
+        ],
+      }),
+      outputDir,
+      templateRoot,
+      createdAt,
+    })
+
+    const routerFile = await readFile(path.join(outputDir, "src", "app", "router.tsx"), "utf8")
+
+    expect(routerFile).toContain("createBrowserRouter")
+    expect(routerFile).toContain("RouterProvider")
+    expect(routerFile).toContain('import DashboardPage1 from "@/pages/dashboard"')
+    expect(routerFile).toContain('{ path: "/dashboard", element: <DashboardPage1 /> }')
+    expect(routerFile).not.toContain("<BrowserRouter")
+    expect(routerFile).not.toContain("<Routes>")
+  })
+
+  it("generates selected template page composition files and router only", async () => {
+    const outputDir = await createTempDir("template-page-composition")
+    const templateRoot = path.resolve(cwd(), "..", "..", "packages", "registry")
+    const recipe = resolveRecipe({
+      catalog,
+      userSelections: ["composition.dashboard-default"],
+    })
+
+    expect(recipe.conflicts.filter((conflict) => conflict.severity === "error")).toEqual([])
+
+    const result = await generateProject({
+      resolvedRecipe: recipe,
+      outputDir,
+      templateRoot,
+      createdAt,
+    })
+    const routerFile = await readFile(path.join(outputDir, "src", "app", "router.tsx"), "utf8")
+
+    expect(result.filesWritten).toContain("src/pages/dashboard/default/page.tsx")
+    expect(result.filesWritten).toContain("src/pages/dashboard/default/_components/data.json")
+    expect(result.filesWritten).not.toContain("src/pages/dashboard/analytics/page.tsx")
+    expect(routerFile).toContain("createBrowserRouter")
+    expect(routerFile).toContain(
+      'import DashboardDefaultPage1 from "@/pages/dashboard/default/page"',
+    )
+    expect(routerFile).toContain(
+      '{ path: "/dashboard/default", element: <DashboardDefaultPage1 /> }',
+    )
+  })
+
+  it("generates legacy presets after template navbar and sidebar replacement", async () => {
+    const templateRoot = path.resolve(cwd(), "..", "..", "packages", "registry")
+
+    for (const presetId of ["preset.saas-dashboard", "preset.chat-app"]) {
+      const outputDir = await createTempDir(`template-${presetId.replace(".", "-")}`)
+      const recipe = resolveRecipe({
+        catalog,
+        presetId,
+        userSelections: [],
+      })
+
+      expect(recipe.conflicts.filter((conflict) => conflict.severity === "error")).toEqual([])
+
+      const result = await generateProject({
+        resolvedRecipe: recipe,
+        outputDir,
+        templateRoot,
+        createdAt,
+      })
+
+      expect(result.filesWritten).toContain("src/App.tsx")
+      expect(result.filesWritten).toContain(
+        "src/app/(main)/dashboard/_components/sidebar/app-sidebar.tsx",
+      )
+      expect(result.filesWritten).not.toContain("src/components/blocks/navbar.tsx")
+      expect(result.filesWritten).not.toContain("src/components/blocks/sidebar.tsx")
+    }
   })
 
   it("fails clearly when a template import token cannot be resolved", async () => {

@@ -28,6 +28,9 @@ const RESERVED_GENERATED_TARGETS = new Set([PACKAGE_JSON_TARGET, METADATA_TARGET
 type ResolvedFileMapping = {
   from: string
   to: string
+  slot?: string
+  name?: string
+  route?: string
   importToken?: string
   importSpecifier?: string
 }
@@ -186,6 +189,20 @@ function resolveFileMappings(
       }
     }
 
+    if (slotFile.slot !== undefined) {
+      resolvedFile.slot = slotFile.slot
+    }
+
+    if (slotFile.name !== undefined) {
+      resolvedFile.name = slotFile.name
+    }
+
+    const route = (file as { route?: string }).route
+
+    if (route !== undefined) {
+      resolvedFile.route = route
+    }
+
     targets.set(targetPath, resolvedFile)
     resolvedFiles.push(resolvedFile)
   }
@@ -206,6 +223,69 @@ function importReplacements(resolvedFiles: ResolvedFileMapping[]): Record<string
 
 function projectName(input: GenerateProjectInput, outputDir: string): string {
   return input.projectName?.trim() || path.basename(outputDir) || "ditto-generated-project"
+}
+
+function routeIdentifier(route: string, index: number): string {
+  const identifier = route
+    .replace(/[^A-Za-z0-9]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join("")
+
+  return `${identifier || "Index"}Page${index + 1}`
+}
+
+function routePath(route: string): string {
+  const trimmed = route.trim().replace(/^\/+|\/+$/g, "")
+
+  return trimmed.length === 0 ? "/" : `/${trimmed}`
+}
+
+function createReactRouterFile(resolvedFiles: ResolvedFileMapping[]): string {
+  const pageFiles = resolvedFiles.filter(
+    (
+      file,
+    ): file is ResolvedFileMapping & {
+      importSpecifier: string
+      route: string
+    } => file.slot === "page" && file.importSpecifier !== undefined && file.route !== undefined,
+  )
+
+  const imports = pageFiles
+    .map(
+      (file, index) =>
+        `import ${routeIdentifier(file.route, index)} from "${file.importSpecifier}"`,
+    )
+    .join("\n")
+  const routes =
+    pageFiles.length === 0
+      ? '  { path: "/", element: <App /> },'
+      : pageFiles
+          .map(
+            (file, index) =>
+              `  { path: ${JSON.stringify(routePath(file.route))}, element: <${routeIdentifier(
+                file.route,
+                index,
+              )} /> },`,
+          )
+          .join("\n")
+
+  return `import { createBrowserRouter, RouterProvider } from "react-router-dom"
+${pageFiles.length === 0 ? 'import { App } from "@/App"' : imports}
+
+export const router = createBrowserRouter([
+${routes}
+])
+
+export function AppRouter() {
+  return <RouterProvider router={router} />
+}
+`
+}
+
+function includesReactRouter(resolvedRecipe: GenerateProjectInput["resolvedRecipe"]): boolean {
+  return resolvedRecipe.effectiveSelections.includes("routing.react-router")
 }
 
 export async function generateProject(input: GenerateProjectInput): Promise<GenerateProjectResult> {
@@ -267,6 +347,16 @@ export async function generateProject(input: GenerateProjectInput): Promise<Gene
         outputDir,
         file,
         replacements,
+      }),
+    )
+  }
+
+  if (includesReactRouter(input.resolvedRecipe)) {
+    filesWritten.push(
+      await writeTextFile({
+        outputDir,
+        targetPath: "src/app/router.tsx",
+        contents: createReactRouterFile(resolvedFiles),
       }),
     )
   }

@@ -1,6 +1,6 @@
 import type { ModuleManifest } from "@dittojs/core"
 
-export const compositionManifests: ModuleManifest[] = [
+const compositionManifestDefinitions: ModuleManifest[] = [
   {
     id: "composition.react-recommended",
     type: "composition",
@@ -118,3 +118,23 @@ export const compositionManifests: ModuleManifest[] = [
     },
   },
 ]
+
+export const compositionManifests: ModuleManifest[] = compositionManifestDefinitions.map(
+  (manifest) => {
+    if (manifest.metadata?.preview !== undefined) {
+      return manifest
+    }
+
+    return {
+      ...manifest,
+      metadata: {
+        ...(manifest.metadata ?? {}),
+        preview: {
+          id: `preview.${manifest.id}`,
+          kind: "page",
+          viewport: "desktop",
+        },
+      },
+    }
+  },
+)

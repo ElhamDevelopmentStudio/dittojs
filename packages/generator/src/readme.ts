@@ -14,6 +14,26 @@ function stackSummary(resolvedRecipe: ResolvedRecipe): string {
   return resolvedRecipe.effectiveSelections.map((selection) => `- ${selection}`).join("\n")
 }
 
+function sampleDataSummary(resolvedRecipe: ResolvedRecipe): string {
+  const sampleDataSelections = resolvedRecipe.effectiveSelections.filter((selection) =>
+    selection.startsWith("sample-data."),
+  )
+
+  if (sampleDataSelections.length === 0) {
+    return ""
+  }
+
+  return `## Mock Data
+
+This template includes mock data modules selected through DittoJs manifests:
+
+${sampleDataSelections.map((selection) => `- ${selection}`).join("\n")}
+
+Mock data is generated under \`src/data/\`. To integrate a backend, replace imports from these files with API calls, server loaders, or your data-fetching client, then remove the corresponding mock data files once no generated page imports them.
+
+`
+}
+
 export function createReadme(input: {
   projectName: string
   packageManager: string
@@ -56,5 +76,7 @@ ${buildCommand}
 \`\`\`
 
 Generation metadata is stored in \`ditto.generated.json\`.
+
+${sampleDataSummary(input.resolvedRecipe)}
 `
 }
