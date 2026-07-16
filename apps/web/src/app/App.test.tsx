@@ -5,6 +5,14 @@ import { resolveRecipe } from "@dittojs/core"
 import { describe, expect, test, vi } from "vitest"
 
 import { App } from "./app"
+import {
+  allSelectableOptions,
+  coreOptionGroups,
+  featureOptionGroups,
+  presetOptions,
+  projectStructureOptions,
+} from "../builder/builder-options"
+import { isAppIconName } from "../components/icons"
 import type {
   GenerationClient,
   GenerationRequest,
@@ -71,6 +79,7 @@ function presetCard(title: string): HTMLElement {
 async function customizePreset(title: string) {
   const user = userEvent.setup()
 
+  window.history.replaceState({}, "", "/")
   render(<App generationClient={resolvingGenerationClient()} />)
   await user.click(within(presetCard(title)).getByRole("button", { name: /Customize/ }))
 
@@ -88,23 +97,31 @@ describe("DittoJs web builder", () => {
     expect(screen.getByRole("heading", { name: "Custom" })).toBeTruthy()
   })
 
-  test("Templates navigation opens Core Configuration", async () => {
+  test("Make a copy navigation opens Core Configuration", async () => {
     const user = userEvent.setup()
 
     render(<App generationClient={resolvingGenerationClient()} />)
-    await user.click(screen.getByRole("button", { name: "Templates" }))
+    await user.click(screen.getByRole("button", { name: "Make a copy" }))
 
     expect(screen.getByRole("heading", { name: "Core Configuration" })).toBeTruthy()
     await waitFor(() => expect(window.location.pathname).toBe("/templates/core"))
   })
 
-  test("coming soon options are disabled and do not change selections", async () => {
+  test("Core Configuration lists catalog-backed options without synthetic coming-soon choices", async () => {
     await customizePreset("Custom")
 
-    const vueCard = screen.getByRole("button", { name: /Vue/ }) as HTMLButtonElement
+    for (const group of coreOptionGroups) {
+      expect(screen.getByRole("heading", { name: group.title })).toBeTruthy()
 
-    expect(vueCard.disabled).toBe(true)
-    expect(vueCard.getAttribute("aria-pressed")).toBe("false")
+      for (const option of group.options) {
+        expect(
+          screen.getAllByRole("button", { name: new RegExp(option.label) }).length,
+        ).toBeGreaterThan(0)
+      }
+    }
+
+    expect(screen.queryByRole("button", { name: /Vue/ })).toBeNull()
+    expect(screen.queryByRole("button", { name: /Svelte/ })).toBeNull()
     expect(screen.getByText("No resolver warnings or conflicts.")).toBeTruthy()
   })
 
@@ -157,59 +174,130 @@ describe("DittoJs web builder", () => {
     expect(screen.getByText("Locked dependencies")).toBeTruthy()
   })
 
-  test("Core Configuration keeps implementation details inside customization modals", async () => {
+  test("Features step lists every feature catalog group", async () => {
+    const user = await customizePreset("React Recommended")
+
+    await user.click(screen.getByRole("button", { name: /Continue/ }))
+
+    for (const group of featureOptionGroups) {
+      expect(screen.getByRole("heading", { name: group.title })).toBeTruthy()
+      expect(
+        screen.getAllByRole("button", { name: new RegExp(group.options[0]?.label ?? "") }).length,
+      ).toBeGreaterThan(0)
+    }
+
+    expect(screen.getAllByRole("button", { name: /Accordion/ }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole("button", { name: /Dashboard layout/ }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole("button", { name: /Analytics dashboard/ }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole("button", { name: /Main Chat Data/ }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole("button", { name: /React Router/ }).length).toBeGreaterThan(0)
+  })
+
+  test("builder option exports cover every catalog manifest and icon", () => {
+    const presetIds = new Set(presetOptions.map((option) => option.id))
+    const selectableIds = new Set(allSelectableOptions.map((option) => option.moduleId))
+
+    for (const manifest of catalog) {
+      if (manifest.type === "preset") {
+        expect(presetIds.has(manifest.id)).toBe(true)
+      } else {
+        expect(selectableIds.has(manifest.id)).toBe(true)
+      }
+
+      expect(isAppIconName(manifest.ui?.icon), `${manifest.id} icon`).toBe(true)
+    }
+  })
+
+  test("component, block, and page previews are exposed from catalog-backed builder options", () => {
+    const previewableTypes = new Set(["primitive", "composite", "block", "composition"])
+
+    for (const option of allSelectableOptions) {
+      const manifest = catalog.find((candidate) => candidate.id === option.moduleId)
+
+      expect(manifest, `${option.moduleId} manifest`).toBeDefined()
+
+      if (manifest === undefined) {
+        continue
+      }
+
+      if (!previewableTypes.has(manifest.type)) {
+        continue
+      }
+
+      expect(option?.preview?.id, `${manifest.id} preview id`).toBe(`preview.${manifest.id}`)
+    }
+  })
+
+  test("Preview action opens an iframe modal without toggling selection", async () => {
+    const user = await customizePreset("Custom")
+
+    await user.click(screen.getByRole("button", { name: /Continue/ }))
+    await user.click(screen.getByRole("button", { name: "Preview Button" }))
+
+    const dialog = screen.getByRole("dialog", { name: "Button" })
+    const iframe = within(dialog).getByTitle("Button preview")
+
+    expect(iframe.getAttribute("src")).toBe("/preview/preview.component.button")
+    expect(
+      screen
+        .getByRole("button", { name: /primitiveButtonButton component/ })
+        .getAttribute("aria-pressed"),
+    ).toBe("false")
+  })
+
+  test("direct preview routes render catalog preview surfaces", () => {
+    window.history.replaceState({}, "", "/preview/preview.composition.dashboard-analytics")
+
+    render(<App generationClient={resolvingGenerationClient()} />)
+
+    expect(screen.getByRole("main", { name: "Analytics dashboard preview" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: "Analytics dashboard" })).toBeTruthy()
+  })
+
+  test("direct preview routes render generic catalog previews", () => {
+    window.history.replaceState({}, "", "/preview/preview.component.accordion")
+
+    render(<App generationClient={resolvingGenerationClient()} />)
+
+    expect(screen.getByRole("main", { name: "Accordion preview" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: "Accordion" })).toBeTruthy()
+    expect(screen.getByText("component.accordion")).toBeTruthy()
+  })
+
+  test("Project Structure lists catalog-backed structures", async () => {
+    const user = await customizePreset("React Recommended")
+
+    await user.click(screen.getByRole("button", { name: /Continue/ }))
+    await user.click(screen.getByRole("button", { name: /Continue/ }))
+
+    for (const option of projectStructureOptions) {
+      expect(screen.getByRole("button", { name: new RegExp(option.label) })).toBeTruthy()
+    }
+  })
+
+  test("Core Configuration exposes foundation modules directly", async () => {
     await customizePreset("React Recommended")
 
     expect(
       screen.getByRole("button", {
-        name: /Fast React build tooling with TypeScript defaults nested inside/,
+        name: /Fast frontend tooling for React projects/,
       }),
     ).toBeTruthy()
     expect(
       screen.getByRole("button", {
-        name: /Copy-and-own component conventions with Base UI primitives/,
+        name: /Copy-and-own React component library conventions/,
       }),
     ).toBeTruthy()
     expect(
       screen.getByRole("button", {
-        name: /Supported generated form state and validation stack/,
+        name: /Form state and validation integration for React/,
       }),
     ).toBeTruthy()
     expect(
-      screen.queryByRole("button", { name: /Typed source and generated project checks/ }),
-    ).toBeNull()
-    expect(
-      screen.queryByRole("button", { name: /Accessible unstyled primitive engine/ }),
-    ).toBeNull()
-    expect(screen.queryByRole("button", { name: /Supported form state engine/ })).toBeNull()
-  })
-
-  test("Core customization modals expose nested selections without enabling unsupported options", async () => {
-    const user = await customizePreset("React Recommended")
-
-    await user.click(screen.getByRole("button", { name: "Customize Vite" }))
-    const viteDialog = screen.getByRole("dialog", { name: "Customize Vite" })
-    const typescriptButton = within(viteDialog).getByRole("button", { name: /TypeScript/ })
-    const bunButton = within(viteDialog).getByRole("button", { name: /Bun/ }) as HTMLButtonElement
-
-    expect(typescriptButton.getAttribute("aria-pressed")).toBe("true")
-    expect(bunButton.disabled).toBe(true)
-    expect(
-      within(viteDialog).getByLabelText(
-        "Recommended: Recommended because generated MVP templates are currently TypeScript-first.",
-      ),
+      screen.getByRole("button", {
+        name: /TypeScript language and typechecking support/,
+      }),
     ).toBeTruthy()
-
-    await user.click(within(viteDialog).getByRole("button", { name: "Close customization" }))
-    await user.click(screen.getByRole("button", { name: "Customize shadcn-style UI" }))
-    const uiDialog = screen.getByRole("dialog", { name: "Customize shadcn-style UI" })
-    const baseUiButton = within(uiDialog).getByRole("button", { name: /Base UI/ })
-    const radixButton = within(uiDialog).getByRole("button", {
-      name: /Radix UI/,
-    }) as HTMLButtonElement
-
-    expect(baseUiButton.getAttribute("aria-pressed")).toBe("true")
-    expect(radixButton.disabled).toBe(true)
   })
 
   test("recommendation badges use metadata-backed tooltip labels", async () => {
@@ -222,42 +310,27 @@ describe("DittoJs web builder", () => {
     ).toBeTruthy()
   })
 
-  test("customize icon opens the modal without toggling the parent option", async () => {
+  test("selecting optional foundation modules updates resolver state", async () => {
     const user = await customizePreset("Custom")
 
-    await user.click(screen.getByRole("button", { name: "Customize React Hook Form + Zod" }))
-    const dialog = screen.getByRole("dialog", { name: "Customize Forms & Validation" })
+    await user.click(screen.getByRole("button", { name: /React Hook Form/ }))
 
-    expect(screen.queryByRole("status")).toBeNull()
     expect(
-      within(dialog)
-        .getByRole("button", { name: /React Hook Form/ })
-        .getAttribute("aria-pressed"),
-    ).toBe("false")
-    expect(within(dialog).getByRole("button", { name: /Zod/ }).getAttribute("aria-pressed")).toBe(
-      "false",
-    )
+      screen.getByRole("button", { name: /React Hook Form/ }).getAttribute("aria-pressed"),
+    ).toBe("true")
+    expect(screen.getAllByText("React Hook Form").length).toBeGreaterThan(0)
   })
 
-  test("combined Forms and Validation parent selects both resolver modules", async () => {
+  test("form and validation modules can be selected independently from the catalog", async () => {
     const user = await customizePreset("Custom")
 
-    await user.click(
-      screen.getByRole("button", {
-        name: /Supported generated form state and validation stack/,
-      }),
-    )
-    await user.click(screen.getByRole("button", { name: "Customize React Hook Form + Zod" }))
-    const dialog = screen.getByRole("dialog", { name: "Customize Forms & Validation" })
+    await user.click(screen.getByRole("button", { name: /React Hook Form/ }))
+    await user.click(screen.getByRole("button", { name: /Zod/ }))
 
     expect(
-      within(dialog)
-        .getByRole("button", { name: /React Hook Form/ })
-        .getAttribute("aria-pressed"),
+      screen.getByRole("button", { name: /React Hook Form/ }).getAttribute("aria-pressed"),
     ).toBe("true")
-    expect(within(dialog).getByRole("button", { name: /Zod/ }).getAttribute("aria-pressed")).toBe(
-      "true",
-    )
+    expect(screen.getByRole("button", { name: /Zod/ }).getAttribute("aria-pressed")).toBe("true")
   })
 
   test("Resolver Ledger can be hidden and expanded", async () => {
@@ -278,33 +351,37 @@ describe("DittoJs web builder", () => {
     const user = await customizePreset("Custom")
 
     await user.click(screen.getByRole("button", { name: /Continue/ }))
-    await user.click(screen.getByRole("button", { name: /Navbar/ }))
+    const navbarButton = screen
+      .getAllByRole("button", { name: /Navbar/ })
+      .find((button) => button.getAttribute("aria-pressed") !== null)
 
-    expect(
-      screen.getByText(
-        "Button, Input, Avatar, and Dropdown are locked because Navbar requires them.",
-      ),
-    ).toBeTruthy()
-    expect(screen.getAllByText("Locked by Navbar").length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/Navbar uses Button for navigation actions/).length).toBeGreaterThan(
+    expect(navbarButton).toBeDefined()
+    await user.click(navbarButton!)
+
+    expect(screen.getByText("Dashboard layout is locked because Navbar requires it.")).toBeTruthy()
+    expect(screen.getAllByText(/Dashboard layout renders Button controls/).length).toBeGreaterThan(
       0,
     )
-    expect(screen.getAllByText(/Navbar uses Input for search/).length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/Navbar uses Avatar for the user menu/).length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/Navbar uses Dropdown for account actions/).length).toBeGreaterThan(
-      0,
-    )
+    expect(screen.getAllByText(/Sidebar account controls render Avatar/).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/Sidebar menus use Dropdown Menu/).length).toBeGreaterThan(0)
   })
 
   test("locked dependency cannot be removed directly", async () => {
     const user = await customizePreset("Custom")
 
     await user.click(screen.getByRole("button", { name: /Continue/ }))
-    await user.click(screen.getByRole("button", { name: /Navbar/ }))
-    await user.click(screen.getByRole("button", { name: /Button/ }))
+    const navbarButton = screen
+      .getAllByRole("button", { name: /Navbar/ })
+      .find((button) => button.getAttribute("aria-pressed") !== null)
 
-    expect(screen.getByRole("status").textContent).toContain("Navbar uses Button")
-    expect(screen.getAllByText(/Navbar uses Button for navigation actions/).length).toBeGreaterThan(
+    expect(navbarButton).toBeDefined()
+    await user.click(navbarButton!)
+    await user.click(screen.getByRole("button", { name: /primitiveButtonButton component/ }))
+
+    expect(screen.getByRole("status").textContent).toContain(
+      "Dashboard layout renders Button controls",
+    )
+    expect(screen.getAllByText(/Dashboard layout renders Button controls/).length).toBeGreaterThan(
       0,
     )
   })
@@ -314,7 +391,7 @@ describe("DittoJs web builder", () => {
 
     await user.click(screen.getByRole("button", { name: /Continue/ }))
     await user.click(screen.getByRole("button", { name: /Continue/ }))
-    await user.click(screen.getByRole("button", { name: /Route-colocated/ }))
+    await user.click(screen.getByRole("button", { name: /Route colocated/ }))
     await user.click(screen.getByRole("button", { name: /Continue/ }))
 
     expect(screen.getAllByText("Route colocated").length).toBeGreaterThan(0)

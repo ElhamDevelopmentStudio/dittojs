@@ -1,31 +1,57 @@
 import type { ReactNode } from "react"
 
+import { AppIcon } from "../icons"
+
 export function AppShell({ children }: { children: ReactNode }) {
   return <div className="app-shell">{children}</div>
 }
 
-export function Header({ onHome, onTemplates }: { onHome: () => void; onTemplates: () => void }) {
+export function Header({
+  isLanding,
+  onHome,
+  onTemplates,
+}: {
+  isLanding: boolean
+  onHome: () => void
+  onTemplates: () => void
+}) {
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
+
   return (
-    <header className="site-header">
+    <header className={`site-header${isLanding ? " landing-header" : " builder-header"}`}>
       <button type="button" className="brand-button" onClick={onHome}>
-        DittoJs
+        <span className="brand-mark" aria-hidden="true">
+          D
+        </span>
+        <span>DittoJs</span>
       </button>
-      <nav aria-label="Builder navigation">
-        <button type="button" className="nav-link" disabled>
-          Docs
-        </button>
-        <button type="button" className="nav-link is-active" onClick={onTemplates}>
-          Templates
-        </button>
-        <button type="button" className="nav-link" disabled>
-          Pricing
-        </button>
-      </nav>
-      <div className="site-actions">
-        <button type="button" className="button button-disabled button-compact" disabled>
-          Ask the Architect <span>Coming soon</span>
-        </button>
-      </div>
+      {isLanding ? (
+        <>
+          <nav aria-label="Landing navigation">
+            <button type="button" className="nav-link" onClick={() => scrollTo("origin")}>
+              Why Ditto?
+            </button>
+            <button type="button" className="nav-link" onClick={() => scrollTo("presets")}>
+              Starting points
+            </button>
+          </nav>
+          <div className="site-actions">
+            <button type="button" className="header-build-button" onClick={onTemplates}>
+              Make a copy
+              <AppIcon name="arrow-right" />
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="builder-header-label">Template builder</p>
+          <button type="button" className="header-home-button" onClick={onHome}>
+            Exit builder
+          </button>
+        </>
+      )}
     </header>
   )
 }

@@ -19,6 +19,7 @@ import { LandingPage } from "../pages/landing-page"
 import { ProjectStructurePage } from "../pages/project-structure-page"
 import { ReviewManifestPage } from "../pages/review-manifest-page"
 import { SuccessPage } from "../pages/success-page"
+import { CatalogPreviewRoute } from "../previews/catalog-preview-route"
 
 type GeneratedTemplateState = {
   response: GenerationResponse
@@ -74,6 +75,16 @@ function currentPathStep(): BuilderStep | undefined {
   return stepFromPath(window.location.pathname)
 }
 
+function currentPreviewId(): string | undefined {
+  if (typeof window === "undefined") {
+    return undefined
+  }
+
+  const match = /^\/preview\/(.+)$/.exec(window.location.pathname)
+
+  return match?.[1] === undefined ? undefined : decodeURIComponent(match[1])
+}
+
 function resolveForState(presetId: string | undefined, userSelections: string[]) {
   const input: {
     catalog: typeof catalog
@@ -103,7 +114,17 @@ function errorMessage(error: unknown): string {
     : "Generation failed while writing files. Please retry or return to Review."
 }
 
-export function App({
+export function App(props: AppProps) {
+  const previewId = currentPreviewId()
+
+  if (previewId !== undefined) {
+    return <CatalogPreviewRoute previewId={previewId} />
+  }
+
+  return <BuilderApp {...props} />
+}
+
+function BuilderApp({
   generationClient = fetchGenerationClient,
   initialStep,
   initialPresetId,
@@ -346,10 +367,27 @@ export function App({
 
   return (
     <AppShell>
-      <Header onHome={resetToLanding} onTemplates={startGenerating} />
+      <Header
+        isLanding={step === "landing"}
+        onHome={resetToLanding}
+        onTemplates={startGenerating}
+      />
       {notice !== undefined ? (
-        <div className="notice" role="status">
-          {notice}
+        <div className="notice" role="status" aria-live="polite">
+          <span className="notice-icon" aria-hidden="true">
+            i
+          </span>
+          <div>
+            <strong>Resolver note</strong>
+            <span>{notice}</span>
+          </div>
+          <button
+            type="button"
+            aria-label="Dismiss resolver note"
+            onClick={() => setNotice(undefined)}
+          >
+            Close
+          </button>
         </div>
       ) : null}
       {step === "landing" ? (

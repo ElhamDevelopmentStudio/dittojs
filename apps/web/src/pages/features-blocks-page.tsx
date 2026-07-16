@@ -1,10 +1,12 @@
+import { useState } from "react"
 import type { ResolvedRecipe } from "@dittojs/core"
 
 import type { BuilderOption } from "../builder/builder-options"
-import { blockOptions, componentOptions } from "../builder/builder-options"
+import { featureOptionGroups } from "../builder/builder-options"
 import { stateForOption } from "../builder/option-state"
 import { lockedLabelsRequiredBy } from "../builder/resolver-view-model"
 import { OptionCard } from "../components/builder/option-card"
+import { PreviewModal } from "../components/builder/preview-modal"
 import { DependencyNotes } from "../components/builder/resolution-panels"
 import { AppIcon } from "../components/icons"
 import { FooterActions, SectionHeader, StepHeader } from "../components/layout/app-shell"
@@ -29,6 +31,7 @@ function OptionGrid({
   recipe,
   resolverNote,
   onSelectOption,
+  onPreviewOption,
 }: {
   number: number
   title: string
@@ -37,6 +40,7 @@ function OptionGrid({
   recipe: ResolvedRecipe
   resolverNote?: string | undefined
   onSelectOption: (option: BuilderOption) => void
+  onPreviewOption: (option: BuilderOption) => void
 }) {
   const titleId = `${title.replace(/\s+/g, "-")}-title`
 
@@ -62,6 +66,7 @@ function OptionGrid({
               locked={state.locked}
               lockExplanation={state.lockExplanation}
               onSelect={onSelectOption}
+              onPreview={onPreviewOption}
             />
           )
         })}
@@ -81,10 +86,13 @@ export function FeaturesBlocksPage({
   onBack: () => void
   onContinue: () => void
 }) {
+  const [previewOption, setPreviewOption] = useState<BuilderOption | undefined>()
   const navbarLockedLabels = lockedLabelsRequiredBy(recipe, "block.navbar")
   const navbarResolverNote =
     navbarLockedLabels.length > 0
-      ? `${formatInlineList(navbarLockedLabels)} are locked because Navbar requires them.`
+      ? navbarLockedLabels.length === 1
+        ? `${formatInlineList(navbarLockedLabels)} is locked because Navbar requires it.`
+        : `${formatInlineList(navbarLockedLabels)} are locked because Navbar requires them.`
       : undefined
 
   return (
@@ -96,23 +104,19 @@ export function FeaturesBlocksPage({
           description="Choose generated components and product blocks."
         />
         <div className="option-group-stack">
-          <OptionGrid
-            number={1}
-            title="UI Components"
-            description="Reusable generated primitives."
-            options={componentOptions}
-            recipe={recipe}
-            resolverNote={navbarResolverNote}
-            onSelectOption={onSelectOption}
-          />
-          <OptionGrid
-            number={2}
-            title="Blocks"
-            description="Product-ready UI sections."
-            options={blockOptions}
-            recipe={recipe}
-            onSelectOption={onSelectOption}
-          />
+          {featureOptionGroups.map((group, index) => (
+            <OptionGrid
+              key={group.id}
+              number={index + 1}
+              title={group.title}
+              description={group.description}
+              options={group.options}
+              recipe={recipe}
+              resolverNote={group.id === "block" ? navbarResolverNote : undefined}
+              onSelectOption={onSelectOption}
+              onPreviewOption={setPreviewOption}
+            />
+          ))}
         </div>
         <FooterActions>
           <button type="button" className="button button-light" onClick={onBack}>
@@ -126,6 +130,9 @@ export function FeaturesBlocksPage({
         </FooterActions>
       </section>
       <DependencyNotes recipe={recipe} />
+      {previewOption === undefined ? null : (
+        <PreviewModal option={previewOption} onClose={() => setPreviewOption(undefined)} />
+      )}
     </main>
   )
 }

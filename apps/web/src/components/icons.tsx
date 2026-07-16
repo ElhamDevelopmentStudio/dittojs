@@ -2,8 +2,10 @@ import type { RemixiconComponentType } from "@remixicon/react"
 import {
   RiArrowLeftLine,
   RiArrowRightLine,
+  RiAppsLine,
   RiBox3Line,
   RiBookOpenLine,
+  RiCalendarLine,
   RiCheckLine,
   RiChat3Line,
   RiCloseLine,
@@ -18,19 +20,24 @@ import {
   RiFileTextLine,
   RiFlashlightLine,
   RiFolderLine,
+  RiKeyLine,
   RiInputField,
   RiLayoutLine,
+  RiListCheck,
   RiLoader4Line,
   RiLockLine,
   RiMenuLine,
   RiMessage2Line,
   RiPaletteLine,
   RiPlayLine,
+  RiPlugLine,
+  RiEyeLine,
   RiReactjsLine,
   RiRouteLine,
   RiSettings3Line,
   RiSidebarFoldLine,
   RiSparklingLine,
+  RiEqualizerLine,
   RiStackLine,
   RiStarLine,
   RiTableLine,
@@ -46,12 +53,14 @@ export type AppIconName =
   | "arrow-left"
   | "arrow-right"
   | "box"
+  | "calendar"
   | "check"
   | "chat"
   | "close"
   | "cloud"
   | "code"
   | "command"
+  | "component"
   | "copy"
   | "dashboard"
   | "database"
@@ -61,18 +70,25 @@ export type AppIconName =
   | "flash"
   | "folder"
   | "form"
+  | "hook"
   | "input"
+  | "key"
   | "layout"
+  | "layout-dashboard"
+  | "list"
   | "lock"
   | "menu"
   | "message"
   | "palette"
   | "play"
+  | "preview"
   | "react"
   | "route"
   | "settings"
   | "sidebar"
   | "sparkle"
+  | "sparkles"
+  | "sliders"
   | "spinner"
   | "stack"
   | "star"
@@ -89,12 +105,14 @@ const icons: Record<AppIconName, RemixiconComponentType> = {
   "arrow-left": RiArrowLeftLine,
   "arrow-right": RiArrowRightLine,
   box: RiBox3Line,
+  calendar: RiCalendarLine,
   check: RiCheckLine,
   chat: RiChat3Line,
   close: RiCloseLine,
   cloud: RiCloudLine,
   code: RiCodeLine,
   command: RiCommandLine,
+  component: RiAppsLine,
   copy: RiFileCopyLine,
   dashboard: RiDashboardLine,
   database: RiDatabaseLine,
@@ -104,18 +122,25 @@ const icons: Record<AppIconName, RemixiconComponentType> = {
   flash: RiFlashlightLine,
   folder: RiFolderLine,
   form: RiFileTextLine,
+  hook: RiPlugLine,
   input: RiInputField,
+  key: RiKeyLine,
   layout: RiLayoutLine,
+  "layout-dashboard": RiDashboardLine,
+  list: RiListCheck,
   lock: RiLockLine,
   menu: RiMenuLine,
   message: RiMessage2Line,
   palette: RiPaletteLine,
   play: RiPlayLine,
+  preview: RiEyeLine,
   react: RiReactjsLine,
   route: RiRouteLine,
   settings: RiSettings3Line,
   sidebar: RiSidebarFoldLine,
   sparkle: RiSparklingLine,
+  sparkles: RiSparklingLine,
+  sliders: RiEqualizerLine,
   spinner: RiLoader4Line,
   stack: RiStackLine,
   star: RiStarLine,

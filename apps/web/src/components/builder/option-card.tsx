@@ -18,6 +18,7 @@ export type OptionCardProps = {
   lockExplanation?: string | undefined
   onSelect: (option: BuilderOption) => void
   onCustomize?: (option: BuilderOption) => void
+  onPreview?: (option: BuilderOption) => void
 }
 
 export function OptionCard({
@@ -28,9 +29,11 @@ export function OptionCard({
   lockExplanation,
   onSelect,
   onCustomize,
+  onPreview,
 }: OptionCardProps) {
   const disabled = option.comingSoon === true
   const customizable = option.customization !== undefined && onCustomize !== undefined
+  const previewable = option.preview !== undefined && onPreview !== undefined
   const className = [
     "option-card",
     selected ? "is-selected" : "",
@@ -48,6 +51,11 @@ export function OptionCard({
   const handleCustomize = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
     onCustomize?.(option)
+  }
+
+  const handlePreview = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    onPreview?.(option)
   }
 
   return (
@@ -98,6 +106,16 @@ export function OptionCard({
               onClick={handleCustomize}
             >
               <AppIcon name="settings" />
+            </button>
+          ) : null}
+          {previewable ? (
+            <button
+              type="button"
+              className="option-card-customize"
+              aria-label={`Preview ${option.label}`}
+              onClick={handlePreview}
+            >
+              <AppIcon name="preview" />
             </button>
           ) : null}
         </span>
