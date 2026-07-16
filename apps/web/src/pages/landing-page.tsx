@@ -129,7 +129,13 @@ export function LandingPage({
         </div>
       </section>
       <footer className="mx-auto grid w-full max-w-304 grid-cols-[1fr_auto_1fr] items-center gap-6 border-t border-(--color-border-strong) py-8 text-sm text-(--color-muted-foreground) max-[760px]:grid-cols-1 max-[760px]:text-center">
-        <strong className="font-(family-name:--font-display) text-lg text-(--color-foreground)">
+        <strong className="inline-flex items-center gap-2 font-(family-name:--font-display) text-lg text-(--color-foreground) max-[760px]:justify-center">
+          <img
+            className="size-10 object-contain"
+            src="/brand/ditto-mark-64.png"
+            alt=""
+            aria-hidden="true"
+          />
           DittoJs
         </strong>
         <nav className="flex justify-center gap-6" aria-label="Footer links">

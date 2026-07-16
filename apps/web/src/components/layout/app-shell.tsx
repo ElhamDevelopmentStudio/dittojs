@@ -44,12 +44,12 @@ export function Header({
         className="flex items-center gap-2 border-0 bg-transparent py-2 font-(family-name:--font-display) text-[1.12rem] font-bold text-(--color-foreground)"
         onClick={onHome}
       >
-        <span
-          className="brand-mark inline-flex size-7 -rotate-6 items-center justify-center bg-(--builder-ink) font-(family-name:--font-mono) text-[0.65rem] text-white"
+        <img
+          className="size-9 object-contain"
+          src="/brand/ditto-mark-64.png"
+          alt=""
           aria-hidden="true"
-        >
-          D
-        </span>
+        />
         <span>DittoJs</span>
       </button>
       {isLanding ? (
