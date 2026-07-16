@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs"
-import { mkdir, rm } from "node:fs/promises"
+import { mkdir, mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
 
@@ -193,12 +193,9 @@ export async function generateTemplateArchive(
 
   const createdAt = options.createdAt ?? new Date()
   const outputRoot = options.temporaryRoot ?? tmpdir()
-  const outputDir = path.join(
-    outputRoot,
-    `ditto-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-  )
 
-  await mkdir(outputDir, { recursive: true })
+  await mkdir(outputRoot, { recursive: true })
+  const outputDir = await mkdtemp(path.join(outputRoot, "ditto-"))
 
   try {
     const recipeWithMetadata = resolvedWithGenerationMetadata(resolvedRecipe, input)
