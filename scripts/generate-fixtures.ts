@@ -25,6 +25,7 @@ const defaultFixtureRecipes = [
   "react-recommended-route-colocated",
   "saas-dashboard",
   "chat-app",
+  "preview-catalog",
 ]
 
 async function readRecipe(recipeName: string): Promise<FixtureRecipe> {

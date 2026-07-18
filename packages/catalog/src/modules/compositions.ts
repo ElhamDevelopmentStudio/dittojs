@@ -1,5 +1,7 @@
 import type { ModuleManifest } from "@dittosh/core"
 
+import { withPreviewMetadata, withoutPreviewMetadata } from "./preview-metadata.js"
+
 const compositionManifestDefinitions: ModuleManifest[] = [
   {
     id: "composition.react-recommended",
@@ -120,21 +122,5 @@ const compositionManifestDefinitions: ModuleManifest[] = [
 ]
 
 export const compositionManifests: ModuleManifest[] = compositionManifestDefinitions.map(
-  (manifest) => {
-    if (manifest.metadata?.preview !== undefined) {
-      return manifest
-    }
-
-    return {
-      ...manifest,
-      metadata: {
-        ...(manifest.metadata ?? {}),
-        preview: {
-          id: `preview.${manifest.id}`,
-          kind: "page",
-          viewport: "desktop",
-        },
-      },
-    }
-  },
+  (manifest) => withPreviewMetadata(withoutPreviewMetadata(manifest), "page", "desktop"),
 )

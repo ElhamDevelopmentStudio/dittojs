@@ -13,6 +13,7 @@ import {
   projectStructureOptions,
 } from "../builder/builder-options"
 import { isAppIconName } from "../components/icons"
+import { registryPreviewIds } from "../previews/preview-capabilities"
 import type {
   GenerationClient,
   GenerationRequest,
@@ -216,9 +217,7 @@ describe("DittoJs web builder", () => {
     }
   })
 
-  test("component, block, and page previews are exposed from catalog-backed builder options", () => {
-    const previewableTypes = new Set(["primitive", "composite", "block", "composition"])
-
+  test("only catalog items with executable registry scenarios expose previews", () => {
     for (const option of allSelectableOptions) {
       const manifest = catalog.find((candidate) => candidate.id === option.moduleId)
 
@@ -228,11 +227,11 @@ describe("DittoJs web builder", () => {
         continue
       }
 
-      if (!previewableTypes.has(manifest.type)) {
-        continue
+      if (registryPreviewIds.has(manifest.id)) {
+        expect(option.preview?.id, `${manifest.id} preview id`).toBe(`preview.${manifest.id}`)
+      } else {
+        expect(option.preview, `${manifest.id} preview`).toBeUndefined()
       }
-
-      expect(option?.preview?.id, `${manifest.id} preview id`).toBe(`preview.${manifest.id}`)
     }
   })
 
@@ -253,23 +252,80 @@ describe("DittoJs web builder", () => {
     ).toBe("false")
   })
 
-  test("direct preview routes render catalog preview surfaces", () => {
-    window.history.replaceState({}, "", "/preview/preview.composition.dashboard-analytics")
+  test("direct preview routes render the actual registry component", async () => {
+    window.history.replaceState({}, "", "/preview/preview.component.button")
 
     render(<App generationClient={resolvingGenerationClient()} />)
 
-    expect(screen.getByRole("main", { name: "Analytics dashboard preview" })).toBeTruthy()
-    expect(screen.getByRole("heading", { name: "Analytics dashboard" })).toBeTruthy()
+    expect(screen.getByRole("main", { name: "Button preview" })).toBeTruthy()
+    expect(
+      await screen.findByRole("button", { name: "Make a copy" }, { timeout: 5_000 }),
+    ).toBeTruthy()
+    expect(screen.getByRole("button", { name: "View manifest" })).toBeTruthy()
   })
 
-  test("direct preview routes render generic catalog previews", () => {
+  test("registry previews render real component content instead of a generic manifest card", async () => {
     window.history.replaceState({}, "", "/preview/preview.component.accordion")
 
     render(<App generationClient={resolvingGenerationClient()} />)
 
     expect(screen.getByRole("main", { name: "Accordion preview" })).toBeTruthy()
-    expect(screen.getByRole("heading", { name: "Accordion" })).toBeTruthy()
-    expect(screen.getByText("component.accordion")).toBeTruthy()
+    expect(await screen.findByRole("button", { name: "Why the name Ditto?" })).toBeTruthy()
+    expect(screen.getByText("One validated source becomes many independent projects.")).toBeTruthy()
+    expect(screen.queryByText("component.accordion")).toBeNull()
+  })
+
+  test("registry block previews execute the actual block source", async () => {
+    window.history.replaceState({}, "", "/preview/preview.block.settings-form")
+
+    render(<App generationClient={resolvingGenerationClient()} />)
+
+    expect(screen.getByRole("main", { name: "Settings Form preview" })).toBeTruthy()
+    expect(await screen.findByRole("heading", { name: "Workspace settings" })).toBeTruthy()
+    expect(screen.getByLabelText("Workspace name")).toHaveProperty("value", "Ditto Workspace")
+    expect(screen.getByRole("button", { name: "Save settings" })).toBeTruthy()
+  })
+
+  test("generated dashboard block previews execute the generated sidebar source", async () => {
+    window.history.replaceState({}, "", "/preview/preview.block.dashboard-sidebar")
+
+    render(<App generationClient={resolvingGenerationClient()} />)
+
+    expect(screen.getByRole("main", { name: "Dashboard sidebar preview" })).toBeTruthy()
+    expect(await screen.findByText("Studio Admin", {}, { timeout: 5_000 })).toBeTruthy()
+    expect(screen.getByRole("link", { name: "Default" })).toBeTruthy()
+    expect(screen.getByRole("button", { name: "Quick Create" })).toBeTruthy()
+  })
+
+  test("generated page previews execute the complete dashboard page source", async () => {
+    window.history.replaceState({}, "", "/preview/preview.composition.dashboard-default")
+
+    render(<App generationClient={resolvingGenerationClient()} />)
+
+    expect(screen.getByRole("main", { name: "Dashboard default preview" })).toBeTruthy()
+    expect(await screen.findByText("Total Revenue", {}, { timeout: 5_000 })).toBeTruthy()
+    expect(screen.getByText("Customer Activity")).toBeTruthy()
+    expect(screen.getByText("18,426 Customers")).toBeTruthy()
+  })
+
+  test("generated app composition previews execute the generated app root", async () => {
+    window.history.replaceState({}, "", "/preview/preview.composition.react-recommended")
+
+    render(<App generationClient={resolvingGenerationClient()} />)
+
+    expect(screen.getByRole("main", { name: "React Recommended preview" })).toBeTruthy()
+    expect(await screen.findByRole("heading", { name: "Ditto React App" })).toBeTruthy()
+    expect(screen.getByRole("heading", { name: "Project intake" })).toBeTruthy()
+    expect(screen.getByRole("button", { name: "Save project" })).toBeTruthy()
+  })
+
+  test("iframe-only page wrappers do not advertise standalone previews", () => {
+    for (const moduleId of ["composition.dashboard-chat", "composition.dashboard-mail"]) {
+      const manifest = catalog.find((candidate) => candidate.id === moduleId)
+
+      expect(manifest?.metadata?.preview, `${moduleId} preview`).toBeUndefined()
+      expect(registryPreviewIds.has(moduleId), `${moduleId} capability`).toBe(false)
+    }
   })
 
   test("Project Structure lists catalog-backed structures", async () => {

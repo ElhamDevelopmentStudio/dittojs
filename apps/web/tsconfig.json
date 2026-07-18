@@ -2,16 +2,181 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
-    "declaration": true,
-    "declarationMap": true,
-    "outDir": "dist",
-    "rootDir": "src",
+    "noEmit": true,
+    "exactOptionalPropertyTypes": false,
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "paths": {
       "@dittosh/core": ["../../packages/core/dist/index.d.ts"],
-      "@dittosh/catalog": ["../../packages/catalog/dist/index.d.ts"]
+      "@dittosh/catalog": ["../../packages/catalog/dist/index.d.ts"],
+      "@/components/ui/accordion": [
+        "../../packages/registry/shadcn/components/accordion/files/accordion.tsx"
+      ],
+      "@/components/ui/alert": ["../../packages/registry/shadcn/components/alert/files/alert.tsx"],
+      "@/components/ui/alert-dialog": [
+        "../../packages/registry/shadcn/components/alert-dialog/files/alert-dialog.tsx"
+      ],
+      "@/components/ui/aspect-ratio": [
+        "../../packages/registry/shadcn/components/aspect-ratio/files/aspect-ratio.tsx"
+      ],
+      "@/components/ui/attachment": [
+        "../../packages/registry/shadcn/components/attachment/files/attachment.tsx"
+      ],
+      "@/components/ui/avatar": [
+        "../../packages/registry/shadcn/components/avatar/files/avatar.tsx"
+      ],
+      "@/components/ui/badge": ["../../packages/registry/shadcn/components/badge/files/badge.tsx"],
+      "@/components/ui/breadcrumb": [
+        "../../packages/registry/shadcn/components/breadcrumb/files/breadcrumb.tsx"
+      ],
+      "@/components/ui/bubble": [
+        "../../packages/registry/shadcn/components/bubble/files/bubble.tsx"
+      ],
+      "@/components/ui/button": [
+        "../../packages/registry/shadcn/components/button/files/button.tsx"
+      ],
+      "@/components/ui/button-group": [
+        "../../packages/registry/shadcn/components/button-group/files/button-group.tsx"
+      ],
+      "@/components/ui/calendar": [
+        "../../packages/registry/shadcn/components/calendar/files/calendar.tsx"
+      ],
+      "@/components/ui/card": ["../../packages/registry/shadcn/components/card/files/card.tsx"],
+      "@/components/ui/carousel": [
+        "../../packages/registry/shadcn/components/carousel/files/carousel.tsx"
+      ],
+      "@/components/ui/chart": ["../../packages/registry/shadcn/components/chart/files/chart.tsx"],
+      "@/components/ui/checkbox": [
+        "../../packages/registry/shadcn/components/checkbox/files/checkbox.tsx"
+      ],
+      "@/components/ui/collapsible": [
+        "../../packages/registry/shadcn/components/collapsible/files/collapsible.tsx"
+      ],
+      "@/components/ui/combobox": [
+        "../../packages/registry/shadcn/components/combobox/files/combobox.tsx"
+      ],
+      "@/components/ui/command": [
+        "../../packages/registry/shadcn/components/command/files/command.tsx"
+      ],
+      "@/components/ui/context-menu": [
+        "../../packages/registry/shadcn/components/context-menu/files/context-menu.tsx"
+      ],
+      "@/components/ui/dialog": [
+        "../../packages/registry/shadcn/components/dialog/files/dialog.tsx"
+      ],
+      "@/components/ui/direction": [
+        "../../packages/registry/shadcn/components/direction/files/direction.tsx"
+      ],
+      "@/components/ui/drawer": [
+        "../../packages/registry/shadcn/components/drawer/files/drawer.tsx"
+      ],
+      "@/components/ui/dropdown-menu": [
+        "../../packages/registry/shadcn/components/dropdown-menu/files/dropdown-menu.tsx"
+      ],
+      "@/components/ui/empty": ["../../packages/registry/shadcn/components/empty/files/empty.tsx"],
+      "@/components/ui/field": ["../../packages/registry/shadcn/components/field/files/field.tsx"],
+      "@/components/ui/form": ["../../packages/registry/shadcn/components/form/files/form.tsx"],
+      "@/components/ui/hover-card": [
+        "../../packages/registry/shadcn/components/hover-card/files/hover-card.tsx"
+      ],
+      "@/components/ui/input": ["../../packages/registry/shadcn/components/input/files/input.tsx"],
+      "@/components/ui/input-group": [
+        "../../packages/registry/shadcn/components/input-group/files/input-group.tsx"
+      ],
+      "@/components/ui/input-otp": [
+        "../../packages/registry/shadcn/components/input-otp/files/input-otp.tsx"
+      ],
+      "@/components/ui/item": ["../../packages/registry/shadcn/components/item/files/item.tsx"],
+      "@/components/ui/kbd": ["../../packages/registry/shadcn/components/kbd/files/kbd.tsx"],
+      "@/components/ui/label": ["../../packages/registry/shadcn/components/label/files/label.tsx"],
+      "@/components/ui/marker": [
+        "../../packages/registry/shadcn/components/marker/files/marker.tsx"
+      ],
+      "@/components/ui/menubar": [
+        "../../packages/registry/shadcn/components/menubar/files/menubar.tsx"
+      ],
+      "@/components/ui/message": [
+        "../../packages/registry/shadcn/components/message/files/message.tsx"
+      ],
+      "@/components/ui/message-scroller": [
+        "../../packages/registry/shadcn/components/message-scroller/files/message-scroller.tsx"
+      ],
+      "@/components/ui/native-select": [
+        "../../packages/registry/shadcn/components/native-select/files/native-select.tsx"
+      ],
+      "@/components/ui/navigation-menu": [
+        "../../packages/registry/shadcn/components/navigation-menu/files/navigation-menu.tsx"
+      ],
+      "@/components/ui/pagination": [
+        "../../packages/registry/shadcn/components/pagination/files/pagination.tsx"
+      ],
+      "@/components/ui/popover": [
+        "../../packages/registry/shadcn/components/popover/files/popover.tsx"
+      ],
+      "@/components/ui/progress": [
+        "../../packages/registry/shadcn/components/progress/files/progress.tsx"
+      ],
+      "@/components/ui/radio-group": [
+        "../../packages/registry/shadcn/components/radio-group/files/radio-group.tsx"
+      ],
+      "@/components/ui/resizable": [
+        "../../packages/registry/shadcn/components/resizable/files/resizable.tsx"
+      ],
+      "@/components/ui/scroll-area": [
+        "../../packages/registry/shadcn/components/scroll-area/files/scroll-area.tsx"
+      ],
+      "@/components/ui/select": [
+        "../../packages/registry/shadcn/components/select/files/select.tsx"
+      ],
+      "@/components/ui/separator": [
+        "../../packages/registry/shadcn/components/separator/files/separator.tsx"
+      ],
+      "@/components/ui/sheet": ["../../packages/registry/shadcn/components/sheet/files/sheet.tsx"],
+      "@/components/ui/sidebar": [
+        "../../packages/registry/shadcn/components/sidebar/files/sidebar.tsx"
+      ],
+      "@/components/ui/skeleton": [
+        "../../packages/registry/shadcn/components/skeleton/files/skeleton.tsx"
+      ],
+      "@/components/ui/slider": [
+        "../../packages/registry/shadcn/components/slider/files/slider.tsx"
+      ],
+      "@/components/ui/sonner": [
+        "../../packages/registry/shadcn/components/sonner/files/sonner.tsx"
+      ],
+      "@/components/ui/spinner": [
+        "../../packages/registry/shadcn/components/spinner/files/spinner.tsx"
+      ],
+      "@/components/ui/switch": [
+        "../../packages/registry/shadcn/components/switch/files/switch.tsx"
+      ],
+      "@/components/ui/table": ["../../packages/registry/shadcn/components/table/files/table.tsx"],
+      "@/components/ui/tabs": ["../../packages/registry/shadcn/components/tabs/files/tabs.tsx"],
+      "@/components/ui/textarea": [
+        "../../packages/registry/shadcn/components/textarea/files/textarea.tsx"
+      ],
+      "@/components/ui/toggle": [
+        "../../packages/registry/shadcn/components/toggle/files/toggle.tsx"
+      ],
+      "@/components/ui/toggle-group": [
+        "../../packages/registry/shadcn/components/toggle-group/files/toggle-group.tsx"
+      ],
+      "@/components/ui/tooltip": [
+        "../../packages/registry/shadcn/components/tooltip/files/tooltip.tsx"
+      ],
+      "@/hooks/use-mobile": ["../../packages/registry/hooks/use-mobile/files/use-mobile.ts"],
+      "@/lib/utils": ["../../packages/registry/shadcn/lib/utils.ts"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../../packages/registry/blocks/messaging-input/**/*.tsx",
+    "../../packages/registry/blocks/online-presence/**/*.tsx",
+    "../../packages/registry/blocks/settings-form/**/*.tsx",
+    "../../packages/registry/blocks/typing-indicator/**/*.tsx",
+    "../../packages/registry/shadcn/**/*.ts",
+    "../../packages/registry/shadcn/**/*.tsx",
+    "../../packages/registry/hooks/use-mobile/**/*.ts"
+  ],
   "exclude": ["dist", "node_modules", "src/**/*.test.ts", "src/**/*.test.tsx", "src/test"]
 }

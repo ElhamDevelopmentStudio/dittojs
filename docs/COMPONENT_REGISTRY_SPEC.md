@@ -116,6 +116,32 @@ Every component or block must have:
 * Provided capabilities.
 * Tests where appropriate.
 
+## Executable preview contract
+
+Builder preview actions are catalog capabilities, not decorative mockups. A manifest may expose
+`metadata.preview` only when the web app has an executable scenario for that exact registry item.
+
+An executable scenario must:
+
+* Import the same registry source that the generator copies, or import the corresponding source
+  from a generated fixture.
+* Render the exported component, block, page, or app root itself.
+* Supply only the props, children, providers, router state, and deterministic fixture data required
+  to run that source.
+* Preserve interactive behavior; screenshots, hand-drawn imitations, manifest cards, and generic
+  fallbacks are not previews.
+* Load lazily so preview-only dependencies and complex pages do not enter the main builder bundle.
+* Map compatibility aliases to the canonical executable scenario instead of maintaining a second
+  imitation.
+
+Items without a meaningful standalone surface must not expose preview metadata. This includes
+frameworks, libraries, tooling, data-only modules, and page wrappers that only point an iframe at a
+route whose screen is not present in the generated output.
+
+Complex pages and app compositions must be previewed from deterministic generated fixtures. This
+keeps the preview and generator contracts coupled: if the fixture cannot generate, typecheck,
+build, or render, the preview is incomplete too.
+
 ## Primitive component manifest example
 
 ```ts
@@ -284,7 +310,8 @@ Checklist:
 5. Add package dependencies if needed.
 6. Add tests or fixture coverage.
 7. Export from catalog.
-8. Confirm generated template builds.
+8. Add an executable preview only when the component has a meaningful rendered surface.
+9. Confirm generated template builds.
 ```
 
 ## Adding a new block
@@ -298,7 +325,8 @@ Checklist:
 4. Add package dependencies if needed.
 5. Add fixture coverage.
 6. Confirm lock explanations are clear.
-7. Confirm generated template builds.
+7. Add a provider-complete executable preview when the block has a meaningful rendered surface.
+8. Confirm generated template builds.
 ```
 
 ## Golden rule

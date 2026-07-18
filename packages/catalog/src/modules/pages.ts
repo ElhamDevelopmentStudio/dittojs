@@ -1,6 +1,7 @@
 import type { ModuleManifest } from "@dittosh/core"
 
 import { packageRange } from "../package-versions.js"
+import { withPreviewMetadata, withoutPreviewMetadata } from "./preview-metadata.js"
 
 const pageCompositionManifestDefinitions: ModuleManifest[] = [
   {
@@ -455,6 +456,7 @@ const pageCompositionManifestDefinitions: ModuleManifest[] = [
     ],
     packages: {
       dependencies: {
+        "country-flag-icons": packageRange("country-flag-icons"),
         "lucide-react": packageRange("lucide-react"),
         recharts: packageRange("recharts"),
       },
@@ -1872,6 +1874,7 @@ const pageCompositionManifestDefinitions: ModuleManifest[] = [
     ],
     packages: {
       dependencies: {
+        "country-flag-icons": packageRange("country-flag-icons"),
         "lucide-react": packageRange("lucide-react"),
         "simple-icons": packageRange("simple-icons"),
       },
@@ -1985,10 +1988,16 @@ const pageCompositionManifestDefinitions: ModuleManifest[] = [
     ],
     packages: {
       dependencies: {
+        "country-flag-icons": packageRange("country-flag-icons"),
         "d3-geo": packageRange("d3-geo"),
         "lucide-react": packageRange("lucide-react"),
         react: packageRange("react"),
         "topojson-client": packageRange("topojson-client"),
+      },
+      devDependencies: {
+        "@types/d3-geo": packageRange("@types/d3-geo"),
+        "@types/geojson": packageRange("@types/geojson"),
+        "@types/topojson-client": packageRange("@types/topojson-client"),
       },
     },
     files: [
@@ -2383,22 +2392,14 @@ const pageCompositionManifestDefinitions: ModuleManifest[] = [
   },
 ]
 
-export const pageCompositionManifests: ModuleManifest[] = pageCompositionManifestDefinitions.map(
-  (manifest) => {
-    if (manifest.metadata?.preview !== undefined) {
-      return manifest
-    }
+const pageCompositionsWithoutStandaloneSurfaces = new Set([
+  "composition.dashboard-chat",
+  "composition.dashboard-mail",
+])
 
-    return {
-      ...manifest,
-      metadata: {
-        ...(manifest.metadata ?? {}),
-        preview: {
-          id: `preview.${manifest.id}`,
-          kind: "page",
-          viewport: "desktop",
-        },
-      },
-    }
-  },
+export const pageCompositionManifests: ModuleManifest[] = pageCompositionManifestDefinitions.map(
+  (manifest) =>
+    pageCompositionsWithoutStandaloneSurfaces.has(manifest.id)
+      ? withoutPreviewMetadata(manifest)
+      : withPreviewMetadata(withoutPreviewMetadata(manifest), "page", "desktop"),
 )

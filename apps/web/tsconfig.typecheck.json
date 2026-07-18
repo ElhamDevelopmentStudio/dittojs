@@ -1,5 +1,15 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../../packages/registry/blocks/messaging-input/**/*.tsx",
+    "../../packages/registry/blocks/online-presence/**/*.tsx",
+    "../../packages/registry/blocks/settings-form/**/*.tsx",
+    "../../packages/registry/blocks/typing-indicator/**/*.tsx",
+    "../../packages/registry/shadcn/**/*.ts",
+    "../../packages/registry/shadcn/**/*.tsx",
+    "../../packages/registry/hooks/use-mobile/**/*.ts"
+  ],
   "exclude": ["dist", "node_modules"]
 }

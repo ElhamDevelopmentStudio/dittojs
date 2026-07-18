@@ -1,6 +1,7 @@
 import type { ModuleManifest } from "@dittosh/core"
 
 import { packageRange } from "../package-versions.js"
+import { withPreviewMetadata, withoutPreviewMetadata } from "./preview-metadata.js"
 
 const blockManifestDefinitions: ModuleManifest[] = [
   {
@@ -405,20 +406,29 @@ const blockManifestDefinitions: ModuleManifest[] = [
   },
 ]
 
-export const blockManifests: ModuleManifest[] = blockManifestDefinitions.map((manifest) => {
-  if (manifest.metadata?.preview !== undefined) {
-    return manifest
-  }
+const previewableBlockIds = new Set([
+  "block.dashboard-sidebar",
+  "block.dashboard-layout",
+  "block.sidebar",
+  "block.navbar",
+  "block.messaging-input",
+  "block.typing-indicator",
+  "block.online-presence",
+  "block.settings-form",
+])
 
-  return {
-    ...manifest,
-    metadata: {
-      ...(manifest.metadata ?? {}),
-      preview: {
-        id: `preview.${manifest.id}`,
-        kind: "block",
-        viewport: "desktop",
-      },
-    },
-  }
+export const blockManifests: ModuleManifest[] = blockManifestDefinitions.map((manifest) => {
+  const manifestWithoutPreview = withoutPreviewMetadata(manifest)
+
+  return previewableBlockIds.has(manifest.id)
+    ? withPreviewMetadata(
+        manifestWithoutPreview,
+        "block",
+        manifest.id.startsWith("block.dashboard") ||
+          manifest.id === "block.sidebar" ||
+          manifest.id === "block.navbar"
+          ? "desktop"
+          : "component",
+      )
+    : manifestWithoutPreview
 })
